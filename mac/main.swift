@@ -84,7 +84,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, 
         if u.scheme == "mailto" { NSWorkspace.shared.open(u); return h(.cancel) }
         let host = u.host ?? ""
         let inApp = u.scheme == "about" || u.scheme == "blob" || u.scheme == "data" || IN_APP_HOSTS.contains(where: { host == $0 || host.hasSuffix("." + $0) })
-        if !inApp && a.targetFrame?.isMainFrame != false { NSWorkspace.shared.open(u); return h(.cancel) }
+        // solo los clics del usuario en enlaces de fuera van al navegador; las redirecciones
+        // (Microsoft → GoDaddy → Microsoft → app) se quedan dentro para que el login funcione
+        if !inApp && a.navigationType == .linkActivated && a.targetFrame?.isMainFrame != false { NSWorkspace.shared.open(u); return h(.cancel) }
         h(.allow)
     }
     func webView(_ w: WKWebView, createWebViewWith c: WKWebViewConfiguration, for a: WKNavigationAction, windowFeatures f: WKWindowFeatures) -> WKWebView? {
