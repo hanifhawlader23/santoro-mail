@@ -140,21 +140,57 @@ def shimmer(final, n=9):
     return out
 
 
+def fadeout(final, start, n=5):
+    """text fades back to the bare card before the build repeats"""
+    return [Image.blend(final, start, (i + 1) / n) for i in range(n)]
+
+
 def save(frames, path):
+    """endless loop: full signature 2.6 s -> soft fade -> build-in -> shimmer -> full again.
+    Frame 0 is the complete signature, so clients that don't animate (Outlook desktop) still show it all."""
     final = frames[-1]
     sh = shimmer(final)
-    seq = [final] + frames + sh          # frame 0 complete -> Outlook desktop shows full signature
-    dur = [20] + [55] * len(frames) + [45] * len(sh)
-    dur[len(frames)] = 700                           # pause on the built signature before the shimmer
-    dur[-1] = 1000
+    fo = fadeout(final, frames[0])
+    seq = [final] + fo + frames[1:] + sh
+    dur = [2600] + [60] * len(fo) + [70] * (len(frames) - 1) + [45] * len(sh)
+    dur[len(fo) + len(frames) - 1] = 500          # little pause before the shimmer
     pal = final.quantize(colors=80, method=Image.MEDIANCUT)
     q = [f.quantize(palette=pal, dither=Image.Dither.NONE) for f in seq]
-    q[0].save(path, save_all=True, append_images=q[1:], duration=dur, optimize=True, disposal=1)  # no loop: plays once, ends complete
+    q[0].save(path, save_all=True, append_images=q[1:], duration=dur, loop=0, optimize=True, disposal=1)
+
+
+def avatar_santoro(path, S=200, n=40):
+    """slow-motion profile GIF: wine square, cream rider gently rocking + soft light sweep"""
+    CRE = (247, 245, 233)
+    big = Image.open('rider150.png').convert('RGBA')
+    big = big.resize((int(S * .74), int(S * .74 * big.height / big.width)), Image.LANCZOS)
+    a = big.getchannel('A'); cream = Image.new('RGBA', big.size, CRE + (255,)); cream.putalpha(a)
+    frames = []
+    for i in range(n):
+        ph = 2 * math.pi * i / n
+        ang = 4.5 * math.sin(ph)                              # rocking, like a slow bull ride
+        dy = int(5 * math.sin(2 * ph))
+        im = Image.new('RGBA', (S, S), WINE + (255,))
+        r = cream.rotate(ang, resample=Image.BICUBIC, expand=True, center=(cream.width * .45, cream.height * .95))
+        im.alpha_composite(r, ((S - r.width) // 2, (S - r.height) // 2 + 8 + dy))
+        # light sweep across in the second half of the loop
+        k = (i - n * .45) / (n * .4)
+        if 0 <= k <= 1:
+            band = Image.new('L', (S, S), 0); d = ImageDraw.Draw(band)
+            x0 = -120 + (S + 240) * k
+            for j in range(80):
+                d.line((x0 + j, 0, x0 + j - 70, S), fill=int(38 * math.sin(math.pi * j / 80)))
+            im = Image.composite(Image.new('RGBA', (S, S), (255, 250, 245, 255)), im, band)
+        frames.append(im.convert('RGB'))
+    pal = frames[0].quantize(colors=20, method=Image.MEDIANCUT)
+    q = [f.quantize(palette=pal, dither=Image.Dither.NONE) for f in frames]
+    q[0].save(path, save_all=True, append_images=q[1:], duration=95, loop=0, optimize=True, disposal=1)
 
 
 if __name__ == '__main__':
     import sys
     save(frames_santoro('Hanif Hawlader', 'Fundador', 'Elegancia, hecha a mano.'), 'sig-santoro.gif')
     save(frames_hanif('Hanif Hawlader', 'Producción y dirección creativa', ''), 'sig-hanif.gif')
+    avatar_santoro('av-santoro.gif')
     frames_santoro('Hanif Hawlader', 'Fundador', 'Elegancia, hecha a mano.')[-1].save('prev-santoro.png')
     frames_hanif('Hanif Hawlader', 'Producción y dirección creativa', '')[-1].save('prev-hanif.png')

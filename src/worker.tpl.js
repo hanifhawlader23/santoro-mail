@@ -20,6 +20,7 @@
 const APP_HTML = __HTML__;
 const PNG = { wine: __PNG_WINE__, cream: __PNG_CREAM__ };
 const SIGGIF = { santoro: __GIF_S_B64__, hanif: __GIF_H_B64__ };
+const AVGIF = { santoro: __AV_S_B64__ };
 const GIF = Uint8Array.from(atob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'), c => c.charCodeAt(0));
 const GRAPH = 'https://graph.microsoft.com/v1.0';
 const SCOPES = 'offline_access User.Read Mail.ReadWrite Mail.Send';
@@ -66,7 +67,7 @@ async function session(req, env) { const s = cookie(req, 'sm_s'); if (!s) return
 
 /* ---------------- email building ---------------- */
 function textToHtml(t) {
-  return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>').replace(/\n/g, '<br>');
+  return esc(t).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" style="color:#5B1A2C">$1</a>').replace(/\*\*([^*\n][^*]*?)\*\*/g, '<b>$1</b>').replace(/==([^=\n][^=]*?)==/g, '<b style="color:#5B1A2C">$1</b>').replace(/\n/g, '<br>');
 }
 function wrapEmail(inner, sig) {
   return `<div style="font-family:Georgia,'Times New Roman',serif;font-size:15px;line-height:1.6;color:#111">${inner}${sig ? '<br><br>' + sig : ''}</div>`;
@@ -319,6 +320,7 @@ export default {
       }
       if (path.startsWith('/brand/rider-')) { const k = path.includes('cream') ? 'cream' : 'wine'; return new Response(Uint8Array.from(atob(PNG[k]), c => c.charCodeAt(0)), { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=604800' } }); }
       if (path === '/brand/sig-santoro.gif' || path === '/brand/sig-hanif.gif') { const k = path.includes('hanif') ? 'hanif' : 'santoro'; return new Response(Uint8Array.from(atob(SIGGIF[k]), c => c.charCodeAt(0)), { headers: { 'content-type': 'image/gif', 'cache-control': 'public, max-age=86400' } }); }
+      if (path === '/brand/av-santoro.gif') return new Response(Uint8Array.from(atob(AVGIF.santoro), c => c.charCodeAt(0)), { headers: { 'content-type': 'image/gif', 'cache-control': 'public, max-age=86400' } });
       if (path.startsWith('/brand/avatar-')) {
         const k = path.slice(14); if (!/^(santoro|hanif)$/.test(k)) return new Response('', { status: 404 });
         const r = await env.DB.getWithMetadata('av:' + k, 'arrayBuffer'); if (!r || !r.value) return new Response('', { status: 404 });

@@ -98,6 +98,32 @@ main{position:relative;overflow:hidden;height:100%}
 .av img,.avimg{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
 .av.pic{padding:0;overflow:hidden;background:none}
 .amk{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 4px;border-radius:5px;background:var(--ac);color:#fff;font-size:9.5px;letter-spacing:.08em}
+.hello{margin:0 20px 12px;display:flex;gap:14px;align-items:center;padding:14px;border-radius:14px;background:var(--bg2);border:1px solid var(--line)}
+.hello .hav{width:58px;height:58px;border-radius:14px;overflow:hidden;flex:none;background:var(--acc);display:flex;align-items:center;justify-content:center;color:var(--on)}
+.hello .hav svg{width:40px;height:38px}
+.hello h2{font-size:20px;font-weight:500;margin:1px 0 2px;letter-spacing:.01em}
+.hello p{font-size:12.5px;color:var(--fg2);margin:0}
+.hello .cap{font-size:10px}
+.hello .ai{margin-left:auto;align-self:center;display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line2);border-radius:999px;padding:7px 12px;font-size:12px;color:var(--at);white-space:nowrap}
+.hello-out{margin:-4px 20px 12px;padding:12px 14px;border-radius:12px;background:var(--wash);font-size:13px;line-height:1.6;white-space:pre-wrap;color:var(--fg2)}
+.cbody[contenteditable]{min-height:220px;outline:0;font-size:15px;line-height:1.7;padding:14px 0;white-space:pre-wrap;word-wrap:break-word}
+.cbody[contenteditable]:empty::before{content:attr(data-ph);color:var(--fg3)}
+.cbody b,.cbody strong{font-weight:700}
+.cbody b.hl,.cbody font[color],.cbody span[style*="color"]{color:var(--at)!important;font-weight:700}
+.rd-text b.hl{color:var(--at)}
+.fmtb{display:inline-flex;gap:2px;margin-right:6px;padding-right:6px;border-right:1px solid var(--line)}
+.fmtb button{width:32px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px}
+.fmtb button:hover{background:var(--wash2)}
+.fmtb .w{color:var(--at);font-weight:700}
+.hlopt{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--fg2);padding:8px 0}
+.alnum{font-size:11px;color:var(--fg3);width:16px;text-align:right}
+.alsrc{display:inline-block;font-size:10px;letter-spacing:.06em;border-radius:4px;padding:1px 6px;margin-top:4px}
+.alsrc.ok{background:color-mix(in srgb,#2F6A66 16%,transparent);color:#2F6A66}
+.alsrc.seen{background:var(--wash2);color:var(--at)}
+.alsrc.wait{background:var(--wash);color:var(--fg3)}
+[data-theme="dark"] .alsrc.ok{color:#8fd0c8}
+.alrow{grid-template-columns:auto auto 1fr auto!important}
+@media(max-width:860px){#listH h1{font-size:23px;line-height:1.2}#listH h1 span{display:none}body:not(.showf) #listH .chips{display:none}.hello{margin:0 16px 10px}.hello-out{margin:-2px 16px 10px}}
 .achips{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}
 @media(max-width:860px){.lh-row .btn .lbl{display:none}}
 [data-theme="dark"] .achip i,[data-theme="dark"] .item .newdot{background:color-mix(in srgb,var(--ac) 62%,#fff)}
@@ -118,6 +144,7 @@ main{position:relative;overflow:hidden;height:100%}
 .swatches button.on{border-color:var(--c)}
 .swatches button svg.i{width:16px;height:16px;opacity:0}
 .swatches button.on svg.i{opacity:1}
+.mobonly{display:none}@media(max-width:860px){.mobonly{display:inline-flex}}
 .prof{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .profcard{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);padding:16px;display:flex;gap:14px;align-items:center}
 .profcard .ph{width:72px;height:72px;border-radius:14px;flex:none;overflow:hidden;background:var(--wash2);display:flex;align-items:center;justify-content:center;color:var(--at);font-size:20px;letter-spacing:.06em}
@@ -543,7 +570,7 @@ a.btn{color:inherit;text-decoration:none}
 /* ================= i18n ================= */
 const LIVE=!!window.__LIVE__;
 function hook(){}
-function bodyHTML(m){return `<div class="rd-text">${esc(m.body)}</div>`}
+function bodyHTML(m){return `<div class="rd-text">${md2html(m.body)}</div>`}
 function footHTML(){return `<span class="dot"></span>${t('demo')}<br>${t('demo_note')}`}
 const T={
 es:{mail:'Correo',inbox:'Bandeja',dash:'Panel',track:'Seguimiento',tpl:'Plantillas',set:'Ajustes',compose:'Redactar',all:'Todo',
@@ -641,7 +668,7 @@ bn:{mail:'মেইল',inbox:'ইনবক্স',dash:'ড্যাশবো�
  safe_t:'নিরাপত্তা চেক',safe_ok:'প্রতারণার কোনো চিহ্ন নেই।',safe_bad:'সাবধান: প্রতারণা মনে হচ্ছে।',safe_mid:'ধীরে দেখে নাও।',
  sec_ago:'এখন',min:'মি',h:'ঘ',yesterday:'গতকাল',days:'দি'}
 };
-Object.assign(T.es,{profile:'Perfil y fotos',profile_d:'Tu foto aparece en el menú, al redactar, en los enviados y en la firma «Tarjeta». Puede ser una foto o un GIF animado.',av_hint:'JPG, PNG o GIF animado',av_up:'Subir foto',av_change:'Cambiar',av_ok:'Foto guardada',av_rm:'Foto quitada',av_big:'El GIF es muy grande (máx. 2,5 MB)',al_color:'Color de la bandeja',read_all:'Marcar leídos',read_done:'marcados como leídos',sg_anim:'Animada',sg_card:'Tarjeta con foto',sg_classic:'Clásica',sg_min:'Mínima',sg_play:'Ver animación',sg_anim_note:'Animación de 2 s que termina en la firma completa. En Outlook de escritorio se ve fija, sin perder nada.',sg_card_note:'Sube tu foto en Ajustes → Perfil para verla aquí.',menu:'Menú',accounts2:'Cuentas',add_acct:'Añadir cuenta (Gmail, iCloud…)',soon:'pronto',ms365:'Microsoft 365',tools:'Herramientas',al_status_ok:'Activo en Microsoft',al_status_wait:'Falta crearlo en GoDaddy',al_check:'Comprobar',al_edit:'Editar alias',al_how1:'Pulsa «Abrir GoDaddy» → Admin → Email aliases → Add alias, con el mismo nombre.',al_how2:'Vuelve aquí y pulsa «Comprobar»: aparecerá como activo.',al_label:'Nombre visible',al_checked:'Alias actualizados',
+Object.assign(T.es,{hl_opt:'La IA resalta lo importante al enviar (negrita y color vino)',hl_btn:'Resaltar con IA',hl_doing:'La IA está resaltando lo importante…',hl_fail:'No se pudo resaltar (conecta la IA)',f_bold:'Negrita',f_wine:'Color vino',f_clear:'Quitar formato',c_ph:'Escribe tu correo…',g_morning:'Buenos días',g_after:'Buenas tardes',g_night:'Buenas noches',g_wait:'esperando respuesta',g_sum:'Resumen IA',filters:'Filtros',al_count:'direcciones',al_auto:'se leen solas de Microsoft y de tus correos',al_seen:'Recibe correo',av_def_s:'Animación Santoro de serie · puedes subir otra',av_def_h:'Envíame tu monograma y lo animo',profile:'Perfil y fotos',profile_d:'Tu foto aparece en el menú, al redactar, en los enviados y en la firma «Tarjeta». Puede ser una foto o un GIF animado.',av_hint:'JPG, PNG o GIF animado',av_up:'Subir foto',av_change:'Cambiar',av_ok:'Foto guardada',av_rm:'Foto quitada',av_big:'El GIF es muy grande (máx. 2,5 MB)',al_color:'Color de la bandeja',read_all:'Marcar leídos',read_done:'marcados como leídos',sg_anim:'Animada',sg_card:'Tarjeta con foto',sg_classic:'Clásica',sg_min:'Mínima',sg_play:'Ver animación',sg_anim_note:'Animación de 2 s que termina en la firma completa. En Outlook de escritorio se ve fija, sin perder nada.',sg_card_note:'Sube tu foto en Ajustes → Perfil para verla aquí.',menu:'Menú',accounts2:'Cuentas',add_acct:'Añadir cuenta (Gmail, iCloud…)',soon:'pronto',ms365:'Microsoft 365',tools:'Herramientas',al_status_ok:'Activo en Microsoft',al_status_wait:'Falta crearlo en GoDaddy',al_check:'Comprobar',al_edit:'Editar alias',al_how1:'Pulsa «Abrir GoDaddy» → Admin → Email aliases → Add alias, con el mismo nombre.',al_how2:'Vuelve aquí y pulsa «Comprobar»: aparecerá como activo.',al_label:'Nombre visible',al_checked:'Alias actualizados',
 inboxes:'Bandejas',all_inb:'Todas',add_alias:'Añadir alias',al_local:'Nombre del alias',al_desc:'Para qué es',al_id:'Identidad',al_note:'Microsoft no deja crear alias desde apps externas. Créalo en GoDaddy (Email y Office → Admin → Email aliases) y añádelo aquí: tendrá su propia bandeja, firma y color.',al_open:'Abrir GoDaddy',al_added:'Alias añadido',al_main:'Principal',al_rm:'Quitar de la app',
 auto:'Automatización',people:'Contactos',moreTab:'Más',pinned:'Fijados',today:'Hoy',yest:'Ayer',older:'Anteriores',pin:'Fijar',unpin:'Quitar',fav:'Favorito',favs:'Favoritos',
  only_from:'Solo de',clear:'Quitar',write:'Escribir',see_mails:'Ver correos',p_mails:'correos',p_last:'último',p_sub:'Marca con el corazón a quien más te importa: aparece arriba en tu bandeja.',
@@ -654,7 +681,7 @@ auto:'Automatización',people:'Contactos',moreTab:'Más',pinned:'Fijados',today:
  detected:'Detectado',bm_t:'Emails de marca',bm_p:'Se envían solos desde pedidos@ con el diseño Santoro.',bm_order:'Confirmación de pedido',bm_ship:'Pedido enviado',bm_club:'Bienvenida Santoro Club',
  step_alias:'Crear los alias en GoDaddy',step_aliasd:'Email y Office → Admin → Email aliases → Add alias: santoro@, pedidos@, club@, hola@. Hoy solo existe contacto@.',
  step_send:'Activar «enviar desde alias»',step_sendd:'Exchange admin center → Settings → Mail flow → «Turn on sending from aliases». Por eso Spark no podía enviar desde santoro@.',done:'Hecho'});
-Object.assign(T.bn,{profile:'প্রোফাইল ও ছবি',profile_d:'তোমার ছবি মেনুতে, মেইল লেখার সময়, পাঠানো মেইলে আর «কার্ড» সিগনেচারে দেখাবে। ছবি বা অ্যানিমেটেড GIF—দুটোই চলবে।',av_hint:'JPG, PNG বা অ্যানিমেটেড GIF',av_up:'ছবি দাও',av_change:'বদলাও',av_ok:'ছবি সেভ হয়েছে',av_rm:'ছবি সরানো হয়েছে',av_big:'GIF অনেক বড় (সর্বোচ্চ ২.৫ MB)',al_color:'ইনবক্সের রং',read_all:'সব পড়া হয়েছে',read_done:'টা পড়া হিসেবে চিহ্নিত',sg_anim:'অ্যানিমেটেড',sg_card:'ছবিসহ কার্ড',sg_classic:'ক্লাসিক',sg_min:'মিনিমাল',sg_play:'অ্যানিমেশন দেখো',sg_anim_note:'২ সেকেন্ডের অ্যানিমেশন, শেষে পুরো সিগনেচার থেকে যায়। Outlook ডেস্কটপে স্থির দেখায়, কিছু হারায় না।',sg_card_note:'ছবি দেখাতে সেটিংস → প্রোফাইলে ছবি দাও।',menu:'মেনু',accounts2:'অ্যাকাউন্ট',add_acct:'অ্যাকাউন্ট যোগ (Gmail, iCloud…)',soon:'শীঘ্রই',ms365:'Microsoft 365',tools:'টুলস',al_status_ok:'Microsoft-এ চালু',al_status_wait:'GoDaddy-তে বানানো বাকি',al_check:'চেক করো',al_edit:'এলিয়াস এডিট',al_how1:'«GoDaddy খোলো» চাপো → Admin → Email aliases → Add alias, একই নাম দিয়ে।',al_how2:'এখানে ফিরে «চেক করো» চাপো: চালু দেখাবে।',al_label:'দেখানোর নাম',al_checked:'এলিয়াস আপডেট হয়েছে',
+Object.assign(T.bn,{hl_opt:'পাঠানোর সময় IA জরুরি অংশ বোল্ড ও ওয়াইন রঙে করবে',hl_btn:'IA দিয়ে হাইলাইট',hl_doing:'IA জরুরি অংশ হাইলাইট করছে…',hl_fail:'হাইলাইট হয়নি (IA কানেক্ট করো)',f_bold:'বোল্ড',f_wine:'ওয়াইন রং',f_clear:'ফরম্যাট মুছো',c_ph:'মেইল লেখো…',g_morning:'শুভ সকাল',g_after:'শুভ বিকাল',g_night:'শুভ রাত্রি',g_wait:'উত্তরের অপেক্ষায়',g_sum:'IA সারাংশ',filters:'ফিল্টার',al_count:'টা ঠিকানা',al_auto:'Microsoft আর তোমার মেইল থেকে নিজে থেকেই আসে',al_seen:'মেইল আসে',av_def_s:'Santoro অ্যানিমেশন দেওয়া আছে · চাইলে অন্যটা দাও',av_def_h:'তোমার মনোগ্রাম পাঠাও, আমি অ্যানিমেট করে দেব',profile:'প্রোফাইল ও ছবি',profile_d:'তোমার ছবি মেনুতে, মেইল লেখার সময়, পাঠানো মেইলে আর «কার্ড» সিগনেচারে দেখাবে। ছবি বা অ্যানিমেটেড GIF—দুটোই চলবে।',av_hint:'JPG, PNG বা অ্যানিমেটেড GIF',av_up:'ছবি দাও',av_change:'বদলাও',av_ok:'ছবি সেভ হয়েছে',av_rm:'ছবি সরানো হয়েছে',av_big:'GIF অনেক বড় (সর্বোচ্চ ২.৫ MB)',al_color:'ইনবক্সের রং',read_all:'সব পড়া হয়েছে',read_done:'টা পড়া হিসেবে চিহ্নিত',sg_anim:'অ্যানিমেটেড',sg_card:'ছবিসহ কার্ড',sg_classic:'ক্লাসিক',sg_min:'মিনিমাল',sg_play:'অ্যানিমেশন দেখো',sg_anim_note:'২ সেকেন্ডের অ্যানিমেশন, শেষে পুরো সিগনেচার থেকে যায়। Outlook ডেস্কটপে স্থির দেখায়, কিছু হারায় না।',sg_card_note:'ছবি দেখাতে সেটিংস → প্রোফাইলে ছবি দাও।',menu:'মেনু',accounts2:'অ্যাকাউন্ট',add_acct:'অ্যাকাউন্ট যোগ (Gmail, iCloud…)',soon:'শীঘ্রই',ms365:'Microsoft 365',tools:'টুলস',al_status_ok:'Microsoft-এ চালু',al_status_wait:'GoDaddy-তে বানানো বাকি',al_check:'চেক করো',al_edit:'এলিয়াস এডিট',al_how1:'«GoDaddy খোলো» চাপো → Admin → Email aliases → Add alias, একই নাম দিয়ে।',al_how2:'এখানে ফিরে «চেক করো» চাপো: চালু দেখাবে।',al_label:'দেখানোর নাম',al_checked:'এলিয়াস আপডেট হয়েছে',
 inboxes:'ইনবক্সগুলো',all_inb:'সব',add_alias:'এলিয়াস যোগ',al_local:'এলিয়াসের নাম',al_desc:'কীসের জন্য',al_id:'পরিচয়',al_note:'Microsoft বাইরের অ্যাপ থেকে এলিয়াস বানাতে দেয় না। GoDaddy-তে বানাও (Email & Office → Admin → Email aliases), তারপর এখানে যোগ করো: নিজের ইনবক্স, সিগনেচার আর রং পাবে।',al_open:'GoDaddy খোলো',al_added:'এলিয়াস যোগ হয়েছে',al_main:'প্রধান',al_rm:'অ্যাপ থেকে সরাও',
 auto:'অটোমেশন',people:'কন্টাক্ট',moreTab:'আরও',pinned:'পিন করা',today:'আজ',yest:'গতকাল',older:'আগের',pin:'পিন',unpin:'পিন সরাও',fav:'প্রিয়',favs:'প্রিয়',
  only_from:'শুধু',clear:'সরাও',write:'লেখো',see_mails:'মেইল দেখো',p_mails:'মেইল',p_last:'শেষ',p_sub:'যাদের বেশি দরকার তাদের হার্ট দাও: ইনবক্সের একদম উপরে দেখাবে।',
@@ -853,6 +880,7 @@ function renderList(){
  const f=S.folder,unread=folderCount('inbox');
  $('#listH').innerHTML=`
   <div class="lh-row">${hb()}<h1>${S.alias&&f==='inbox'?esc(S.alias.split('@')[0])+'@':t('fo_'+f)} ${f==='inbox'&&!S.alias?`<span>${unread} ${t('f_unread').toLowerCase()}</span>`:''}</h1><span class="sp"></span>
+   ${f==='inbox'?`<button class="btn mobonly" data-act="filters" title="${t('filters')}">${ic('grid')}${S.filter!=='all'?` <span class="lbl" style="display:inline">${t('f_'+S.filter)}</span>`:''}</button>`:''}
    ${f==='inbox'&&rows().some(x=>x.unread)?`<button class="btn" data-act="readall" title="${t('read_all')}">${ic('check')}<span class="lbl"> ${t('read_all')}</span></button>`:''}
    ${f==='trash'&&rows().length?`<button class="btn" data-act="emptytrash">${t('empty_trash')}</button>`:''}</div>
   <div class="search">${ic('search','muted')}<input id="q" placeholder="${t('search')}" value="${esc(S.q)}"></div>
@@ -867,13 +895,15 @@ function renderList(){
    <p style="font-size:19px;letter-spacing:.04em">${esc(AL.email)}</p>
    <p style="opacity:.75">${n} ${t('p_mails')} · ${u} ${t('f_unread').toLowerCase()} · ${sn.length} ${t('fo_sent').toLowerCase()} · ${t('st_open').toLowerCase()} ${sn.length?Math.round(sn.filter(x=>x.opens.some(o=>!o.auto)).length/sn.length*100):0}%</p>
    <button data-act="compose" style="border-color:currentColor;color:inherit">${ic('pen')} ${t('compose')} · ${esc(AL.email.split('@')[0])}@</button></div>`}
+ else if(f==='inbox'&&S.filter==='all'&&!S.q&&!S.contact){const h=new Date().getHours(),g=h<6?t('g_night'):h<14?t('g_morning'):h<21?t('g_after'):t('g_night'),me=S.ident==='santoro'?'santoro':'hanif',src=avSrc(me)||avSrc('santoro');
+  $('#pulse').innerHTML=`<div class="hello"><div class="hav">${src?`<img class="avimg" src="${src}" alt="">`:rider()}</div><div style="min-width:0"><span class="cap">${new Date().toLocaleDateString(LANG==='bn'?'bn-BD':'es-ES',{weekday:'long',day:'numeric',month:'long'})}</span><h2>${g}, Hanif</h2><p>${c.n} ${t('f_unread').toLowerCase()} · ${c.p} ${t('f_pri').toLowerCase()} · ${c.w} ${t('g_wait')}</p></div><button class="ai" data-act="pulse">${ic('ai')} <span class="lbl">${t('g_sum')}</span></button></div>${S.pulse?`<div class="hello-out" id="pulseTxt">${esc(S.pulse)}</div>`:'<div id="pulseTxt" hidden></div>'}`}
  else $('#pulse').innerHTML=f==='inbox'&&S.filter==='all'&&!S.q?`<div class="pulse">${rider('pat')}<span class="cap">${t('pulse')}</span><p id="pulseTxt">${esc(S.pulse||t('pulse_def').replace('{n}',c.n).replace('{p}',c.p).replace('{w}',c.w))}</p><button data-act="pulse">${ic('ai')} ${t('pulse_btn')}</button></div>`
   :f==='spam'?`<div class="banner">${ic('shield','acc')} ${t('spam_note')}</div>`:'';
  const r=rows();
  const itemHTML=x=>`
   <div class="item ${x.unread?'unread':''} ${S.sel&&S.sel.k===x.k&&S.sel.id===x.id?'sel':''}" data-k="${x.k}" data-open="${x.id}" ${acStyle(x.to||x.from)}>
    ${x.k!=='m'&&!x.draft&&!x.sched&&avSrc(x.idn)?avBox(x.idn):`<div class="av ${x.idn==='hanif'?'h':''}">${x.draft?ic('pen'):x.sched?ic('cal'):esc(ini(x.name.replace(t('to')+': ','')))}</div>`}
-   <div style="min-width:0"><div class="who">${x.unread?'<span class="newdot"></span>':''}${x.draft?`<span class="acc">${t('c_draft')}</span> · `:''}${esc(x.name)}</div><div class="sub">${esc(x.sub)}</div><div class="snip">${esc(String(x.snip).replace(/\n+/g,' '))}</div></div>
+   <div style="min-width:0"><div class="who">${x.unread?'<span class="newdot"></span>':''}${x.draft?`<span class="acc">${t('c_draft')}</span> · `:''}${esc(x.name)}</div><div class="sub">${esc(x.sub)}</div><div class="snip">${esc(mdStrip(x.snip).replace(/\n+/g,' '))}</div></div>
    <div class="meta"><span>${x.snz?ic('clock'):''}${rel(x.date)}</span>
     <span class="row">${x.att?ic('file'):''}${x.spam?'<span class="tag warn">!</span>':''}${(()=>{const A=ALIASES.find(a=>a.email===(x.to||x.from));return A?`<span class="tag ac">${esc(aMark(A))}</span>`:`<span class="tag ${x.idn==='hanif'?'h':''}">${x.idn==='hanif'?'HH':'S'}</span>`})()}</span>
     ${x.trk?miniTrk(x.trk):`<span class="row">${x.fav?`<span class="heart">${ic('heart')}</span>`:''}${x.star?`<span class="starred">${ic('star')}</span>`:''}</span>`}</div>
@@ -1025,7 +1055,7 @@ function renderTrack(){
 /* one builder for the in-app preview and the real e-mail (abs = absolute URLs, e-mail safe) */
 function sigBuild(k,abs){const s=sigs[k]||{},st=s.st||'anim',o=abs?location.origin:'',W='#5B1A2C';
  const logo=abs?`<img src="${o}/brand/rider-wine.png" width="46" alt="Santoro" style="display:block;border:0">`:`<svg viewBox="0 0 900 843" width="44" height="41" style="color:${W};display:block"><use href="#rider"/></svg>`;
- const av=AVV[k]?(abs?`${o}/brand/avatar-${k}?v=${AVV[k]}`:avSrc(k)):null;
+ const av=AVV[k]?(abs?`${o}/brand/avatar-${k}?v=${AVV[k]}`:avSrc(k)):DEFAV[k]?(abs?`${o}/brand/av-${k}.gif`:DEFAV[k]):null;
  const ff=`font-family:'El Messiri',Georgia,serif`,mut='color:#6b6560';
  const contact=`<div style="font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a></div><div style="font-size:12px;${mut}">${esc(s.c)}</div>`;
  if(st==='anim'){const g=abs?`${o}/brand/sig-${k}.gif`:SIGGIF[k];
@@ -1080,9 +1110,10 @@ function renderSet(){
  $('#setPage').innerHTML=`
   <div class="page-h">${hb()}<h1>${t('set_t')}</h1></div>
   <div class="sec"><span class="cap">${t('profile')}</span><p class="muted" style="font-size:12px;margin:-4px 0 12px">${t('profile_d')}</p><div class="prof">
-   ${[['santoro','Santoro'],['hanif','Hanif Hawlader']].map(([k,l])=>`<div class="profcard"><div class="ph ${k==='hanif'?'h':''}">${avSrc(k)?`<img class="avimg" src="${avSrc(k)}" alt="">`:k==='hanif'?'HH':rider()}</div><div style="min-width:0"><b>${l}</b><small>${t('av_hint')}</small><div class="bt"><button class="btn pri" data-avpick="${k}">${ic('pen')} ${avSrc(k)?t('av_change'):t('av_up')}</button>${avSrc(k)?`<button class="btn" data-avrm="${k}">${ic('x')}</button>`:''}</div></div></div>`).join('')}</div></div>
+   ${[['santoro','Santoro'],['hanif','Hanif Hawlader']].map(([k,l])=>`<div class="profcard"><div class="ph ${k==='hanif'?'h':''}">${avSrc(k)?`<img class="avimg" src="${avSrc(k)}" alt="">`:k==='hanif'?'HH':rider()}</div><div style="min-width:0"><b>${l}</b><small>${AVV[k]?t('av_hint'):k==='santoro'?t('av_def_s'):t('av_def_h')}</small><div class="bt"><button class="btn pri" data-avpick="${k}">${ic('pen')} ${avSrc(k)?t('av_change'):t('av_up')}</button>${AVV[k]?`<button class="btn" data-avrm="${k}">${ic('x')}</button>`:''}</div></div></div>`).join('')}</div></div>
   <div class="sec" id="aliasSec"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span class="cap">${t('accounts')}</span><span class="sp"></span>${LIVE?`<button class="btn" data-act="alcheck">${ic('undo')} ${t('al_check')}</button>`:''}<button class="btn pri" data-act="addalias">${ic('pen')} ${t('add_alias')}</button></div>
-   ${ALIASES.map(a=>{const ok=!window.MS_ALIASES||window.MS_ALIASES.includes(a.email);return `<div class="alrow"><span class="mk" style="background:${colOf(a.email)};color:#fff">${esc(aMark(a))}</span><div style="min-width:0"><b>${esc(a.email)}</b><span>${esc(a.lbl||'')}${a.desc?' · '+esc(a.desc):''} · ${a.id==='hanif'?'Hanif Hawlader':'Santoro'}</span><br><span class="${ok?'acc':''}" style="${ok?'':'color:var(--fg3)'}">${ok?'● '+t('al_status_ok'):'○ '+t('al_status_wait')}</span></div><button class="ib" data-editalias="${a.email}">${ic('pen')}</button></div>`}).join('')}</div>
+   <p class="muted" style="font-size:12px;margin:0 0 6px">${ALIASES.length} ${t('al_count')}${LIVE?' · '+t('al_auto'):''}</p>
+   ${ALIASES.map((a,i)=>{const ms=!window.MS_ALIASES||window.MS_ALIASES.includes(a.email),src=a.main?'ok':ms?'ok':a.seen?'seen':'wait';return `<div class="alrow"><span class="alnum">${i+1}</span><span class="mk" style="background:${colOf(a.email)};color:#fff">${esc(aMark(a))}</span><div style="min-width:0"><b>${esc(a.email)}</b><span>${esc(a.lbl||'')}${a.desc?' · '+esc(a.desc):''} · ${a.id==='hanif'?'Hanif Hawlader':'Santoro'}</span><br><span class="alsrc ${src}">${src==='ok'?'● '+t('al_status_ok'):src==='seen'?'● '+t('al_seen'):'○ '+t('al_status_wait')}</span></div><button class="ib" data-editalias="${a.email}">${ic('pen')}</button></div>`}).join('')}</div>
   <div class="sec">
    <div class="set-row"><div class="lb"><b>${t('theme')}</b><span>${t('theme_d')}</span></div>${seg('theme',[['auto',t('th_auto')],['light',t('th_light')],['dark',t('th_dark')]],S.theme)}</div>
    <div class="set-row"><div class="lb"><b>${t('lang')}</b><span>Español · বাংলা</span></div>${seg('lang',[['es','Español'],['bn','বাংলা']],LANG)}</div>
@@ -1108,7 +1139,7 @@ function renderSet(){
 let C=null;
 const defaultFrom=idn=>(ALIASES.find(a=>a.id===idn&&a.def)||ALIASES[0]).email;
 function openCompose(o={}){const idn=S.ident==='all'?'santoro':S.ident;
- C=Object.assign({from:S.alias||defaultFrom(idn),to:'',toName:'',sub:'',body:'',trackO:true,trackC:true,at:'',follow:'3',ai:false,tpl:false,tone:false},o);
+ C=Object.assign({from:S.alias||defaultFrom(idn),to:'',toName:'',sub:'',body:'',trackO:true,trackC:true,hl:true,at:'',follow:'3',ai:false,tpl:false,tone:false},o);
  $('#sheet').className='sheet';renderCompose();$('#scrim').classList.add('on');setTimeout(()=>{const f=C&&(C.to?$('#c-body'):$('#c-to'));f&&!isMobile()&&f.focus()},40)}
 function renderCompose(){const idn=idOf(C.from),h=idn==='hanif';
  $('#sheet').innerHTML=`
@@ -1119,6 +1150,7 @@ function renderCompose(){const idn=idOf(C.from),h=idn==='hanif';
    <datalist id="contacts">${[...new Map(mails.map(m=>[m.from.e,m.from.n])).entries()].map(([e,n])=>`<option value="${esc(e)}">${esc(n)}</option>`).join('')}</datalist>
    <div class="cf"><label>${t('subject')}</label><input id="c-sub" value="${esc(C.sub)}"><button class="ib ai" data-act="c-subj" title="${t('c_subj')}">${ic('ai')}</button></div>
    <div class="c-tools">
+    <span class="fmtb"><button data-fmt="bold" title="${t('f_bold')}"><b>B</b></button><button data-fmt="wine" class="w" title="${t('f_wine')}">A</button><button data-fmt="clear" title="${t('f_clear')}">${ic('x')}</button><button class="ai" data-act="c-hl" title="${t('hl_btn')}">${ic('ai')}</button></span>
     <button class="ib" data-act="c-tpl">${ic('tpl')} ${t('c_tpl')}</button>
     <button class="ib ai" data-act="c-ai">${ic('ai')} ${t('c_ai')}</button>
     <button class="ib ai" data-act="c-tone">${ic('pen')} ${t('c_tone')}</button>
@@ -1128,7 +1160,8 @@ function renderCompose(){const idn=idOf(C.from),h=idn==='hanif';
    <div class="tplpick ${C.tpl?'on':''}">${templates.map(x=>`<button data-usetpl="${x.id}"><span class="tag ${x.id_==='hanif'?'h':''}">${x.id_==='hanif'?'HH':'S'}</span> ${esc(x.name)}</button>`).join('')}</div>
    <div class="c-ai ${C.ai?'on':''}"><input id="c-idea" placeholder="${t('c_idea')}"><button class="btn pri" data-act="c-aigo">${ic('ai')} ${t('gen')}</button></div>
    ${C.tone?`<div class="c-tones">${[['short','to_short'],['formal','to_formal'],['warm','to_warm'],['lux','to_lux'],['fix','to_fix']].map(([v,l])=>`<button class="chip" data-tone="${v}">${t(l)}</button>`).join('')}</div>`:''}
-   <textarea class="cbody" id="c-body">${esc(C.body)}</textarea>
+   <div class="cbody" id="c-body" contenteditable="true" data-ph="${t('c_ph')}">${md2html(C.body)}</div>
+   <label class="hlopt"><span class="sw ${C.hl!==false?'on':''}" data-sw="hl"></span>${ic('ai')} ${t('hl_opt')}</label>
    <div class="c-sig"><span class="cap" style="display:block;margin-bottom:10px">${t('sig_preview')}</span>${sigHTML(idn)}</div>
    <div class="c-opts">
     <label class="opt"><span class="sw ${C.trackO?'on':''}" data-sw="trackO"></span>${ic('eye')} ${t('c_track_o')}</label>
@@ -1139,7 +1172,7 @@ function renderCompose(){const idn=idOf(C.from),h=idn==='hanif';
   <div class="sh-foot"><span class="muted" style="font-size:11px">${C.trackO?ic('eye')+' ':''}${C.trackC?ic('link'):''}</span><span class="sp"></span>
    <button class="send ${h?'h':''}" data-act="c-send">${ic(C.at?'cal':'send')} ${C.at?t('sched_btn'):t('send')}</button></div>`;
  $('#c-lang').value=C.lang||guessLang(C.body||'')}
-function syncC(){if(!C||!$('#c-from'))return;C.from=$('#c-from').value;C.to=$('#c-to').value;C.sub=$('#c-sub').value;C.body=$('#c-body').value;C.at=$('#c-at').value;C.follow=$('#c-follow').value;C.lang=$('#c-lang').value}
+function syncC(){if(!C||!$('#c-from'))return;C.from=$('#c-from').value;C.to=$('#c-to').value;C.sub=$('#c-sub').value;C.body=html2md($('#c-body'));C.at=$('#c-at').value;C.follow=$('#c-follow').value;C.lang=$('#c-lang').value}
 function fillVars(s,name){name=(name||'').trim();if(!name)return s;const nm=name.includes('·')?name.split('·').pop().trim().split(/\s+/)[0]:name.split(/\s+/)[0];const emp=name.includes('·')?name.split('·')[0].trim():name;return s.replace(/\{\{nombre\}\}/g,nm).replace(/\{\{empresa\}\}/g,emp)}
 function closeCompose(save=true){
  if(C&&$('#c-from'))syncC();
@@ -1186,14 +1219,14 @@ function safeCheck(m){const a=S.ai[m.id]=S.ai[m.id]||{};const sig=[];
  renderReader()}
 async function aiPulse(){const l=mails.filter(m=>m.folder==='inbox'&&identOK(m.to)&&(m.unread||m.pri));
  const w=sent.filter(s=>s.wait&&!s.replied).map(s=>`- Esperando respuesta: ${s.to.n} («${s.sub}»), abierto ${s.opens.filter(x=>!x.auto).length} veces`).join('\n');
- await ask(`${BRAND}\nEres el asistente de correo de Hanif. En ${outLang()}, resume el día en máximo 4 líneas cortas: lo más importante, a quién responder primero y por qué.\n\nCorreos:\n${l.map(m=>`- ${m.from.n}: ${m.sub} — ${m.body.slice(0,180).replace(/\n/g,' ')}`).join('\n')}\n${w}`,x=>{S.pulse=x;const o=$('#pulseTxt');if(o)o.textContent=x})}
+ await ask(`${BRAND}\nEres el asistente de correo de Hanif. En ${outLang()}, resume el día en máximo 4 líneas cortas: lo más importante, a quién responder primero y por qué.\n\nCorreos:\n${l.map(m=>`- ${m.from.n}: ${m.sub} — ${m.body.slice(0,180).replace(/\n/g,' ')}`).join('\n')}\n${w}`,x=>{S.pulse=x;const o=$('#pulseTxt');if(o){o.hidden=false;o.className='hello-out';o.textContent=x}})}
 async function cAI(kind,arg){syncC();const lang=$('#c-lang').value,box=$('#c-body');let p;
- if(kind==='write'){const idea=$('#c-idea').value.trim();if(!idea)return;p=`${BRAND}\nEscribe un correo en ${langName[lang]} a partir de esta idea: "${idea}". Destinatario: ${C.toName||C.to||'—'}. Firma solo "Hanif". Devuelve primero una línea "Asunto: ..." y luego el cuerpo.`}
+ if(kind==='write'){const idea=$('#c-idea').value.trim();if(!idea)return;p=`${BRAND}\nEscribe un correo en ${langName[lang]} a partir de esta idea: "${idea}". Destinatario: ${C.toName||C.to||'—'}. Firma solo "Hanif". ${FMT} Devuelve primero una línea "Asunto: ..." y luego el cuerpo.`}
  else if(kind==='tone'){if(!C.body.trim())return;const how={short:'mucho más corto (la mitad), sin perder datos',formal:'más formal y profesional',warm:'más cálido y cercano',lux:'más elegante y exclusivo, voz de casa de lujo',fix:'solo corrige ortografía, gramática y puntuación, sin cambiar el estilo'}[arg];
-  p=`${BRAND}\nReescribe este correo ${how}. Mantén el idioma original. Devuelve solo el cuerpo.\n\n${C.body}`}
+  p=`${BRAND}\nReescribe este correo ${how}. Mantén el idioma original. ${FMT} Devuelve solo el cuerpo.\n\n${C.body}`}
  else if(kind==='subj'){if(!C.body.trim())return;await ask(`Propón un asunto breve (máx. 7 palabras), elegante y claro para este correo, en su idioma. Solo el asunto.\n\n${C.body}`,x=>{if(x!==t('thinking'))$('#c-sub').value=x.replace(/^asunto:\s*/i,'').replace(/^"|"$/g,'').trim()});syncC();return}
  else{if(!C.body.trim())return;p=`Traduce este correo al ${langName[lang]} manteniendo el tono. Devuelve solo la traducción.\n\n${C.body}`}
- await ask(p,x=>{let b=x;if(kind==='write'){const mm=x.match(/^\s*(Asunto|Subject|বিষয়)\s*:\s*(.+)\n+/i);if(mm){$('#c-sub').value=mm[2].trim();b=x.slice(mm[0].length)}}box.value=b});syncC()}
+ await ask(p,x=>{let b=x;if(kind==='write'){const mm=x.match(/^\s*(Asunto|Subject|বিষয়)\s*:\s*(.+)\n+/i);if(mm){$('#c-sub').value=mm[2].trim();b=x.slice(mm[0].length)}}box.innerHTML=md2html(b)});syncC()}
 
 window.MS_ALIASES=null;
 const hb=()=>`<button class="hamb" data-act="drawer" aria-label="Menú">${ic('menu')}</button>`;
@@ -1205,7 +1238,7 @@ function colOf(email){if(!email)return '';const i=ALIASES.findIndex(a=>a.email==
 const acStyle=e=>{const c=colOf(e);return c?`style="--ac:${c}"`:''};
 /* ---- profile photos (per identity) ---- */
 let AVV=LS.get('avv',{});      // live: version per identity  ·  demo: data URL
-function avSrc(k){const v=AVV[k];if(!v)return null;return LIVE?`/brand/avatar-${k}?v=${v}`:v}
+function avSrc(k){const v=AVV[k];if(!v)return DEFAV[k]||null;return LIVE?`/brand/avatar-${k}?v=${v}`:v}
 function avBox(k,cls='av'){const src=avSrc(k);return src?`<div class="${cls} pic ${k==='hanif'?'h':''}"><img src="${src}" alt=""></div>`:''}
 function pickAvatar(k){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
  inp.onchange=()=>{const f=inp.files[0];if(!f)return;
@@ -1217,6 +1250,30 @@ function setAvatar(k,data){if(LIVE){hook('avatar',{k,data});return}
  if(data)AVV[k]=data;else delete AVV[k];LS.set('avv',AVV);toast(data?t('av_ok'):t('av_rm'),{wine:true});renderAll()}
 /* ---- animated signature banners ---- */
 const SIGGIF={santoro:'__GIF_S__',hanif:'__GIF_H__'};
+const DEFAV={santoro:'__AV_S__'};   // built-in animated profile GIFs (Hanif's arrives with his monogram)
+/* light markup inside mail bodies: **bold**  ==wine highlight== */
+const md2html=t=>esc(String(t||'')).replace(/\*\*([^*\n][^*]*?)\*\*/g,'<b>$1</b>').replace(/==([^=\n][^=]*?)==/g,'<b class="hl">$1</b>').replace(/\n/g,'<br>');
+const mdStrip=t=>String(t||'').replace(/\*\*|==/g,'');
+function html2md(root){let out='';
+ const walk=(n,inside)=>{for(const c of n.childNodes){
+  if(c.nodeType===3){out+=c.nodeValue.replace(/ /g,' ');continue}if(c.nodeType!==1)continue;
+  const tg=c.tagName;if(tg==='BR'){out+='\n';continue}
+  const blk=tg==='DIV'||tg==='P';if(blk&&out&&!out.endsWith('\n'))out+='\n';
+  const hl=c.classList.contains('hl')||c.hasAttribute('color')||(c.style&&c.style.color);
+  const bold=tg==='B'||tg==='STRONG'||(c.style&&(c.style.fontWeight==='bold'||+c.style.fontWeight>=600));
+  const mk=inside?'':hl?'==':bold?'**':'';
+  out+=mk;walk(c,inside||!!mk);out+=mk;if(blk&&!out.endsWith('\n'))out+='\n'}};
+ walk(root,false);return out.replace(/\*\*\*\*|====/g,'').replace(/\n{3,}/g,'\n\n').replace(/\n$/,'')}
+const FMT='Marca con **negrita** las palabras clave (fechas, horas, precios, cantidades, plazos, lo que hay que hacer) y con ==dobles iguales== lo más importante (máximo 2). No uses otro formato.';
+async function aiHighlight(txt){let res=null;
+ await ask(`Devuelve EXACTAMENTE el mismo texto, sin cambiar, añadir ni quitar ninguna letra ni salto de línea. Solo rodea con ** entre 3 y 8 palabras o frases clave (fechas, horas, precios, cantidades, plazos, nombres de producto, lo que hay que hacer) y con == la frase más importante (máximo 2). Devuelve solo el texto.\n\n${txt}`,x=>{res=x});
+ if(!res||res===t('thinking'))return null;res=res.replace(/^\s+|\s+$/g,'');
+ const norm=x=>mdStrip(x).replace(/\s+/g,' ').trim();return norm(res)===norm(txt)?res:null}
+async function preSend(){syncC();
+ if(C.hl!==false&&AI&&C.body.trim()&&!/\*\*|==/.test(C.body)){const el=toast(`${ic('ai')} ${t('hl_doing')}`,{ms:15000});
+  const r=await Promise.race([aiHighlight(C.body),new Promise(z=>setTimeout(()=>z(null),12000))]);el&&el.remove&&el.remove();
+  if(r&&C){C.body=r;const b=$('#c-body');if(b)b.innerHTML=md2html(r)}}
+ if(C)doSend()}
 function aliasSheet(edit){const a=edit?ALIASES.find(x=>x.email===edit):null;$('#sheet').className='sheet';
  $('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${(a?t('al_edit'):t('add_alias')).toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div>
  <div class="bld">
@@ -1233,7 +1290,7 @@ function aliasSheet(edit){const a=edit?ALIASES.find(x=>x.email===edit):null;$('#
 function saveAlias(edit){
  if(edit){const a=ALIASES.find(x=>x.email===edit);a.lbl=$('#al-n').value.trim()||a.lbl;a.desc=$('#al-d').value.trim();a.col=$('#al-c').dataset.c;if(!a.main)a.id=$('#al-i').value;saveAliases();$('#scrim').classList.remove('on');renderAll();return}
  const l=$('#al-l').value.trim().toLowerCase().replace(/@.*$/,'').replace(/[^a-z0-9._-]/g,'');if(!l)return;const email=l+'@hanifhawlader.com';
- if(!ALIASES.find(a=>a.email===email)){ALIASES.push({email,col:$('#al-c').dataset.c,id:$('#al-i').value,lbl:$('#al-n').value.trim()||l.charAt(0).toUpperCase()+l.slice(1),desc:$('#al-d').value.trim()});saveAliases()}
+ if(!ALIASES.find(a=>a.email===email)){ALIASES.push({email,manual:true,col:$('#al-c').dataset.c,id:$('#al-i').value,lbl:$('#al-n').value.trim()||l.charAt(0).toUpperCase()+l.slice(1),desc:$('#al-d').value.trim()});saveAliases()}
  $('#scrim').classList.remove('on');toast(t('al_added'),{wine:true});renderAll()}
 /* ================= favourites & contacts ================= */
 function contacts(){const map=new Map();
@@ -1440,10 +1497,14 @@ document.addEventListener('click',e=>{
   case 'c-aigo':cAI('write');break;
   case 'c-tr':cAI('tr');break;
   case 'c-subj':cAI('subj');break;
-  case 'c-send':doSend();break;
+  case 'c-send':preSend();break;
+  case 'c-hl':{syncC();if(!C.body.trim())break;const el=toast(`${ic('ai')} ${t('hl_doing')}`,{ms:15000});aiHighlight(mdStrip(C.body)).then(r=>{el&&el.remove&&el.remove();if(r&&C){C.body=r;$('#c-body').innerHTML=md2html(r)}else toast(t('hl_fail'))});break}
+  case 'filters':document.body.classList.toggle('showf');break;
  }
 });
 function snz(m,fn){m.snz=fn().toISOString();hook('prefs');closeReader();toast(`${t('snoozed_until')} ${fdt(m.snz)}`);renderAll()}
+document.addEventListener('mousedown',e=>{const b=e.target.closest('[data-fmt]');if(!b)return;e.preventDefault();const k=b.dataset.fmt;
+ if(k==='bold')document.execCommand('bold');else if(k==='wine')document.execCommand('foreColor',false,'#5B1A2C');else document.execCommand('removeFormat')});
 document.addEventListener('input',e=>{
  if(e.target.id==='q'){S.q=e.target.value;const p=e.target.selectionStart;renderList();const q=$('#q');q.focus();q.setSelectionRange(p,p)}
  if(e.target.id==='askIn')S.ask=e.target.value;

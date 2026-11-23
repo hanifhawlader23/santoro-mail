@@ -32,6 +32,12 @@ function loadingScreen(on){let el=document.getElementById('loadingS');
   el.innerHTML=`<svg viewBox="0 0 900 843" style="width:80px;height:75px;opacity:.85"><use href="#rider"/></svg><div class="cap">${t('loading')}</div>`;document.body.appendChild(el)}
 
 /* ---------- mapping ---------- */
+let DOM='hanifhawlader.com';
+/* any address of my domain that receives mail (or that I send from) is a real alias */
+function detectAliases(raw){const found=new Set();
+  raw.forEach(x=>[...(x.to||[]),...(x.cc||[])].forEach(a=>{a=lc(a);if(a.endsWith('@'+DOM))found.add(a)}));
+  let added=0;found.forEach(e=>{const a=ALIASES.find(z=>z.email===e);if(a){if(!a.main&&!a.seen){a.seen=true;added++}}else{ALIASES.push({email:e,id:'santoro',seen:true,lbl:e.split('@')[0].replace(/^./,c=>c.toUpperCase()),desc:''});added++}});
+  return added}
 const CATN={prov:'Proveedores',cli:'Clientes',ped:'Pedidos',col:'Colaboraciones'};
 function pickTo(x){const all=[...(x.to||[]),...(x.cc||[])];const al=ALIASES.map(a=>a.email);return all.find(a=>al.includes(a))||ME.email}
 function catOf(x,to){for(const [k,v] of Object.entries(CATN))if((x.cats||[]).includes(v))return k;
@@ -43,6 +49,7 @@ function mapTrk(r){return {...r,id:'t:'+r.id,tid:r.id,live:true}}
 /* ---------- loading ---------- */
 async function loadMail(){
   const [inb,arc,spm,trs,snt,drf,trk,sch]=await Promise.all([A('/messages?folder=inbox&top=120'),A('/messages?folder=archive&top=40').catch(()=>[]),A('/messages?folder=spam&top=30').catch(()=>[]),A('/messages?folder=trash&top=30').catch(()=>[]),A('/messages?folder=sent&top=60'),A('/messages?folder=drafts&top=30').catch(()=>[]),A('/tracking'),A('/sched')]);
+  if(detectAliases([...inb,...arc,...spm,...trs,...snt.map(x=>({to:[lc(x.from&&x.from.e)]}))]))savePrefs();
   mails=[...inb,...arc,...spm,...trs].map(mapMail);
   const recs=trk.map(mapTrk);
   const extra=[];
@@ -67,7 +74,8 @@ hook=function(kind,x){
   if(kind==='prefs')return savePrefs();
   if(kind==='avatar'){const k=x.k;(x.data?A('/avatar/'+k,{method:'PUT',body:{data:x.data}}):A('/avatar/'+k,{method:'DELETE'})).then(r=>{if(x.data)AVV[k]=r.v;else delete AVV[k];savePrefs();toast(x.data?t('av_ok'):t('av_rm'),{wine:true});renderAll()}).catch(fail);return}
   if(kind==='readall'){(async()=>{for(let i=0;i<x.length;i+=6)await Promise.all(x.slice(i,i+6).map(m=>A('/message/'+encodeURIComponent(m.id),{method:'PATCH',body:{read:true}}).catch(()=>{})))})();return}
-  if(kind==='alcheck'){A('/me').then(me=>{window.MS_ALIASES=[ME.email,...(me.aliases||[])];(me.aliases||[]).filter(e=>e.endsWith('@hanifhawlader.com')&&!ALIASES.find(x=>x.email===e)).forEach(e=>ALIASES.push({email:e,id:'santoro',lbl:e.split('@')[0],desc:''}));savePrefs();toast(t('al_checked'),{wine:true});renderAll()}).catch(fail);return}
+  if(kind==='alcheck'){A('/me').then(me=>{window.MS_ALIASES=[ME.email,...(me.aliases||[])];(me.aliases||[]).filter(e=>e.endsWith('@'+DOM)&&!ALIASES.find(x=>x.email===e)).forEach(e=>ALIASES.push({email:e,id:'santoro',lbl:e.split('@')[0].replace(/^./,c=>c.toUpperCase()),desc:''}));
+    ALIASES=ALIASES.filter(a=>a.main||a.manual||a.seen||window.MS_ALIASES.includes(a.email));savePrefs();toast(t('al_checked')+` · ${ALIASES.length}`,{wine:true});renderAll()}).catch(fail);return}
   if(kind==='open'){if(x.unread)A('/message/'+encodeURIComponent(x.id),{method:'PATCH',body:{read:true}}).catch(fail);return}
   if(kind==='unread')return A('/message/'+encodeURIComponent(x.id),{method:'PATCH',body:{read:false}}).catch(fail);
   if(kind==='star')return A('/message/'+encodeURIComponent(x.id),{method:'PATCH',body:{star:x.star}}).catch(fail);
@@ -147,13 +155,15 @@ async function poll(){
     if(prefs.templates)templates=prefs.templates;if(prefs.sigs)sigs=prefs.sigs;if(prefs.rules)rules=prefs.rules;
     favs=prefs.favs||[];AVV=prefs.av||{};
     if(prefs.theme){S.theme=prefs.theme;applyTheme()}
-    // aliases: lo que diga Microsoft + lo guardado
-    const known=Object.fromEntries((prefs.aliases||ALIASES).map(a=>[a.email,a]));
-    const list=[ME.email,...(me.aliases||[]).filter(a=>a.endsWith('@hanifhawlader.com')&&a!==ME.email)];
-    (prefs.aliases||[]).forEach(a=>{if(!list.includes(a.email))list.push(a.email)});
-    ALIASES=[...new Set(list)].map(e=>known[e]||{email:e,id:e===ME.email?'hanif':'santoro',lbl:e.split('@')[0],desc:''});
+    // aliases: SOLO los reales = Microsoft (lo que creaste en GoDaddy) + los que reciben correo + los que añadiste tú a mano
+    DOM=ME.email.split('@')[1];
+    const ms=(me.aliases||[]).filter(a=>a.endsWith('@'+DOM));
+    const saved=(prefs.aliases||[]).filter(a=>a&&a.email);
+    const known=Object.fromEntries(saved.map(a=>[a.email,a]));
+    const list=[ME.email,...ms,...saved.filter(a=>a.manual||a.seen).map(a=>a.email)];
+    ALIASES=[...new Set(list)].map(e=>Object.assign({email:e,id:e===ME.email?'hanif':'santoro',lbl:e.split('@')[0].replace(/^./,c=>c.toUpperCase()),desc:''},known[e]||{}));
     ALIASES.forEach(a=>{if(a.email===ME.email){a.main=true;a.def=true;a.id='hanif'}});
-    if(!ALIASES.some(a=>a.id==='santoro'&&a.def)){const s=ALIASES.find(a=>a.email.startsWith('santoro@'));if(s)s.def=true}
+    if(!ALIASES.some(a=>a.id==='santoro'&&a.def)){const s=ALIASES.find(a=>a.email.startsWith('santoro@'))||ALIASES.find(a=>a.id==='santoro');if(s)s.def=true}
     window.MS_ALIASES=[ME.email,...(me.aliases||[])];
     AI=me.ai?{}:null;
     alog=[];
