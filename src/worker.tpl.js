@@ -63,7 +63,7 @@ async function g(env, path, opt = {}) {
 }
 
 /* ---------------- sessions ---------------- */
-async function session(req, env) { const s = cookie(req, 'sm_s'); if (!s) return null; return kget(env, 'sess:' + s); }
+async function session(req, env) { const b = (req.headers.get('authorization') || '').match(/^Bearer\s+(\S+)/i); const s = (b && b[1]) || cookie(req, 'sm_s'); if (!s) return null; return kget(env, 'sess:' + s); }
 
 /* ---------------- email building ---------------- */
 function textToHtml(t) {
@@ -80,9 +80,27 @@ function addTracking(html, id, origin, opts) {
 }
 const rcpt = list => (Array.isArray(list) ? list : String(list || '').split(/[,;]\s*/)).map(s => s.trim()).filter(Boolean).map(a => ({ emailAddress: { address: a } }));
 
+const SIG_DEF = { santoro: { st: 'anim', n: 'Hanif Hawlader', r: 'Fundador', e: 'santoro@hanifhawlader.com', w: 'hanifhawlader.com', c: 'Santander · España', l: 'Elegancia, hecha a mano.' },
+  hanif: { st: 'anim', n: 'Hanif Hawlader', r: 'Producción y dirección creativa', e: 'contacto@hanifhawlader.com', w: 'hanifhawlader.com', c: 'Cantabria · España', l: '' } };
+function sigServer(o, prefs, k) {
+  const s = Object.assign({}, SIG_DEF[k], ((prefs.sigs || {})[k]) || {}), st = s.st || 'anim', W = '#5B1A2C', ff = "font-family:'El Messiri',Georgia,serif", mut = 'color:#6b6560';
+  const avv = (prefs.av || {})[k], av = avv ? `${o}/brand/avatar-${k}?v=${avv}` : k === 'santoro' ? `${o}/brand/av-santoro.gif` : null;
+  const logo = `<img src="${o}/brand/rider-wine.png" width="46" alt="Santoro" style="display:block;border:0">`;
+  const contact = `<div style="font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a></div><div style="font-size:12px;${mut}">${esc(s.c)}</div>`;
+  if (st === 'anim') return `<div style="${ff};color:#000"><img src="${o}/brand/sig-${k}.gif" width="440" alt="${esc(s.n)}" style="display:block;width:440px;max-width:100%;height:auto;border:0;border-radius:6px"><div style="padding:8px 2px 0;font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a> · ${esc(s.c)}</div></div>`;
+  if (st === 'card') return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse;background:#F7F5E9;border-radius:10px"><tr><td style="padding:14px 14px 14px 16px;vertical-align:middle">${av ? `<img src="${av}" width="64" height="64" alt="" style="display:block;width:64px;height:64px;border-radius:12px;border:0">` : logo}</td><td style="padding:14px 18px 14px 4px;vertical-align:middle;border-left:3px solid ${W}"><div style="padding-left:12px"><div style="font-size:15px">${esc(s.n)}</div><div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()}${k === 'santoro' ? ' · SANTORO' : ''}</div>${contact}${s.l ? `<div style="font-size:11px;color:${W};font-style:italic;margin-top:5px">${esc(s.l)}</div>` : ''}</div></td></tr></table>`;
+  if (st === 'min') return `<div style="${ff};color:#000;font-size:13px;line-height:1.5"><b style="font-weight:500">${esc(s.n)}</b> <span style="color:${W}">—</span> ${esc(s.r)}${k === 'santoro' ? ' · Santoro' : ''}<br><span style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)}</span></div>`;
+  if (k === 'santoro') return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse"><tr><td style="padding-right:16px;border-right:1px solid ${W};vertical-align:middle">${logo}</td><td style="padding-left:16px;vertical-align:middle"><div style="font-size:14px">${esc(s.n)}</div><div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()} · SANTORO</div>${contact}${s.l ? `<div style="font-size:11px;color:${W};font-style:italic;margin-top:6px">${esc(s.l)}</div>` : ''}</td></tr></table>`;
+  return `<div style="${ff};color:#000"><div style="font-size:15px;letter-spacing:2px">${esc(s.n).toUpperCase()}</div><div style="width:28px;height:1px;background:${W};margin:6px 0 7px"></div><div style="font-size:12px;color:#555">${esc(s.r)}</div><div style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)} · ${esc(s.c)}</div>${s.l ? `<div style="font-size:11px;color:${W};margin-top:5px">${esc(s.l)}</div>` : ''}<div style="font-size:9.5px;letter-spacing:3px;color:${W};margin-top:8px">FUNDADOR DE SANTORO</div></div>`;
+}
 async function sendTracked(env, origin, m) {
-  // m: {from, to, cc, subject, text|html, sig, track:{open,click}, follow, name}
+  // m: {from, to, cc, subject, text|html, sig | sigAuto, track:{open,click}, follow, name}
   const id = rid(10);
+  if (!m.sig && m.sigAuto) {
+    const prefs = await kget(env, 'prefs', {}); const from = lc(m.from || allowed(env));
+    const al = (prefs.aliases || []).find(a => lc(a.email) === from); const k = al ? al.id : from === allowed(env) ? 'hanif' : 'santoro';
+    m.sig = `<div style="margin-top:10px">${sigServer(origin, prefs, k === 'hanif' ? 'hanif' : 'santoro')}</div>`;
+  }
   let html = m.html || wrapEmail(textToHtml(m.text || ''), m.sig || '');
   const tr = addTracking(html, id, origin, m.track || { open: true, click: true });
   const msg = { subject: m.subject || '', body: { contentType: 'HTML', content: tr.html }, toRecipients: rcpt(m.to), ccRecipients: rcpt(m.cc) };
@@ -337,13 +355,13 @@ export default {
       if (path === '/api/pedido' && req.method === 'POST') return webhook(req, env, origin);
       if (path === '/auth/login') {
         if (!env.CLIENT_ID || !env.TENANT_ID || !env.CLIENT_SECRET) return new Response('Faltan CLIENT_ID, TENANT_ID o CLIENT_SECRET en Settings → Variables and Secrets.', { status: 500 });
-        const st = rid(); await kput(env, 'oauth:' + st, 1, { expirationTtl: 600 });
+        const st = rid(); await kput(env, 'oauth:' + st, url.searchParams.get('app') ? 'app' : 1, { expirationTtl: 600 });
         return Response.redirect(authUrl(env, origin, st), 302);
       }
       if (path === '/auth/callback') {
         const code = url.searchParams.get('code'), st = url.searchParams.get('state');
         if (url.searchParams.get('error')) return new Response('Microsoft: ' + url.searchParams.get('error_description'), { status: 400 });
-        if (!st || !(await env.DB.get('oauth:' + st))) return new Response('Sesión caducada. Vuelve a intentarlo.', { status: 400 });
+        const stv = st && (await env.DB.get('oauth:' + st)); if (!stv) return new Response('Sesión caducada. Vuelve a intentarlo.', { status: 400 });
         const d = await tokenReq(env, { grant_type: 'authorization_code', code, redirect_uri: origin + '/auth/callback' });
         const me = await (await fetch(GRAPH + '/me?$select=mail,userPrincipalName', { headers: { authorization: 'Bearer ' + d.access_token } })).json();
         const email = lc(me.mail || me.userPrincipalName);
@@ -351,6 +369,7 @@ export default {
         await kput(env, 'tok', { access: d.access_token, refresh: d.refresh_token, exp: Math.floor(Date.now() / 1000) + d.expires_in });
         await env.DB.put('origin', origin);
         const sid = rid(24); await kput(env, 'sess:' + sid, { email }, { expirationTtl: 60 * 60 * 24 * 60 });
+        if (stv === 'app' || stv === '"app"') return new Response(null, { status: 302, headers: { location: 'santoromail://auth?t=' + sid } });
         return new Response(null, { status: 302, headers: { location: '/', 'set-cookie': `sm_s=${sid}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${60 * 60 * 24 * 60}` } });
       }
       if (path === '/auth/logout') { const s = cookie(req, 'sm_s'); if (s) await env.DB.delete('sess:' + s); return new Response(null, { status: 302, headers: { location: '/', 'set-cookie': 'sm_s=; Path=/; Max-Age=0' } }); }
