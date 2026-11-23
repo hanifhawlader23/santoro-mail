@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Santoro Mail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600&family=Hind+Siliguri:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --bg:#F7F5E9; --bg2:#FCFBF5; --fg:#000; --fg2:rgba(0,0,0,.66); --fg3:rgba(0,0,0,.44);
+  --line:rgba(91,26,44,.13); --line2:rgba(91,26,44,.22); --wash:rgba(91,26,44,.05); --wash2:rgba(91,26,44,.09);
+  --acc:#5B1A2C; --acc-d:#46121f; --at:#5B1A2C; --on:#F7F5E9; --hf:#000; --onh:#F7F5E9; --hw:rgba(0,0,0,.07);
+  --scrim:rgba(39,3,3,.28); --shadow:rgba(39,3,3,.22); color-scheme:light;
+}
+[data-theme="dark"]{
+  --bg:#0A0708; --bg2:#141012; --fg:#F7F5E9; --fg2:rgba(247,245,233,.74); --fg3:rgba(247,245,233,.48);
+  --line:rgba(247,245,233,.09); --line2:rgba(247,245,233,.17); --wash:rgba(247,245,233,.04); --wash2:rgba(91,26,44,.5);
+  --acc:#5B1A2C; --acc-d:#6d2236; --at:#DDBDC5; --on:#F7F5E9; --hf:#F7F5E9; --onh:#000; --hw:rgba(247,245,233,.09);
+  --scrim:rgba(0,0,0,.6); --shadow:rgba(0,0,0,.6); color-scheme:dark;
+}
+:root{--r:8px;--r-s:5px;--f:'El Messiri','Hind Siliguri',Georgia,serif}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--f);background:var(--bg);color:var(--fg);font-size:13.5px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow:hidden;transition:background .2s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+select,input,textarea{background:var(--bg)}
+svg.i{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.cap{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--fg3)}
+.muted{color:var(--fg3)}
+.acc{color:var(--at)}
+.sp{flex:1}
+
+#app{display:grid;grid-template-columns:236px 1fr;height:100%}
+.rail{border-right:1px solid var(--line);padding:22px 14px 18px;display:flex;flex-direction:column;gap:18px;overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:0 6px}
+.brand svg{width:30px;height:28px;color:var(--at)}
+.brand b{display:block;font-weight:600;letter-spacing:.32em;font-size:13px;color:var(--at)}
+.brand small{display:block;font-size:10px;letter-spacing:.12em;color:var(--fg3)}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;border:1px solid var(--line2);border-radius:var(--r);overflow:hidden}
+.seg button{padding:7px 4px;font-size:11px;color:var(--fg2);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--acc);color:var(--on)}
+.seg button.on[data-v="hanif"]{background:var(--hf);color:var(--onh)}
+.btn-compose{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:var(--on);border-radius:var(--r);padding:11px;font-size:13px;letter-spacing:.06em}
+.btn-compose:hover{background:var(--acc-d)}
+.nav{display:flex;flex-direction:column;gap:1px}
+.nav button{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--r-s);color:var(--fg2);text-align:left;font-size:13px}
+.nav button:hover{background:var(--wash)}
+.nav button.on{background:var(--wash2);color:var(--at)}
+.nav .n{margin-left:auto;font-size:11px;color:var(--fg3)}
+.nav button.on .n{color:var(--at)}
+.rail .grp>.cap{display:block;padding:0 10px 6px}
+.rail>*{flex-shrink:0}
+.rail .foot{margin-top:auto;font-size:10.5px;color:var(--fg3);padding:0 8px;line-height:1.6}
+.dot{display:inline-block;width:6px;height:6px;border-radius:1.5px;background:var(--acc);margin-right:6px;vertical-align:1px}
+
+main{position:relative;overflow:hidden;height:100%}
+.view{position:absolute;inset:0;display:none}
+.view.on{display:flex}
+
+/* list */
+.list{width:390px;border-right:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.list-h{padding:18px 20px 10px;display:flex;flex-direction:column;gap:12px}
+.lh-row{display:flex;align-items:center;gap:10px}
+.lh-row h1{font-size:19px;font-weight:500;display:flex;align-items:baseline;gap:10px}
+.lh-row h1 span{font-size:11px;color:var(--fg3);letter-spacing:.06em}
+.fold-btn{display:none;align-items:center;gap:6px;border:1px solid var(--line2);border-radius:var(--r-s);padding:5px 9px;font-size:12px;color:var(--fg2)}
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:var(--r);padding:7px 10px;background:var(--bg2)}
+.search input{border:0;outline:0;background:none;width:100%;font-size:13px}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line2);border-radius:var(--r-s);padding:4px 10px;font-size:11.5px;color:var(--fg2);white-space:nowrap}
+.chip.on{background:var(--acc);border-color:var(--acc);color:var(--on)}
+.pulse{margin:0 20px 10px;background:var(--acc);color:var(--on);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.pulse .pat{position:absolute;right:-18px;bottom:-26px;width:150px;height:140px;color:var(--on);opacity:.08;pointer-events:none}
+.pulse .cap{color:rgba(247,245,233,.7)}
+.pulse p{font-size:13px;margin-top:6px;max-width:92%;white-space:pre-wrap;position:relative}
+.pulse button{margin-top:10px;font-size:11.5px;border:1px solid rgba(247,245,233,.45);border-radius:var(--r-s);padding:5px 10px;display:inline-flex;gap:6px;align-items:center;position:relative;color:var(--on)}
+.banner{margin:0 20px 10px;border:1px solid var(--line2);border-radius:var(--r);padding:10px 14px;font-size:12px;color:var(--fg2);display:flex;gap:10px;align-items:center}
+.items{overflow-y:auto;flex:1;padding-bottom:110px}
+.item{display:grid;grid-template-columns:36px 1fr auto;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
+.item:hover{background:var(--wash)}
+.item.sel{background:var(--wash2)}
+.item.unread::before{content:"";position:absolute;left:8px;top:22px;width:5px;height:5px;border-radius:1px;background:var(--at)}
+.av{width:36px;height:36px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;font-size:12.5px;letter-spacing:.04em;background:var(--wash2);color:var(--at);flex:none}
+.av.h{background:var(--hw);color:var(--fg)}
+.item .who{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item.unread .who{font-weight:600}
+.item .sub{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .snip{font-size:12px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .meta{display:flex;flex-direction:column;align-items:flex-end;gap:5px;font-size:11px;color:var(--fg3)}
+.item .meta .row{display:flex;gap:4px;align-items:center}
+.tag{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;border-radius:3px;padding:1px 5px;border:1px solid var(--line2);color:var(--at);white-space:nowrap}
+.tag.h{color:var(--fg);border-color:var(--line2)}
+.tag.solid{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.tag.warn{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.starred{color:var(--at)}
+.starred svg.i{fill:currentColor}
+.empty{padding:60px 30px;text-align:center;color:var(--fg3)}
+.empty svg{width:70px;height:66px;color:var(--at);opacity:.15;margin-bottom:12px}
+
+/* reader */
+.reader{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg2)}
+.rd-bar{display:flex;align-items:center;gap:2px;padding:10px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ib{display:inline-flex;align-items:center;gap:6px;padding:6px 8px;border-radius:var(--r-s);font-size:12px;color:var(--fg2)}
+.ib:hover{background:var(--wash);color:var(--at)}
+.ib.ai{color:var(--at)}
+.ib.on{color:var(--at)}
+.ib.on svg.i{fill:currentColor}
+.rd-body{overflow-y:auto;flex:1;padding:28px 40px 110px}
+.rd-body h2{font-size:22px;font-weight:500;line-height:1.3;margin-bottom:16px;max-width:680px}
+.rd-from{display:flex;gap:12px;align-items:center;margin-bottom:20px}
+.rd-from .nm{font-size:13.5px}
+.rd-from .em{font-size:11.5px;color:var(--fg3)}
+.rd-text{white-space:pre-wrap;font-size:14px;line-height:1.75;max-width:640px}
+.att{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+.att span{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--line2);border-radius:var(--r-s);padding:7px 10px;font-size:12px}
+.att b{font-weight:500;color:var(--at);font-size:10px;letter-spacing:.1em}
+.qr{display:flex;gap:8px;flex-wrap:wrap;max-width:640px;margin:26px 0 0;padding-top:18px;border-top:1px solid var(--line)}
+.qr .cap{width:100%;display:flex;gap:6px;align-items:center;color:var(--at)}
+.qr button{border:1px solid var(--line2);border-radius:var(--r-s);padding:7px 12px;font-size:12.5px;text-align:left;max-width:100%}
+.qr button:hover{border-color:var(--at);color:var(--at)}
+.aibox{max-width:640px;border:1px solid var(--line2);border-radius:var(--r);padding:14px 16px;margin-bottom:20px;background:var(--bg)}
+.aibox .cap{color:var(--at);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.aibox .out{white-space:pre-wrap;font-size:13px;line-height:1.65}
+.aibox .row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.aibox.warn{border-color:var(--acc);border-width:1.5px}
+.sel-s{border:1px solid var(--line2);border-radius:var(--r-s);padding:5px 8px;background:var(--bg2);font-size:12px}
+.btn{border:1px solid var(--line2);border-radius:var(--r-s);padding:6px 12px;font-size:12px;display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.btn:hover{border-color:var(--at);color:var(--at)}
+.btn.pri{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.btn.pri:hover{background:var(--acc-d);color:var(--on)}
+.back{display:none}
+
+/* pages */
+.page{flex:1;overflow-y:auto;padding:28px 40px 120px}
+.page-h{display:flex;align-items:flex-end;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.page-h h1{font-size:22px;font-weight:500}
+.page-h p{font-size:12.5px;color:var(--fg3);max-width:520px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:26px}
+.stat{border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;background:var(--bg2)}
+.stat b{display:block;font-size:24px;font-weight:500;color:var(--at);line-height:1.2}
+.stat small{font-size:11px;color:var(--fg3)}
+.stat.dark{background:var(--acc);border-color:var(--acc)}
+.stat.dark b,.stat.dark .cap,.stat.dark small{color:var(--on)}
+.sec{margin-bottom:28px}
+.sec>.cap{margin-bottom:10px;display:block}
+.panel{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);padding:16px 18px}
+.dgrid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-bottom:14px}
+.bars{display:flex;flex-direction:column;gap:9px;margin-top:10px}
+.bar{display:grid;grid-template-columns:110px 1fr 28px;gap:10px;align-items:center;font-size:12px}
+.bar .tr{height:8px;border-radius:2px;background:var(--wash2);overflow:hidden}
+.bar .tr i{display:block;height:100%;background:var(--acc)}
+.bar span:last-child{text-align:right;color:var(--fg3)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:150px;align-items:end;margin-top:14px}
+.week .d{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.week .cols{display:flex;gap:3px;align-items:flex-end;height:120px}
+.week .cols i{width:9px;border-radius:2px 2px 0 0;background:var(--line2)}
+.week .cols i.s{background:var(--acc)}
+.week small{font-size:10.5px;color:var(--fg3)}
+.legend{display:flex;gap:14px;font-size:11px;color:var(--fg3);margin-top:10px}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:0}
+.ask{display:flex;gap:8px;margin-top:10px}
+.ask input{flex:1;border:1px solid var(--line2);border-radius:var(--r-s);padding:8px 10px;background:var(--bg);outline:0;font-size:13px}
+.ask-out{white-space:pre-wrap;font-size:13px;line-height:1.65;margin-top:12px}
+.sugs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.mini{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px}
+.mini:last-child{border-bottom:0}
+.trow{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);margin-bottom:8px;overflow:hidden}
+.trow-h{display:grid;grid-template-columns:1fr auto;gap:14px;padding:13px 16px;cursor:pointer;align-items:center}
+.trow-h:hover{background:var(--wash)}
+.trow .sub{font-size:13.5px}
+.trow .to{font-size:11.5px;color:var(--fg3)}
+.badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.bdg{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:4px;background:var(--wash2);color:var(--at);white-space:nowrap}
+.bdg.off{background:var(--hw);color:var(--fg3)}
+.bdg.solid{background:var(--acc);color:var(--on)}
+.bdg svg.i{width:12px;height:12px}
+.temp{display:inline-flex;gap:2px}
+.temp i{width:7px;height:7px;border-radius:1.5px;background:var(--line2)}
+.temp i.f{background:var(--at)}
+.trow-d{padding:4px 16px 16px;border-top:1px solid var(--line);display:none}
+.trow.open .trow-d{display:block}
+.tl{list-style:none;margin:12px 0}
+.tl li{display:grid;grid-template-columns:96px 1fr;gap:10px;font-size:12px;padding:5px 0}
+.tl li .t{color:var(--fg3)}
+.tl li .ev{display:flex;gap:6px;align-items:flex-start}
+.tl li .ev svg{margin-top:2px;color:var(--at)}
+.note{font-size:11.5px;color:var(--fg3);border-left:2px solid var(--line2);padding:4px 10px;margin:8px 0}
+.hint{font-size:12px;display:flex;gap:8px;align-items:center;color:var(--at);margin:6px 0}
+.grid2{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:16px;background:var(--bg2);cursor:pointer;display:flex;flex-direction:column;gap:6px}
+.card:hover{border-color:var(--at)}
+.card h3{font-size:14px;font-weight:500}
+.card p{font-size:12px;color:var(--fg3);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.sigs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.sigcard{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);overflow:hidden}
+.sigcard .hd{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.sigcard .pv{padding:22px 18px;background:#fff;color:#000}
+.sigcard .fm{padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--line)}
+.fld{display:flex;flex-direction:column;gap:3px}
+.fld label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg3)}
+.fld input,.fld textarea,.fld select{border:1px solid var(--line);border-radius:var(--r-s);padding:6px 8px;font-size:12.5px;outline:0}
+.fld input:focus,.fld textarea:focus{border-color:var(--at)}
+.set-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.set-row .lb{flex:1;min-width:200px}
+.set-row .lb b{font-weight:500;display:block;font-size:13.5px}
+.set-row .lb span{font-size:12px;color:var(--fg3)}
+.set-row .seg{width:260px}
+.step{display:grid;grid-template-columns:28px 1fr auto;gap:12px;align-items:start;padding:14px 0;border-bottom:1px solid var(--line)}
+.step .no{width:26px;height:26px;border-radius:var(--r-s);border:1px solid var(--line2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--at)}
+.step .no.ok{background:var(--acc);color:var(--on);border-color:var(--acc)}
+.step b{font-weight:500}
+.step .d{font-size:12px;color:var(--fg3)}
+.step ol{font-size:12.5px;color:var(--fg2);padding-left:18px;margin-top:6px;line-height:1.7}
+.kbd{display:inline-block;min-width:20px;text-align:center;border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:0 5px;font-size:11px;margin-right:8px}
+.keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;font-size:12.5px;color:var(--fg2)}
+
+/* compose & sheets */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:50;display:none;align-items:center;justify-content:center;padding:20px}
+.scrim.on{display:flex}
+.sheet{background:var(--bg2);width:min(780px,100%);max-height:100%;border-radius:10px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px var(--shadow)}
+.sheet.sm{width:min(380px,100%)}
+.sh-top{background:var(--acc);color:var(--on);padding:12px 18px;display:flex;align-items:center;gap:10px}
+.sh-top.h{background:var(--hf);color:var(--onh)}
+.sh-top svg.logo{width:22px;height:20px;color:currentColor}
+.sh-top b{font-weight:500;letter-spacing:.2em;font-size:12px}
+.sh-top .x{margin-left:auto;color:currentColor;padding:4px}
+.sh-body{overflow-y:auto;padding:4px 18px 10px}
+.cf{display:grid;grid-template-columns:62px 1fr auto;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:7px 0}
+.cf label{font-size:11px;color:var(--fg3);letter-spacing:.06em}
+.cf input,.cf select{border:0;outline:0;background:none;font-size:13.5px;padding:3px 0;width:100%}
+.c-tools{display:flex;gap:2px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line);align-items:center}
+.c-tones{display:flex;gap:6px;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line);align-items:center}
+.c-tones .cap{margin-right:4px}
+.c-ai{display:none;gap:8px;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap;align-items:center}
+.c-ai.on{display:flex}
+.c-ai input{flex:1;min-width:180px;border:1px solid var(--line2);border-radius:var(--r-s);padding:6px 9px;outline:0;font-size:12.5px}
+textarea.cbody{width:100%;min-height:200px;border:0;outline:0;background:none;resize:vertical;font-size:14px;line-height:1.7;padding:14px 0}
+.c-sig{border-top:1px dashed var(--line2);padding:14px 0 6px}
+.c-sig .pv{background:#fff;color:#000;padding:14px;border-radius:var(--r-s)}
+.c-opts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.opt{display:flex;align-items:center;gap:10px;font-size:12.5px}
+.sw{width:30px;height:17px;border-radius:4px;background:var(--line2);position:relative;flex:none;transition:.15s;cursor:pointer}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:3px;background:var(--bg2);transition:.15s}
+.sw.on{background:var(--acc)}
+.sw.on::after{left:15px;background:var(--on)}
+.opt select,.opt input{border:1px solid var(--line);border-radius:var(--r-s);padding:4px 6px;font-size:12px;outline:0}
+.sh-foot{display:flex;align-items:center;gap:10px;padding:12px 18px;border-top:1px solid var(--line);background:var(--bg)}
+.send{background:var(--acc);color:var(--on);border-radius:var(--r-s);padding:9px 20px;display:inline-flex;gap:8px;align-items:center;font-size:13px;letter-spacing:.05em}
+.send.h{background:var(--hf);color:var(--onh)}
+.tplpick{display:none;border:1px solid var(--line2);border-radius:var(--r);margin:8px 0;max-height:220px;overflow:auto;background:var(--bg)}
+.tplpick.on{display:block}
+.tplpick button{display:block;width:100%;text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);font-size:12.5px}
+.tplpick button:hover{background:var(--wash)}
+.flist button{display:flex;width:100%;gap:12px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);font-size:14px;color:var(--fg2)}
+.flist button.on{color:var(--at);background:var(--wash2)}
+.flist .n{margin-left:auto;font-size:12px;color:var(--fg3)}
+
+.toasts{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:80;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:var(--hf);color:var(--onh);border-radius:var(--r);padding:10px 14px;font-size:12.5px;display:flex;gap:12px;align-items:center;box-shadow:0 8px 30px var(--shadow);max-width:92vw}
+.toast.w{background:var(--acc);color:var(--on)}
+.toast button{color:inherit;text-decoration:underline;font-size:12.5px}
+.menu{position:fixed;z-index:60;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--r);box-shadow:0 10px 30px var(--shadow);padding:4px;min-width:210px}
+.menu button{display:flex;gap:8px;align-items:center;width:100%;text-align:left;padding:8px 10px;font-size:12.5px;border-radius:var(--r-s)}
+.menu button:hover{background:var(--wash)}
+
+.tabbar,.fab,.mtop{display:none}
+
+@media (max-width:900px){
+  body{font-size:14px}
+  #app{grid-template-columns:1fr}
+  .rail{display:none}
+  .list{width:100%;border-right:0}
+  .fold-btn{display:inline-flex}
+  .reader{position:absolute;inset:0;z-index:5;transform:translateX(100%);transition:transform .22s ease}
+  body.reading .reader{transform:none}
+  .back{display:inline-flex}
+  .rd-body{padding:22px 20px 110px}
+  .rd-bar{padding:8px 10px}
+  .rd-bar .lbl{display:none}
+  .rd-bar .ai .lbl{display:inline;font-size:11px}
+  .rd-bar .ib{padding:6px 6px}
+  .page{padding:20px 18px 130px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .dgrid{grid-template-columns:1fr}
+  .sigs{grid-template-columns:1fr}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:20;padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .tabbar button{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;color:var(--fg3);padding:4px 0}
+  .tabbar button.on{color:var(--at)}
+  .tabbar svg.i{width:20px;height:20px}
+  .fab{display:flex;position:fixed;right:18px;bottom:80px;z-index:21;width:52px;height:52px;border-radius:12px;background:var(--acc);color:var(--on);align-items:center;justify-content:center;box-shadow:0 8px 24px var(--shadow)}
+  .fab svg.i{width:22px;height:22px}
+  body.reading .fab{display:none}
+  .scrim{padding:0}
+  .sheet{border-radius:0;height:100%;width:100%}
+  .sheet.sm{height:auto;margin-top:auto;border-radius:12px 12px 0 0;padding-bottom:env(safe-area-inset-bottom)}
+  .c-opts{grid-template-columns:1fr}
+  .mtop{display:flex;align-items:center;gap:10px;padding:16px 20px 0}
+  .mtop svg.logo{width:26px;height:24px;color:var(--at)}
+  .mtop b{font-weight:600;letter-spacing:.3em;font-size:12px;color:var(--at)}
+  .mtop .seg{margin-left:auto;width:190px}
+  .mtop .seg button{font-size:10.5px;padding:5px 2px}
+  .toasts{bottom:150px}
+  .tl li{grid-template-columns:78px 1fr}
+  .bar{grid-template-columns:90px 1fr 24px}
+  .set-row .seg{width:100%}
+}
+
+.favs{display:flex;gap:12px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}
+.favs::-webkit-scrollbar{display:none}
+.fav{flex:none;display:flex;flex-direction:column;align-items:center;gap:4px;width:54px;font-size:10.5px;color:var(--fg2);position:relative}
+.fav .av{width:44px;height:44px;font-size:13px;border-radius:10px}
+.fav.on .av{outline:2px solid var(--acc);outline-offset:2px}
+.fav .hb{position:absolute;top:30px;right:4px;width:16px;height:16px;border-radius:4px;background:var(--acc);color:var(--on);display:flex;align-items:center;justify-content:center}
+.fav .hb svg.i{width:10px;height:10px;fill:currentColor;stroke-width:1}
+.fav span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:54px}
+.grp-h{padding:14px 20px 6px;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--fg3);display:flex;gap:6px;align-items:center;border-bottom:1px solid var(--line)}
+.grp-h.pin{color:var(--at)}
+.item.pinned{background:linear-gradient(90deg,var(--wash2),transparent 60%)}
+.heart svg.i,.pinic svg.i{fill:currentColor}
+.heart{color:var(--at)}
+.cfilter{display:flex;gap:8px;align-items:center;font-size:12px;color:var(--at)}
+.people{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.pcard{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);padding:16px;display:flex;flex-direction:column;gap:10px}
+.pcard.fv{border-color:var(--line2);background:linear-gradient(180deg,var(--wash2),var(--bg2) 55%)}
+.pcard .top{display:flex;gap:12px;align-items:center}
+.pcard .top .av{width:44px;height:44px;border-radius:10px}
+.pcard .nm{font-size:14px}
+.pcard .em{font-size:11.5px;color:var(--fg3)}
+.pcard .st{display:flex;gap:14px;font-size:11.5px;color:var(--fg3);flex-wrap:wrap}
+.pcard .st b{color:var(--fg);font-weight:500}
+.hbtn{margin-left:auto;padding:6px;border-radius:var(--r-s);color:var(--fg3)}
+.hbtn.on{color:var(--at)}
+.hbtn.on svg.i{fill:currentColor}
+.rule{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:center;margin-bottom:8px}
+.rule.off{opacity:.55}
+.rule .ico{width:36px;height:36px;border-radius:var(--r-s);background:var(--wash2);color:var(--at);display:flex;align-items:center;justify-content:center}
+.rule .nm{font-size:13.5px}
+.rule .flow{font-size:11.5px;color:var(--fg3);display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:3px}
+.rule .flow b{font-weight:500;color:var(--fg2)}
+.rule .rt{display:flex;gap:8px;align-items:center}
+.pill{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:var(--hw);color:var(--fg3)}
+.pill.ok{background:var(--wash2);color:var(--at)}
+.log li{display:grid;grid-template-columns:96px 1fr;gap:10px;font-size:12px;padding:7px 0;border-bottom:1px solid var(--line);list-style:none}
+.conn{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.conn .c{border:1px solid var(--line);border-radius:var(--r);padding:14px;background:var(--bg2);display:flex;flex-direction:column;gap:6px}
+.conn .c b{font-weight:500;display:flex;gap:8px;align-items:center}
+.conn .c small{font-size:11.5px;color:var(--fg3)}
+.code{font-family:ui-monospace,Menlo,monospace;font-size:11px;background:var(--hw);padding:6px 8px;border-radius:4px;word-break:break-all}
+.bmails{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.bmail{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--bg2)}
+.bmail .hd{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;gap:8px;align-items:center;font-size:13px}
+.bmail .pv{background:#EFEDE2;padding:16px;max-height:520px;overflow:auto}
+.bld{display:grid;gap:12px;padding:16px 18px}
+.bld .flowrow{display:grid;grid-template-columns:70px 1fr;gap:10px;align-items:center}
+.bld .flowrow>span{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--at)}
+.bld select,.bld input{border:1px solid var(--line2);border-radius:var(--r-s);padding:8px 10px;font-size:13px;outline:0;width:100%}
+.testout{white-space:pre-wrap;font-size:13px;line-height:1.65;padding:16px 18px;overflow:auto}
+@media (max-width:900px){.rule{grid-template-columns:auto 1fr}.rule .rt{grid-column:1/-1;justify-content:flex-end}.bmails{grid-template-columns:1fr}}
+
+a.btn{color:inherit;text-decoration:none}
+.att a.btn{color:var(--at)}
+.hamb{display:none;width:40px;height:40px;border-radius:10px;align-items:center;justify-content:center;color:var(--fg);margin-left:-8px;flex:none}
+.hamb svg.i{width:22px;height:22px}
+.aichips{display:flex;gap:8px;flex-wrap:wrap;margin:-4px 0 20px}
+.aichips button{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line2);border-radius:var(--r-s);padding:7px 12px;font-size:12.5px;color:var(--at)}
+.rd-mob{display:none}
+.drawer-bg{display:none}
+.acct{display:flex;gap:10px;align-items:center;padding:8px 10px;font-size:12.5px;color:var(--fg2)}
+.acct .ms{width:26px;height:26px;border-radius:6px;background:var(--hw);display:flex;align-items:center;justify-content:center;flex:none}
+.alrow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+.alrow .mk{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--wash2);color:var(--at);font-size:12px;letter-spacing:.06em}
+.alrow .mk.h{background:var(--hw);color:var(--fg)}
+.alrow b{font-weight:500;font-size:13.5px;display:block}
+.alrow span{font-size:12px;color:var(--fg3)}
+.stp{font-size:12.5px;color:var(--fg2);line-height:1.7;padding-left:18px;margin:4px 0 0}
+@media (max-width:900px){
+  .mtop{display:none!important}
+  .hamb{display:inline-flex}
+  .rail{display:flex;position:fixed;top:0;bottom:0;left:0;width:84%;max-width:330px;z-index:70;background:var(--bg);transform:translateX(-105%);transition:transform .25s ease;padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))}
+  body.drawer .rail{transform:none;box-shadow:10px 0 40px var(--shadow)}
+  body.reading .tabbar{display:none}
+  body:not([data-view="mail"]) .fab{display:none}
+  .drawer-bg{position:fixed;inset:0;background:var(--scrim);z-index:65}
+  body.drawer .drawer-bg{display:block}
+  .rail .nav button{padding:11px 12px;font-size:15px;gap:12px}
+  .rail .nav button svg.i{width:19px;height:19px}
+  .rail .btn-compose{padding:14px;font-size:15px}
+  .rail .seg button{padding:9px 4px;font-size:12.5px}
+  .list-h{padding:14px 18px 10px;gap:10px}
+  .lh-row h1{font-size:21px}
+  .search{padding:10px 12px}
+  .search input{font-size:15px}
+  .chip{padding:8px 13px;font-size:13.5px}
+  .item{grid-template-columns:42px 1fr auto;padding:15px 18px;gap:13px}
+  .av{width:42px;height:42px;font-size:13.5px}
+  .item .who{font-size:15.5px}
+  .item .sub{font-size:14.5px}
+  .item .snip{font-size:13.5px}
+  .item .meta{font-size:12px}
+  .pulse{margin:0 18px 8px;padding:13px 15px}
+  .pulse .pat{display:none}
+  .pulse p{font-size:14px}
+  .rd-bar{padding:8px 10px;gap:4px}
+  .rd-bar .ib{padding:9px}
+  .rd-bar .ib svg.i{width:21px;height:21px}
+  .rd-bar .dsk{display:none}
+  .rd-body{padding:20px 18px 130px}
+  .rd-body h2{font-size:21px}
+  .rd-mob{display:grid;grid-template-columns:repeat(4,1fr);position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:6}
+  .rd-mob button{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11.5px;color:var(--fg2);padding:6px 0}
+  .rd-mob button svg.i{width:22px;height:22px}
+  .rd-mob button.pri{color:var(--at)}
+  .aichips button{padding:9px 13px;font-size:13.5px}
+  .page-h{align-items:center}
+  .page-h h1{font-size:22px}
+  .tabbar{grid-template-columns:repeat(5,1fr)}
+  .tabbar button{font-size:11px;padding:5px 0}
+  .tabbar svg.i{width:23px;height:23px}
+  .btn{padding:9px 14px;font-size:13px}
+  .fab{bottom:86px}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+ <symbol id="rider" viewBox="0 0 900 843"><path fill="currentColor" fill-rule="evenodd" d="__RIDER__"/></symbol>
+ <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M3 13l2.5-7.5A2 2 0 0 1 7.4 4h9.2a2 2 0 0 1 1.9 1.5L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/></symbol>
+ <symbol id="i-dash" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+ <symbol id="i-tpl" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+ <symbol id="i-set" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><rect x="14" y="5" width="4" height="4" rx="1"/><rect x="8" y="15" width="4" height="4" rx="1"/></symbol>
+ <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></symbol>
+ <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+ <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+ <symbol id="i-reply" viewBox="0 0 24 24"><path d="M10 8L4 13l6 5"/><path d="M4 13h10a6 6 0 0 1 6 6"/></symbol>
+ <symbol id="i-fwd" viewBox="0 0 24 24"><path d="M14 8l6 5-6 5"/><path d="M20 13H10a6 6 0 0 0-6 6"/></symbol>
+ <symbol id="i-arch" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9M10 13h4"/></symbol>
+ <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+ <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M12 8v5M12 16v.5"/></symbol>
+ <symbol id="i-clock" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 7v5l3 2"/></symbol>
+ <symbol id="i-ai" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+ <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></symbol>
+ <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><rect x="4" y="4" width="13" height="13" rx="4"/><path d="M15.5 15.5L20 20"/></symbol>
+ <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></symbol>
+ <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+ <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 21h4"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></symbol>
+ <symbol id="i-tr" viewBox="0 0 24 24"><path d="M3 5h10M8 3v2c0 5-2 8-5 9M5 9c1.5 2.5 4 4 7 4.5"/><path d="M13 21l4-10 4 10M14.5 18h5"/></symbol>
+ <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></symbol>
+ <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+ <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></symbol>
+ <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+ <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 7L4 12l5 5"/><path d="M4 12h11a5 5 0 0 1 0 10h-2"/></symbol>
+ <symbol id="i-more" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></symbol>
+ <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+ <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"/></symbol>
+ <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></symbol>
+ <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
+ <symbol id="i-users" viewBox="0 0 24 24"><rect x="5" y="3" width="8" height="8" rx="2.5"/><path d="M2 21c0-4 3-6 7-6s7 2 7 6"/><path d="M16 4a3.5 3.5 0 0 1 0 7M18 15c2.5.5 4 2.5 4 6"/></symbol>
+ <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></symbol>
+ <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></symbol>
+ <symbol id="i-globe" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+ <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+ <symbol id="i-dl" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+</defs></svg>
+
+<div id="app">
+  <aside class="rail" id="rail"></aside>
+  <main>
+    <section class="view" id="v-mail">
+      <div class="list">
+        <div class="mtop" id="mtop"></div>
+        <div class="list-h" id="listH"></div>
+        <div id="pulse"></div>
+        <div class="items" id="items"></div>
+      </div>
+      <div class="reader" id="reader"></div>
+    </section>
+    <section class="view" id="v-dash"><div class="page" id="dashPage"></div></section>
+    <section class="view" id="v-track"><div class="page" id="trackPage"></div></section>
+    <section class="view" id="v-auto"><div class="page" id="autoPage"></div></section>
+    <section class="view" id="v-people"><div class="page" id="peoplePage"></div></section>
+    <section class="view" id="v-tpl"><div class="page" id="tplPage"></div></section>
+    <section class="view" id="v-set"><div class="page" id="setPage"></div></section>
+  </main>
+</div>
+<div class="drawer-bg" data-act="closedrawer"></div>
+<nav class="tabbar" id="tabbar"></nav>
+<button class="fab" data-act="compose" aria-label="Redactar"><svg class="i"><use href="#i-pen"/></svg></button>
+<div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ================= i18n ================= */
+const LIVE=!!window.__LIVE__;
+function hook(){}
+function bodyHTML(m){return `<div class="rd-text">${esc(m.body)}</div>`}
+function footHTML(){return `<span class="dot"></span>${t('demo')}<br>${t('demo_note')}`}
+const T={
+es:{mail:'Correo',inbox:'Bandeja',dash:'Panel',track:'Seguimiento',tpl:'Plantillas',set:'Ajustes',compose:'Redactar',all:'Todo',
+ search:'Buscar correos, personas, pedidos…',folders:'Carpetas',labels:'Etiquetas',
+ fo_inbox:'Bandeja de entrada',fo_star:'Destacados',fo_snz:'Pospuestos',fo_drafts:'Borradores',fo_sent:'Enviados',fo_sched:'Programados',fo_archive:'Archivo',fo_spam:'Spam',fo_trash:'Papelera',
+ f_all:'Todos',f_pri:'Prioridad',f_unread:'Sin leer',f_prov:'Proveedores',f_cli:'Clientes',f_ped:'Pedidos',f_col:'Colaboraciones',f_otr:'Otros',
+ pulse:'Pulso del día',pulse_btn:'Resumir mi bandeja con IA',pulse_def:'{n} correos sin leer · {p} con prioridad · {w} esperando tu respuesta.',
+ reply:'Responder',fwd:'Reenviar',arch:'Archivar',del:'Eliminar',snooze:'Posponer',star:'Destacar',unread:'Marcar no leído',spam:'Es spam',notspam:'No es spam',restore:'Restaurar',more:'Más',
+ summ:'Resumir',aireply:'Respuesta IA',trbn:'Traducir',safe:'¿Es seguro?',quick:'Respuestas rápidas',quick_gen:'Sugerir con IA',
+ to:'Para',from:'De',subject:'Asunto',demo:'Modo demo',demo_note:'Correos de ejemplo. Al conectar Microsoft 365 aparecerán los reales.',
+ sel_mail:'Elige un correo para leerlo',received_on:'recibido en',sent_from:'enviado desde',
+ ai_sum:'Resumen IA',ai_reply:'Borrador de respuesta',t_formal:'Formal',t_warm:'Cercano',t_lux:'Lujo Santoro',
+ gen:'Generar',use_reply:'Usar en respuesta',ai_off:'La IA funciona cuando abres la app dentro de Claude. En la versión instalada usará tu propia conexión de IA.',thinking:'Pensando…',
+ sn_eve:'Esta tarde · 18:00',sn_tom:'Mañana · 9:00',sn_mon:'El lunes · 9:00',snoozed_until:'Pospuesto hasta',
+ st_sent:'Enviados',st_open:'Tasa de apertura',st_click:'Clics en enlaces',st_wait:'Esperando respuesta',
+ tracked:'Correos con seguimiento',scheduled:'Programados',
+ opened:'Abierto',times:'veces',not_opened:'No abierto',clicked:'Clic',replied:'Respondió',
+ ev_sent:'Enviado',ev_open:'Abrió el correo',ev_click:'Hizo clic en',ev_auto:'Apertura automática probable (Apple Mail)',
+ best_time:'Suele abrir entre',temp:'Interés',hot:'Caliente',warm:'Templado',cold:'Frío',
+ send_rem:'Enviar recordatorio',cancel:'Cancelar',send_now:'Enviar ahora',
+ track_note:'Las aperturas se detectan con una imagen invisible. Apple Mail a veces abre las imágenes solo; esas aperturas se marcan como "automática probable".',
+ tpl_t:'Plantillas y firmas',tpl_p:'Textos listos para proveedores, clientes y Santoro Club. Usa {{nombre}} y {{empresa}}; se rellenan solos.',
+ new_tpl:'Nueva plantilla',sigs:'Firmas',sig_s:'Firma Santoro',sig_h:'Firma Hanif Hawlader',
+ name:'Nombre',role:'Cargo',email:'Email',web:'Web',city:'Ciudad',line:'Frase',save:'Guardar',delete:'Borrar',edit_tpl:'Editar plantilla',cat:'Categoría',body:'Texto',
+ set_t:'Ajustes',lang:'Idioma de la app',theme:'Tema',theme_d:'Automático sigue el modo claro u oscuro de tu iPhone o Mac.',th_auto:'Automático',th_light:'Claro',th_dark:'Oscuro',
+ undo_s:'Tiempo para deshacer envío',notif:'Avisarme cuando abran mis correos',accounts:'Cuentas y alias',default:'Principal',conn:'Conectar tu correo',
+ step1:'Comprobar tu correo en GoDaddy',step1d:'Entra en GoDaddy → «Email y Office». Si pone Microsoft 365, sigue al paso 2.',
+ step2:'Registrar la app en Microsoft',step2d:'Inicias sesión en portal.azure.com con contacto@ y creas «Santoro Mail» en 5 minutos. Claude te guía paso a paso.',
+ step3:'Servidor gratuito (Cloudflare)',step3d:'Aloja la app en mail.hanifhawlader.com y registra aperturas y clics. Claude escribe todo el código.',
+ step4:'Iniciar sesión',step4d:'Pulsas «Entrar con Microsoft» una vez y tus 5 direcciones aparecen aquí.',
+ pending:'Pendiente',in_claude:'Activa en Claude',ai_step:'IA',ai_stepd:'Resúmenes, respuestas en español, inglés y bengalí, y textos pulidos.',
+ install:'Usarla como app',inst_ios:'iPhone',inst_ios_s:'Abre mail.hanifhawlader.com en Safari → botón Compartir → «Añadir a pantalla de inicio». Se abre a pantalla completa, con su icono, como una app.',
+ inst_mac:'Mac',inst_mac_s:'Abre la web en Safari → menú Archivo → «Añadir al Dock». Tendrás Santoro Mail en el Dock como cualquier programa.',
+ inst_now:'Ahora mismo',inst_now_s:'Esta vista previa vive dentro de Claude. Ábrela desde el enlace del chat en el móvil o el ordenador.',
+ keys:'Atajos de teclado (Mac)',k_c:'Redactar',k_r:'Responder',k_e:'Archivar',k_del:'Eliminar',k_s:'Destacar',k_slash:'Buscar',k_jk:'Siguiente / anterior',
+ c_new:'Nuevo correo',c_draft:'Borrador',c_tpl:'Plantilla',c_ai:'Escribir con IA',c_tr:'Traducir',c_subj:'Asunto IA',
+ c_idea:'Escribe la idea: «pedir 3 muestras de lino crudo a Pertegaz»',c_tone:'Ajustar',
+ to_short:'Más corto',to_formal:'Más formal',to_warm:'Más cálido',to_lux:'Más lujo',to_fix:'Corregir',
+ c_track_o:'Saber si lo abre',c_track_c:'Saber si hace clic',c_sched:'Programar envío',c_follow:'Recordarme si no responde',
+ never:'No',d2:'En 2 días',d3:'En 3 días',d7:'En 7 días',send:'Enviar',sched_btn:'Programar',
+ sending:'Enviando…',undo:'Deshacer',sent_ok:'Correo enviado',sched_ok:'Envío programado',undone:'Envío cancelado',draft_ok:'Guardado en borradores',
+ demo_open:'abrió tu correo',demo_tag:'(simulación demo)',archived:'Archivado',deleted:'Movido a la papelera',spammed:'Movido a spam',restored:'Restaurado',
+ need_to:'Escribe un destinatario',sig_preview:'Firma',identity:'Identidad',empty_trash:'Vaciar papelera',spam_note:'Los correos sospechosos llegan aquí. Revisa antes de abrir enlaces.',
+ wait_reply:'Esperando respuesta',follow_on:'Recordatorio',
+ d_title:'Panel',d_sub:'Cómo va tu correo esta semana.',d_unread:'Sin leer',d_resp:'Tu tiempo de respuesta',d_week:'Actividad · 7 días',d_recv:'Recibidos',d_sent:'Enviados',
+ d_cats:'Por tipo',d_hot:'Contactos más interesados',d_next:'Próximo',d_ask:'Pregúntale a tu correo',d_ask_ph:'¿Qué me ha pedido La Vespita? ¿Quién me debe respuesta?',
+ d_q1:'¿Qué tengo pendiente hoy?',d_q2:'¿Qué precios me han dado los proveedores?',d_q3:'¿Quién está más interesado en Santoro?',ask:'Preguntar',
+ safe_t:'Revisión de seguridad',safe_ok:'No vemos señales de fraude.',safe_bad:'Cuidado: parece fraude.',safe_mid:'Revisa con calma.',
+ sec_ago:'ahora',min:'min',h:'h',yesterday:'ayer',days:'d'},
+bn:{mail:'মেইল',inbox:'ইনবক্স',dash:'ড্যাশবোর্ড',track:'ট্র্যাকিং',tpl:'টেমপ্লেট',set:'সেটিংস',compose:'নতুন মেইল',all:'সব',
+ search:'মেইল, মানুষ, অর্ডার খুঁজুন…',folders:'ফোল্ডার',labels:'লেবেল',
+ fo_inbox:'ইনবক্স',fo_star:'স্টার করা',fo_snz:'পরে দেখব',fo_drafts:'ড্রাফট',fo_sent:'পাঠানো',fo_sched:'শিডিউল করা',fo_archive:'আর্কাইভ',fo_spam:'স্প্যাম',fo_trash:'ট্র্যাশ',
+ f_all:'সব',f_pri:'জরুরি',f_unread:'না পড়া',f_prov:'সাপ্লায়ার',f_cli:'ক্লায়েন্ট',f_ped:'অর্ডার',f_col:'কোলাবোরেশন',f_otr:'অন্যান্য',
+ pulse:'আজকের অবস্থা',pulse_btn:'AI দিয়ে ইনবক্সের সারাংশ',pulse_def:'{n}টা না পড়া মেইল · {p}টা জরুরি · {w}টা তোমার উত্তরের অপেক্ষায়।',
+ reply:'উত্তর',fwd:'ফরোয়ার্ড',arch:'আর্কাইভ',del:'মুছুন',snooze:'পরে দেখব',star:'স্টার',unread:'না পড়া করো',spam:'স্প্যাম',notspam:'স্প্যাম না',restore:'ফেরত আনো',more:'আরও',
+ summ:'সারাংশ',aireply:'AI উত্তর',trbn:'অনুবাদ',safe:'নিরাপদ?',quick:'দ্রুত উত্তর',quick_gen:'AI দিয়ে সাজেস্ট',
+ to:'প্রাপক',from:'থেকে',subject:'বিষয়',demo:'ডেমো মোড',demo_note:'এগুলো উদাহরণ মেইল। Microsoft 365 কানেক্ট করলে আসল মেইল আসবে।',
+ sel_mail:'পড়তে একটা মেইল বেছে নাও',received_on:'এসেছে',sent_from:'পাঠানো হয়েছে',
+ ai_sum:'AI সারাংশ',ai_reply:'উত্তরের খসড়া',t_formal:'ফরমাল',t_warm:'আন্তরিক',t_lux:'Santoro লাক্সারি',
+ gen:'তৈরি করো',use_reply:'উত্তরে বসাও',ai_off:'অ্যাপটা Claude-এর ভেতরে খুললে AI কাজ করে। ইনস্টল করা ভার্সনে তোমার নিজের AI কানেকশন লাগবে।',thinking:'ভাবছে…',
+ sn_eve:'আজ সন্ধ্যা · ১৮:০০',sn_tom:'কাল · ৯:০০',sn_mon:'সোমবার · ৯:০০',snoozed_until:'পরে দেখাবে',
+ st_sent:'পাঠানো',st_open:'খোলার হার',st_click:'লিংকে ক্লিক',st_wait:'উত্তরের অপেক্ষায়',
+ tracked:'ট্র্যাক করা মেইল',scheduled:'শিডিউল করা',
+ opened:'খুলেছে',times:'বার',not_opened:'খোলেনি',clicked:'ক্লিক',replied:'উত্তর দিয়েছে',
+ ev_sent:'পাঠানো হয়েছে',ev_open:'মেইল খুলেছে',ev_click:'ক্লিক করেছে',ev_auto:'সম্ভবত Apple Mail নিজে খুলেছে',
+ best_time:'সাধারণত খোলে',temp:'আগ্রহ',hot:'গরম',warm:'মাঝারি',cold:'ঠান্ডা',
+ send_rem:'রিমাইন্ডার পাঠাও',cancel:'বাতিল',send_now:'এখনই পাঠাও',
+ track_note:'একটা অদৃশ্য ছবি দিয়ে মেইল খোলা ধরা হয়। Apple Mail মাঝে মাঝে নিজেই ছবি খুলে ফেলে; সেগুলোকে "সম্ভবত অটো" হিসেবে দেখানো হয়।',
+ tpl_t:'টেমপ্লেট ও সিগনেচার',tpl_p:'সাপ্লায়ার, ক্লায়েন্ট আর Santoro Club-এর জন্য রেডি লেখা। {{nombre}} আর {{empresa}} নিজে থেকে বসে যাবে।',
+ new_tpl:'নতুন টেমপ্লেট',sigs:'সিগনেচার',sig_s:'Santoro সিগনেচার',sig_h:'Hanif Hawlader সিগনেচার',
+ name:'নাম',role:'পদ',email:'ইমেইল',web:'ওয়েব',city:'শহর',line:'লাইন',save:'সেভ',delete:'মুছুন',edit_tpl:'টেমপ্লেট এডিট',cat:'ক্যাটাগরি',body:'লেখা',
+ set_t:'সেটিংস',lang:'অ্যাপের ভাষা',theme:'থিম',theme_d:'অটো দিলে তোমার iPhone বা Mac-এর লাইট/ডার্ক মোড অনুযায়ী বদলাবে।',th_auto:'অটো',th_light:'লাইট',th_dark:'ডার্ক',
+ undo_s:'পাঠানো ফেরানোর সময়',notif:'মেইল খুললে আমাকে জানাও',accounts:'অ্যাকাউন্ট ও এলিয়াস',default:'প্রধান',conn:'তোমার মেইল কানেক্ট',
+ step1:'GoDaddy-তে মেইল চেক',step1d:'GoDaddy → «Email & Office»। সেখানে Microsoft 365 লেখা থাকলে ২ নম্বরে যাও।',
+ step2:'Microsoft-এ অ্যাপ রেজিস্টার',step2d:'portal.azure.com-এ contacto@ দিয়ে লগইন করে ৫ মিনিটে «Santoro Mail» বানাবে। Claude ধাপে ধাপে দেখাবে।',
+ step3:'ফ্রি সার্ভার (Cloudflare)',step3d:'অ্যাপটা mail.hanifhawlader.com-এ চলবে আর মেইল খোলা/ক্লিক রেকর্ড করবে। সব কোড Claude লিখবে।',
+ step4:'লগইন',step4d:'একবার «Microsoft দিয়ে লগইন» চাপলেই তোমার ৫টা ঠিকানা এখানে চলে আসবে।',
+ pending:'বাকি',in_claude:'Claude-এ চালু',ai_step:'AI',ai_stepd:'সারাংশ, স্প্যানিশ/ইংরেজি/বাংলায় উত্তর, লেখা সুন্দর করা।',
+ install:'অ্যাপ হিসেবে ব্যবহার',inst_ios:'iPhone',inst_ios_s:'Safari-তে mail.hanifhawlader.com খোলো → Share বাটন → «Add to Home Screen»। আইকনসহ পুরো স্ক্রিনে অ্যাপের মতো খুলবে।',
+ inst_mac:'Mac',inst_mac_s:'Safari-তে ওয়েবসাইটটা খোলো → File মেনু → «Add to Dock»। Dock-এ অন্য প্রোগ্রামের মতো Santoro Mail থাকবে।',
+ inst_now:'এখন',inst_now_s:'এই প্রিভিউটা Claude-এর ভেতরে চলে। ফোন বা কম্পিউটারে চ্যাটের লিংক থেকে খোলো।',
+ keys:'কিবোর্ড শর্টকাট (Mac)',k_c:'নতুন মেইল',k_r:'উত্তর',k_e:'আর্কাইভ',k_del:'মুছুন',k_s:'স্টার',k_slash:'খোঁজো',k_jk:'পরের / আগের',
+ c_new:'নতুন মেইল',c_draft:'ড্রাফট',c_tpl:'টেমপ্লেট',c_ai:'AI দিয়ে লেখো',c_tr:'অনুবাদ',c_subj:'AI বিষয়',
+ c_idea:'আইডিয়াটা লেখো: «Pertegaz-এর কাছে ৩টা লিনেন স্যাম্পল চাও»',c_tone:'বদলাও',
+ to_short:'ছোট করো',to_formal:'আরও ফরমাল',to_warm:'আরও আন্তরিক',to_lux:'আরও লাক্সারি',to_fix:'ভুল ঠিক করো',
+ c_track_o:'খুলল কি না জানব',c_track_c:'ক্লিক করল কি না জানব',c_sched:'পরে পাঠাও',c_follow:'উত্তর না দিলে মনে করাবে',
+ never:'না',d2:'২ দিনে',d3:'৩ দিনে',d7:'৭ দিনে',send:'পাঠাও',sched_btn:'শিডিউল',
+ sending:'পাঠানো হচ্ছে…',undo:'ফেরাও',sent_ok:'মেইল পাঠানো হয়েছে',sched_ok:'শিডিউল হয়েছে',undone:'পাঠানো বাতিল',draft_ok:'ড্রাফটে সেভ হয়েছে',
+ demo_open:'তোমার মেইল খুলেছে',demo_tag:'(ডেমো)',archived:'আর্কাইভ হয়েছে',deleted:'ট্র্যাশে গেছে',spammed:'স্প্যামে গেছে',restored:'ফেরত এসেছে',
+ need_to:'প্রাপকের ঠিকানা লেখো',sig_preview:'সিগনেচার',identity:'পরিচয়',empty_trash:'ট্র্যাশ খালি করো',spam_note:'সন্দেহজনক মেইল এখানে আসে। লিংকে ক্লিক করার আগে দেখে নাও।',
+ wait_reply:'উত্তরের অপেক্ষায়',follow_on:'রিমাইন্ডার',
+ d_title:'ড্যাশবোর্ড',d_sub:'এই সপ্তাহে তোমার মেইলের অবস্থা।',d_unread:'না পড়া',d_resp:'তোমার উত্তর দেওয়ার সময়',d_week:'৭ দিনের কাজ',d_recv:'এসেছে',d_sent:'পাঠানো',
+ d_cats:'ধরন অনুযায়ী',d_hot:'সবচেয়ে আগ্রহী',d_next:'সামনে',d_ask:'তোমার মেইলকে জিজ্ঞেস করো',d_ask_ph:'La Vespita কী চেয়েছে? কে আমার উত্তরের অপেক্ষায়?',
+ d_q1:'আজ আমার কী কী বাকি?',d_q2:'সাপ্লায়াররা কী দাম দিয়েছে?',d_q3:'Santoro-তে কে সবচেয়ে আগ্রহী?',ask:'জিজ্ঞেস করো',
+ safe_t:'নিরাপত্তা চেক',safe_ok:'প্রতারণার কোনো চিহ্ন নেই।',safe_bad:'সাবধান: প্রতারণা মনে হচ্ছে।',safe_mid:'ধীরে দেখে নাও।',
+ sec_ago:'এখন',min:'মি',h:'ঘ',yesterday:'গতকাল',days:'দি'}
+};
+Object.assign(T.es,{menu:'Menú',accounts2:'Cuentas',add_acct:'Añadir cuenta (Gmail, iCloud…)',soon:'pronto',ms365:'Microsoft 365',tools:'Herramientas',al_status_ok:'Activo en Microsoft',al_status_wait:'Falta crearlo en GoDaddy',al_check:'Comprobar',al_edit:'Editar alias',al_how1:'Pulsa «Abrir GoDaddy» → Admin → Email aliases → Add alias, con el mismo nombre.',al_how2:'Vuelve aquí y pulsa «Comprobar»: aparecerá como activo.',al_label:'Nombre visible',al_checked:'Alias actualizados',
+inboxes:'Bandejas',all_inb:'Todas',add_alias:'Añadir alias',al_local:'Nombre del alias',al_desc:'Para qué es',al_id:'Identidad',al_note:'Microsoft no deja crear alias desde apps externas. Créalo en GoDaddy (Email y Office → Admin → Email aliases) y añádelo aquí: tendrá su propia bandeja, firma y color.',al_open:'Abrir GoDaddy',al_added:'Alias añadido',al_main:'Principal',al_rm:'Quitar de la app',
+auto:'Automatización',people:'Contactos',moreTab:'Más',pinned:'Fijados',today:'Hoy',yest:'Ayer',older:'Anteriores',pin:'Fijar',unpin:'Quitar',fav:'Favorito',favs:'Favoritos',
+ only_from:'Solo de',clear:'Quitar',write:'Escribir',see_mails:'Ver correos',p_mails:'correos',p_last:'último',p_sub:'Marca con el corazón a quien más te importa: aparece arriba en tu bandeja.',
+ a_sub:'Reglas que trabajan solas: responder con Claude, enviar emails de marca cuando alguien compra en la web, avisarte, ordenar tu correo.',a_new:'Nueva automatización',a_rules:'Tus reglas',a_log:'Historial',a_conn:'Conexiones',a_test:'Probar',
+ a_when:'Cuando',a_if:'Si',a_do:'Hacer',a_mode:'Modo',m_draft:'Dejar borrador para revisar',m_send:'Enviar automáticamente',a_tpl:'Plantilla',a_runs:'veces',a_saved:'Automatización guardada',a_ran:'Prueba hecha',a_nomatch:'No hay ningún correo que cumpla esta regla ahora.',
+ a_name:'Nombre',a_result:'Resultado de la prueba',a_safe:'Consejo: deja las respuestas con IA en «borrador» hasta que te fíes de ellas.',
+ w_from:'Llega un correo de…',w_to:'Llega a la dirección…',w_has:'El asunto o texto contiene…',w_order:'Nuevo pedido en la web Santoro',w_ship:'Pedido marcado como enviado',w_signup:'Alta en Santoro Club',w_noreply:'Sin respuesta en X días',w_opened:'Abren mi correo X veces',w_off:'Fuera de horario / fin de semana',
+ d_ai:'Responder con Claude (IA)',d_tpl:'Responder con plantilla',d_brand:'Enviar email de marca',d_pin:'Fijar arriba',d_star:'Destacar',d_label:'Poner etiqueta',d_notify:'Avisarme',d_fwd:'Reenviar a…',d_remind:'Enviar recordatorio',
+ c_ms:'Microsoft 365',c_ms_s:'Correo esencial de GoDaddy · detectado',c_claude:'Claude (API de Anthropic)',c_claude_s:'Para respuestas automáticas y resúmenes en la app instalada',c_web:'Web Santoro',c_web_s:'La web avisa a la app en esta dirección cuando hay un pedido:',
+ detected:'Detectado',bm_t:'Emails de marca',bm_p:'Se envían solos desde pedidos@ con el diseño Santoro.',bm_order:'Confirmación de pedido',bm_ship:'Pedido enviado',bm_club:'Bienvenida Santoro Club',
+ step_alias:'Crear los alias en GoDaddy',step_aliasd:'Email y Office → Admin → Email aliases → Add alias: santoro@, pedidos@, club@, hola@. Hoy solo existe contacto@.',
+ step_send:'Activar «enviar desde alias»',step_sendd:'Exchange admin center → Settings → Mail flow → «Turn on sending from aliases». Por eso Spark no podía enviar desde santoro@.',done:'Hecho'});
+Object.assign(T.bn,{menu:'মেনু',accounts2:'অ্যাকাউন্ট',add_acct:'অ্যাকাউন্ট যোগ (Gmail, iCloud…)',soon:'শীঘ্রই',ms365:'Microsoft 365',tools:'টুলস',al_status_ok:'Microsoft-এ চালু',al_status_wait:'GoDaddy-তে বানানো বাকি',al_check:'চেক করো',al_edit:'এলিয়াস এডিট',al_how1:'«GoDaddy খোলো» চাপো → Admin → Email aliases → Add alias, একই নাম দিয়ে।',al_how2:'এখানে ফিরে «চেক করো» চাপো: চালু দেখাবে।',al_label:'দেখানোর নাম',al_checked:'এলিয়াস আপডেট হয়েছে',
+inboxes:'ইনবক্সগুলো',all_inb:'সব',add_alias:'এলিয়াস যোগ',al_local:'এলিয়াসের নাম',al_desc:'কীসের জন্য',al_id:'পরিচয়',al_note:'Microsoft বাইরের অ্যাপ থেকে এলিয়াস বানাতে দেয় না। GoDaddy-তে বানাও (Email & Office → Admin → Email aliases), তারপর এখানে যোগ করো: নিজের ইনবক্স, সিগনেচার আর রং পাবে।',al_open:'GoDaddy খোলো',al_added:'এলিয়াস যোগ হয়েছে',al_main:'প্রধান',al_rm:'অ্যাপ থেকে সরাও',
+auto:'অটোমেশন',people:'কন্টাক্ট',moreTab:'আরও',pinned:'পিন করা',today:'আজ',yest:'গতকাল',older:'আগের',pin:'পিন',unpin:'পিন সরাও',fav:'প্রিয়',favs:'প্রিয়',
+ only_from:'শুধু',clear:'সরাও',write:'লেখো',see_mails:'মেইল দেখো',p_mails:'মেইল',p_last:'শেষ',p_sub:'যাদের বেশি দরকার তাদের হার্ট দাও: ইনবক্সের একদম উপরে দেখাবে।',
+ a_sub:'যে নিয়মগুলো নিজে কাজ করে: Claude দিয়ে উত্তর, ওয়েবসাইটে অর্ডার এলে ব্র্যান্ডেড মেইল, নোটিফিকেশন, মেইল গোছানো।',a_new:'নতুন অটোমেশন',a_rules:'তোমার নিয়ম',a_log:'ইতিহাস',a_conn:'কানেকশন',a_test:'টেস্ট',
+ a_when:'যখন',a_if:'যদি',a_do:'করো',a_mode:'মোড',m_draft:'ড্রাফট রাখো, আমি দেখে পাঠাব',m_send:'নিজে থেকে পাঠাও',a_tpl:'টেমপ্লেট',a_runs:'বার',a_saved:'অটোমেশন সেভ হয়েছে',a_ran:'টেস্ট হয়েছে',a_nomatch:'এই মুহূর্তে এই নিয়মে মেলে এমন মেইল নেই।',
+ a_name:'নাম',a_result:'টেস্টের ফল',a_safe:'পরামর্শ: AI উত্তরে ভরসা না আসা পর্যন্ত «ড্রাফট» মোডে রাখো।',
+ w_from:'কারো কাছ থেকে মেইল এলে…',w_to:'এই ঠিকানায় মেইল এলে…',w_has:'বিষয় বা লেখায় থাকলে…',w_order:'Santoro ওয়েবসাইটে নতুন অর্ডার',w_ship:'অর্ডার পাঠানো হলে',w_signup:'Santoro Club-এ নতুন সদস্য',w_noreply:'X দিনে উত্তর না এলে',w_opened:'আমার মেইল X বার খুললে',w_off:'কাজের সময়ের বাইরে / ছুটির দিন',
+ d_ai:'Claude (AI) দিয়ে উত্তর',d_tpl:'টেমপ্লেট দিয়ে উত্তর',d_brand:'ব্র্যান্ডেড মেইল পাঠাও',d_pin:'উপরে পিন করো',d_star:'স্টার দাও',d_label:'লেবেল দাও',d_notify:'আমাকে জানাও',d_fwd:'ফরোয়ার্ড করো…',d_remind:'রিমাইন্ডার পাঠাও',
+ c_ms:'Microsoft 365',c_ms_s:'GoDaddy-র Correo esencial · পাওয়া গেছে',c_claude:'Claude (Anthropic API)',c_claude_s:'ইনস্টল করা অ্যাপে অটো-উত্তর আর সারাংশের জন্য',c_web:'Santoro ওয়েবসাইট',c_web_s:'অর্ডার এলে ওয়েবসাইট এই ঠিকানায় অ্যাপকে জানাবে:',
+ detected:'পাওয়া গেছে',bm_t:'ব্র্যান্ডেড মেইল',bm_p:'pedidos@ থেকে Santoro ডিজাইনে নিজে থেকে যায়।',bm_order:'অর্ডার কনফার্মেশন',bm_ship:'অর্ডার পাঠানো হয়েছে',bm_club:'Santoro Club-এ স্বাগতম',
+ step_alias:'GoDaddy-তে এলিয়াস বানাও',step_aliasd:'Email & Office → Admin → Email aliases → Add alias: santoro@, pedidos@, club@, hola@। এখন শুধু contacto@ আছে।',
+ step_send:'«এলিয়াস থেকে পাঠানো» চালু করো',step_sendd:'Exchange admin center → Settings → Mail flow → «Turn on sending from aliases»। এই কারণেই Spark থেকে santoro@ দিয়ে পাঠানো যাচ্ছিল না।',done:'হয়ে গেছে'});
+const LS={get(k,d){try{const v=localStorage.getItem('sm2_'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('sm2_'+k,JSON.stringify(v))}catch(e){}}};
+let LANG=LS.get('lang','es');
+const t=k=>(T[LANG]&&T[LANG][k])||T.es[k]||k;
+
+/* ================= data ================= */
+const NOW=Date.now(),ago=m=>new Date(NOW-m*60000).toISOString();
+let ALIASES=[{email:'contacto@hanifhawlader.com',id:'hanif',def:true,main:true,lbl:'Hanif Hawlader',desc:'Buzón principal'},{email:'santoro@hanifhawlader.com',id:'santoro',def:true,lbl:'Santoro',desc:'La marca'},{email:'pedidos@hanifhawlader.com',id:'santoro',lbl:'Pedidos',desc:'Pedidos de la web'},{email:'club@hanifhawlader.com',id:'santoro',lbl:'Santoro Club',desc:'Miembros del club'},{email:'hola@hanifhawlader.com',id:'santoro',lbl:'Hola',desc:'Clientes y consultas'}];
+try{const a=JSON.parse(localStorage.getItem('sm2_aliases')||'null');if(a&&a.length)ALIASES=a}catch(e){}
+const saveAliases=()=>{try{localStorage.setItem('sm2_aliases',JSON.stringify(ALIASES))}catch(e){}hook('prefs')};
+const idOf=em=>(ALIASES.find(a=>a.email===em)||{id:'hanif'}).id;
+const M=(o)=>Object.assign({folder:'inbox',star:false,unread:false,pri:false,att:[]},o);
+let mails=[
+ M({id:'m1',to:'santoro@hanifhawlader.com',from:{n:'Pertegaz · Tejidos',e:'comercial@pertegaz.demo'},cat:'prov',pri:true,unread:true,star:true,date:ago(25),att:['Tarifa_invierno_2027.pdf'],
+  sub:'Muestrario de tejidos invierno 2027',body:'Hola Hanif,\n\nGracias por tu interés. Te preparamos el muestrario de invierno 2027 con las lanas frías, franelas y el oxford que comentaste.\n\nPrecios orientativos: entre 14 y 22 €/m según calidad. Pedido mínimo por referencia: 50 metros.\n\n¿Nos confirmas la dirección de envío para mandarte el muestrario esta semana?\n\nUn saludo,\nMarta · Dpto. Comercial'}),
+ M({id:'m2',to:'hola@hanifhawlader.com',from:{n:'Lucía Martín',e:'lucia.martin@correo.demo'},cat:'cli',pri:true,unread:true,date:ago(70),
+  sub:'Consulta sobre camisas a medida',body:'Buenas tardes,\n\nHe visto vuestra marca y me encanta el estilo. Me caso en marzo y quería saber si hacéis camisas a medida para el novio y dos testigos.\n\n¿Cuál sería el precio aproximado y cuánto tardáis?\n\nMuchas gracias,\nLucía'}),
+ M({id:'m3',to:'santoro@hanifhawlader.com',from:{n:'La Vespita',e:'taller@lavespita.demo'},cat:'prov',unread:true,date:ago(130),
+  sub:'Re: Pedido de prueba: 20 camisas Oxford',body:'Hola Hanif,\n\nPodemos hacer el pedido de prueba de 20 camisas. Precio: 18 €/unidad con tu tejido, 26 €/unidad con el nuestro. Plazo: 3 semanas desde que recibimos la ficha técnica.\n\nEnvíanos el tech pack con medidas y detalles de cuello y puño.\n\nSaludos desde Valencia,\nPaco'}),
+ M({id:'m4',to:'pedidos@hanifhawlader.com',from:{n:'Tienda Santoro',e:'notificaciones@santoro.demo'},cat:'ped',unread:true,date:ago(190),
+  sub:'Nuevo pedido web #0012',body:'Nuevo pedido recibido.\n\nPedido: #0012\nCliente: Javier Ruiz\nProducto: Camisa Oxford crema · talla M\nTotal: 89,00 €\nEnvío: Santander\n\nPrepara el pedido en 48 h.'}),
+ M({id:'m5',to:'club@hanifhawlader.com',from:{n:'Adolfo · Serigrafía',e:'adolfo@serigrafia.demo'},cat:'prov',date:ago(300),
+  sub:'Presupuesto serigrafía Santoro Club',body:'Hanif, te paso números:\n\n50 camisetas, logo a una tinta en pecho: 4,20 €/ud\n100 camisetas: 3,60 €/ud\nPantalla: 25 € una vez.\n\nSi me pasas el logo en vector lo tengo en una semana.\n\nAdolfo'}),
+ M({id:'m6',to:'contacto@hanifhawlader.com',from:{n:'James Carter',e:'james@showroom.demo'},cat:'col',date:ago(60*26),star:true,
+  sub:'Collaboration proposal – menswear showroom, London',body:'Hi Hanif,\n\nI run a small menswear showroom in London and came across Santoro. We would love to discuss carrying a capsule of your shirts for spring.\n\nWould you have 20 minutes for a call next week?\n\nBest,\nJames'}),
+ M({id:'m7',to:'contacto@hanifhawlader.com',from:{n:'Registro de dominios',e:'avisos@dominios.demo'},cat:'otr',date:ago(60*30),
+  sub:'Tu dominio hanifhawlader.com se renueva pronto',body:'Tu dominio hanifhawlader.com se renovará automáticamente dentro de 30 días. No tienes que hacer nada si los datos de pago están al día.'}),
+ M({id:'m8',to:'santoro@hanifhawlader.com',from:{n:'Textil & Moda Semanal',e:'news@textil.demo'},cat:'otr',date:ago(60*50),
+  sub:'Tendencias de tejido para otoño-invierno',body:'Esta semana: el regreso de la franela, nuevas fibras recicladas y las ferias de enero en Europa.'}),
+ M({id:'m9',folder:'archive',to:'contacto@hanifhawlader.com',from:{n:'Maquinaria Textil Norte',e:'ventas@maqnorte.demo'},cat:'prov',date:ago(60*24*6),
+  sub:'Factura de la máquina de coser recta',body:'Adjuntamos la factura de la máquina recta industrial. Garantía de 2 años.',att:['Factura_0451.pdf']}),
+ M({id:'m10',folder:'spam',to:'contacto@hanifhawlader.com',from:{n:'Seguridad de tu cuenta',e:'alerta@verif1cacion-cuenta.demo'},cat:'otr',unread:true,date:ago(60*5),
+  sub:'URGENTE: tu buzón será bloqueado en 24 horas',body:'Estimado usuario,\n\nHemos detectado actividad inusual. Tu buzón será bloqueado en 24 horas si no verificas tu contraseña ahora.\n\nHaz clic aquí para verificar: http://verif1cacion-cuenta.demo/login\n\nEquipo de seguridad'}),
+ M({id:'m11',folder:'spam',to:'santoro@hanifhawlader.com',from:{n:'Premios Online',e:'ganador@premios-xyz.demo'},cat:'otr',date:ago(60*20),
+  sub:'¡Has ganado un premio de 1.000 €!',body:'¡Felicidades! Has sido seleccionado. Para recibir tu premio envíanos tus datos bancarios hoy mismo.'}),
+ M({id:'m12',folder:'trash',to:'santoro@hanifhawlader.com',from:{n:'Ofertas Packaging',e:'info@packaging.demo'},cat:'otr',date:ago(60*24*3),
+  sub:'Cajas personalizadas con 20 % de descuento',body:'Cajas rígidas con tu logo desde 0,90 €/ud. Pedido mínimo 500 unidades.'})
+];
+mails.find(m=>m.id==='m2').pin=true;mails.find(m=>m.id==='m3').pin=true;
+let favs=LS.get('favs',['comercial@pertegaz.demo','taller@lavespita.demo','james@showroom.demo','lucia.martin@correo.demo']);
+let rules=LS.get('rules',[
+ {id:'r1',on:true,name:'Pedido web → confirmación Santoro',w:'order',wv:'',d:'brand',dv:'order',mode:'send',runs:12,last:ago(190)},
+ {id:'r2',on:true,name:'Pedido enviado → aviso al cliente',w:'ship',wv:'',d:'brand',dv:'ship',mode:'send',runs:9,last:ago(60*20)},
+ {id:'r3',on:true,name:'Alta Santoro Club → bienvenida',w:'signup',wv:'',d:'brand',dv:'club',mode:'send',runs:4,last:ago(60*30)},
+ {id:'r4',on:true,name:'Clientes en hola@ → Claude prepara la respuesta',w:'to',wv:'hola@hanifhawlader.com',d:'ai',dv:'lux',mode:'draft',runs:3,last:ago(70)},
+ {id:'r5',on:false,name:'Fin de semana → respuesta de ausencia',w:'off',wv:'',d:'tpl',dv:'t3',mode:'send',runs:0,last:null},
+ {id:'r6',on:true,name:'Proveedor sin respuesta 3 días → recordatorio',w:'noreply',wv:'3',d:'remind',dv:'t3',mode:'draft',runs:2,last:ago(60*24)},
+ {id:'r7',on:true,name:'Facturas → fijar y etiquetar',w:'has',wv:'factura',d:'pin',dv:'',mode:'send',runs:1,last:ago(60*24*6)},
+ {id:'r8',on:true,name:'Abren mi correo 3 veces → avisarme',w:'opened',wv:'3',d:'notify',dv:'',mode:'send',runs:5,last:ago(95)}
+]);
+let alog=[
+ {t:ago(70),r:'r4',txt:'Claude preparó un borrador para Lucía Martín (hola@)'},
+ {t:ago(95),r:'r8',txt:'Showroom London abrió tu correo por 4.ª vez'},
+ {t:ago(190),r:'r1',txt:'Confirmación de pedido #0012 enviada a Javier Ruiz'},
+ {t:ago(60*20),r:'r2',txt:'Aviso de envío del pedido #0011 enviado'},
+ {t:ago(60*24),r:'r6',txt:'Borrador de recordatorio para Tejidos Gratacós'}
+];
+const saveRules=()=>{LS.set('rules',rules);hook('prefs')};
+let sent=[
+ {id:'s1',from:'santoro@hanifhawlader.com',to:{n:'Showroom London · James',e:'james@showroom.demo'},sub:'Santoro · lookbook y precios mayoristas',date:ago(60*6),
+  body:'Hi James,\n\nThank you for your interest in Santoro. Please find our lookbook and wholesale price list attached.\n\nI would be delighted to talk next week.\n\nHanif',
+  opens:[{t:ago(60*5.7),d:'MacBook · Chrome',p:'Londres, UK'},{t:ago(60*5.5),d:'MacBook · Chrome',p:'Londres, UK'},{t:ago(60*3),d:'iPhone',p:'Londres, UK'},{t:ago(95),d:'iPhone',p:'Londres, UK'},{t:ago(40),d:'MacBook · Chrome',p:'Londres, UK'}],
+  clicks:[{t:ago(60*5.5),u:'Lookbook Santoro (PDF)'},{t:ago(40),u:'Lista de precios mayoristas'}],replied:false,wait:true,follow:ago(-60*24*2)},
+ {id:'s2',from:'santoro@hanifhawlader.com',to:{n:'La Vespita',e:'taller@lavespita.demo'},sub:'Pedido de prueba: 20 camisas Oxford',date:ago(60*28),
+  body:'Hola Paco,\n\nQueremos hacer un pedido de prueba: 20 camisas Oxford, patrón propio. Adjunto la ficha técnica.\n\nUn saludo,\nHanif',
+  opens:[{t:ago(60*20),d:'Ordenador · Windows',p:'Valencia, ES'},{t:ago(60*3),d:'Ordenador · Windows',p:'Valencia, ES'}],clicks:[{t:ago(60*19.8),u:'Ficha técnica camisa (tech pack)'}],replied:true,wait:false},
+ {id:'s3',from:'santoro@hanifhawlader.com',to:{n:'Pertegaz · Tejidos',e:'comercial@pertegaz.demo'},sub:'Solicitud de muestrario invierno',date:ago(60*50),
+  body:'Hola Marta,\n\nNos interesaría recibir vuestro muestrario de invierno: lanas frías, franela y oxford.\n\nGracias,\nHanif',
+  opens:[{t:ago(60*47),d:'Ordenador · Outlook',p:'España'},{t:ago(60*24),d:'Ordenador · Outlook',p:'España'},{t:ago(60*23.5),d:'Android',p:'España'}],clicks:[],replied:true,wait:false},
+ {id:'s4',from:'club@hanifhawlader.com',to:{n:'Adolfo · Serigrafía',e:'adolfo@serigrafia.demo'},sub:'Logo Santoro Club en vector',date:ago(180),
+  body:'Adolfo, te paso el logo en vector. ¿Podemos empezar con 50 camisetas?\n\nHanif',opens:[{t:new Date(NOW-180*60000+4000).toISOString(),d:'Apple Mail',p:'—',auto:true}],clicks:[],replied:false,wait:false},
+ {id:'s5',from:'santoro@hanifhawlader.com',to:{n:'Tejidos Gratacós',e:'info@gratacos.demo'},sub:'Consulta de precios: lino crudo',date:ago(60*24*4),
+  body:'Buenos días,\n\n¿Podríais indicarme precio por metro y pedido mínimo del lino crudo?\n\nGracias,\nHanif',opens:[],clicks:[],replied:false,wait:true,follow:ago(-60*20)}
+];
+let drafts=[{id:'d1',from:'club@hanifhawlader.com',to:'adolfo@serigrafia.demo',toName:'Adolfo · Serigrafía',sub:'Propuesta Santoro Club: primeras 50 camisetas',body:'Hola Adolfo,\n\nGracias por el presupuesto. Me encaja la opción de 50 camisetas. ',date:ago(45)}];
+function nextMon9(){const d=new Date();d.setDate(d.getDate()+((8-d.getDay())%7||7));d.setHours(9,0,0,0);return d.toISOString()}
+let scheduled=[{id:'p1',from:'santoro@hanifhawlader.com',to:{n:'Pertegaz · Tejidos',e:'comercial@pertegaz.demo'},sub:'Dirección de envío del muestrario',body:'Hola Marta,\n\nTe confirmo la dirección de envío del muestrario: [dirección].\n\nGracias,\nHanif',at:nextMon9()}];
+let templates=[
+ {id:'t1',cat:'prov',id_:'santoro',name:'Solicitud de muestras de tejido',sub:'Solicitud de muestras · Santoro',body:'Hola {{nombre}},\n\nSoy Hanif Hawlader, fundador de Santoro, una marca de ropa de lujo nacida en Santander. Tengo 6 años como responsable de producción y socio en una empresa de moda.\n\nEstamos seleccionando tejidos para nuestra primera colección y nos interesaría recibir muestras de {{empresa}}: lanas frías, oxford y lino.\n\n¿Podríais indicarme precios por metro, pedido mínimo y plazos?\n\nMuchas gracias,'},
+ {id:'t2',cat:'prov',id_:'santoro',name:'Pedido de prueba de camisas',sub:'Pedido de prueba · camisas Santoro',body:'Hola {{nombre}},\n\nQueremos hacer un pedido de prueba con {{empresa}}: 20 camisas, patrón propio, en dos tallas.\n\nAdjunto la ficha técnica. ¿Me confirmáis precio por unidad, plazo de entrega y si trabajáis con tejido del cliente?\n\nUn saludo,'},
+ {id:'t3',cat:'prov',id_:'santoro',name:'Seguimiento amable',sub:'Re: seguimiento',body:'Hola {{nombre}},\n\nTe escribo para retomar mi correo anterior. Sigo muy interesado en trabajar con {{empresa}}. Cuando tengas un momento, me ayudaría mucho tu respuesta.\n\nGracias de antemano,'},
+ {id:'t4',cat:'cli',id_:'santoro',name:'Respuesta a camisa a medida',sub:'Tu camisa a medida · Santoro',body:'Hola {{nombre}},\n\nGracias por escribirnos. Será un placer acompañarte en un día tan especial.\n\nNuestras camisas a medida parten de [precio] € y el plazo es de 3 a 4 semanas desde la toma de medidas. Podemos vernos en Cantabria o hacer la toma de medidas por videollamada.\n\n¿Qué día te vendría bien?\n\nCon cariño,'},
+ {id:'t5',cat:'ped',id_:'santoro',name:'Confirmación de pedido',sub:'Tu pedido Santoro está en camino',body:'Hola {{nombre}},\n\nGracias por tu compra. Tu pedido ya está preparado y saldrá hoy. Te llegará en 24–48 h.\n\nCada prenda Santoro se revisa a mano antes de salir del taller.\n\nUn abrazo,'},
+ {id:'t6',cat:'cli',id_:'santoro',name:'Bienvenida a Santoro Club',sub:'Bienvenido a Santoro Club',body:'Hola {{nombre}},\n\nYa formas parte de Santoro Club. Serás el primero en ver cada colección, tendrás acceso a ediciones limitadas y a encuentros privados.\n\nBienvenido a la casa,'},
+ {id:'t7',cat:'col',id_:'hanif',name:'Propuesta de colaboración',sub:'Colaboración con Santoro',body:'Hola {{nombre}},\n\nTe escribo porque me gusta mucho lo que hacéis en {{empresa}} y creo que encaja con Santoro. Me encantaría proponeros una colaboración.\n\n¿Tendrías 20 minutos esta semana para hablarlo?\n\nUn saludo,'},
+ {id:'t8',cat:'prov',id_:'santoro',name:'Supplier inquiry (English)',sub:'Sourcing inquiry · Santoro',body:'Dear {{nombre}},\n\nI am Hanif Hawlader, founder of Santoro, a luxury menswear brand from Santander, Spain. I spent six years as head of production and partner at a fashion company.\n\nWe are sourcing for our first collection and would like to know more about {{empresa}}: price list, minimum order and lead times.\n\nKind regards,'}
+];
+let sigs={santoro:{n:'Hanif Hawlader',r:'Fundador',e:'santoro@hanifhawlader.com',w:'hanifhawlader.com',c:'Santander · España',l:'Elegancia, hecha a mano.'},
+ hanif:{n:'Hanif Hawlader',r:'Producción y dirección creativa',e:'contacto@hanifhawlader.com',w:'hanifhawlader.com',c:'Cantabria · España',l:''}};
+templates=LS.get('templates',templates);sigs=LS.get('sigs',sigs);
+const persist=()=>{LS.set('templates',templates);LS.set('sigs',sigs);hook('prefs')};
+
+const S={alias:null,contact:null,view:'mail',folder:'inbox',filter:'all',ident:'all',sel:null,q:'',openRow:'s1',pulse:null,ai:{},
+ theme:LS.get('theme','auto'),undoSec:LS.get('undo',6),notif:LS.get('notif',true),ask:''};
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const ic=(n,c='')=>`<svg class="i ${c}"><use href="#i-${n}"/></svg>`;
+const rider=(c='')=>`<svg class="${c}" viewBox="0 0 900 843"><use href="#rider"/></svg>`;
+const ini=n=>String(n).replace(/[·\-].*$/,'').trim().split(/\s+/).slice(0,2).map(w=>w[0]||'').join('').toUpperCase()||'·';
+const loc=()=>LANG==='bn'?'bn-BD':'es-ES';
+function rel(iso){const d=(Date.now()-new Date(iso))/60000;
+ if(d<0){return fdt(iso)} if(d<1)return t('sec_ago'); if(d<60)return Math.round(d)+' '+t('min'); if(d<1440)return Math.round(d/60)+' '+t('h'); if(d<2880)return t('yesterday'); return Math.round(d/1440)+' '+t('days')}
+const fdt=iso=>new Date(iso).toLocaleString(loc(),{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const ftime=iso=>new Date(iso).toLocaleString(loc(),{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const catLbl={prov:'f_prov',cli:'f_cli',ped:'f_ped',col:'f_col',otr:'f_otr'};
+function toast(msg,o={}){const el=document.createElement('div');el.className='toast'+(o.wine?' w':'');el.innerHTML=`<span>${msg}</span>`+(o.action?`<button>${o.action}</button>`:'');
+ $('#toasts').appendChild(el);if(o.action)el.querySelector('button').onclick=()=>{o.onAction&&o.onAction();el.remove()};setTimeout(()=>el.remove(),o.ms||3500);return el}
+const isMobile=()=>innerWidth<=900;
+
+/* ================= theme ================= */
+const mq=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):null;
+function applyTheme(){const dark=S.theme==='dark'||(S.theme==='auto'&&mq&&mq.matches);document.documentElement.dataset.theme=dark?'dark':'light'}
+if(mq&&mq.addEventListener)mq.addEventListener('change',applyTheme);
+applyTheme();
+
+/* ================= AI ================= */
+let AI=null;
+(async()=>{try{if(window.claude&&window.claude.use)AI=await window.claude.use('sample')}catch(e){AI=null}setTimeout(renderAll,0)})();
+async function ask(prompt,onText){
+ if(!AI){onText(t('ai_off'));return null}
+ onText(t('thinking'));
+ try{const r=await AI(prompt,{onText:({text})=>onText(text)});onText(r.text);return r.text}
+ catch(e){onText(e&&e.code==='not_granted'?t('ai_off'):(e&&e.message)||'Error');return null}}
+const BRAND='Escribes para Hanif Hawlader, fundador de Santoro (marca de ropa de lujo de Santander, España). Estilo: elegante, breve, cálido, sin emojis, sin exageraciones.';
+const langName={es:'español de España',en:'inglés británico',bn:'bengalí (escritura bengalí)'};
+const outLang=()=>LANG==='bn'?'bengalí (escritura bengalí)':'español';
+const guessLang=txt=>/\b(hi|dear|thank|would|please)\b/i.test(txt)?'en':/[ঀ-৿]/.test(txt)?'bn':'es';
+
+/* ================= folders & list ================= */
+const FOLDERS=[['inbox','inbox'],['star','star'],['snz','clock'],['drafts','pen'],['sent','send'],['sched','cal'],['archive','arch'],['spam','shield'],['trash','trash']];
+const identOK=em=>S.ident==='all'||idOf(em)===S.ident;
+function folderCount(f){
+ if(f==='inbox')return mails.filter(m=>m.folder==='inbox'&&!m.snz&&m.unread&&identOK(m.to)).length;
+ if(f==='spam')return mails.filter(m=>m.folder==='spam'&&identOK(m.to)).length;
+ if(f==='drafts')return drafts.filter(d=>identOK(d.from)).length;
+ if(f==='sched')return scheduled.filter(d=>identOK(d.from)).length;
+ if(f==='snz')return mails.filter(m=>m.snz&&m.folder==='inbox'&&identOK(m.to)).length;
+ if(f==='star')return mails.filter(m=>m.star&&m.folder!=='trash'&&identOK(m.to)).length;
+ return 0}
+function applyFilter(l,f){
+ if(f==='pri')return l.filter(m=>m.pri);if(f==='unread')return l.filter(m=>m.unread);
+ if(catLbl[f])return l.filter(m=>m.cat===f);return l}
+function rows(){
+ const f=S.folder,q=S.q.toLowerCase();let r=[];
+ const mm=m=>({to:m.to,k:'m',pin:m.pin,fav:favs.includes(m.from.e),em:m.from.e,id:m.id,name:m.from.n,sub:m.sub,snip:m.body,date:m.date,idn:idOf(m.to),unread:m.unread,star:m.star,pri:m.pri,snz:m.snz,att:m.att.length,spam:m.folder==='spam'});
+ if(['inbox','archive','spam','trash'].includes(f)){let l=mails.filter(m=>m.folder===f&&identOK(m.to)&&(f!=='inbox'||!m.snz));if(f==='inbox')l=applyFilter(l,S.filter);r=l.map(mm)}
+ else if(f==='star')r=mails.filter(m=>m.star&&m.folder!=='trash'&&identOK(m.to)).map(mm);
+ else if(f==='snz')r=mails.filter(m=>m.snz&&m.folder==='inbox'&&identOK(m.to)).map(mm);
+ else if(f==='sent')r=sent.filter(s=>identOK(s.from)).map(s=>({from:s.from,k:'s',em:s.to.e,id:s.id,name:t('to')+': '+s.to.n,sub:s.sub,snip:s.body,date:s.date,idn:idOf(s.from),trk:s}));
+ else if(f==='drafts')r=drafts.filter(d=>identOK(d.from)).map(d=>({k:'d',id:d.id,name:d.toName||d.to||'—',sub:d.sub||'—',snip:d.body,date:d.date,idn:idOf(d.from),draft:true}));
+ else if(f==='sched')r=scheduled.filter(p=>identOK(p.from)).map(p=>({k:'p',id:p.id,name:t('to')+': '+p.to.n,sub:p.sub,snip:p.body,date:p.at,idn:idOf(p.from),sched:true}));
+ if(q)r=r.filter(x=>(x.name+x.sub+x.snip).toLowerCase().includes(q));
+ if(S.alias)r=r.filter(x=>x.to===S.alias||x.from===S.alias);
+ if(S.contact)r=r.filter(x=>x.em===S.contact||(x.trk&&x.trk.to.e===S.contact));
+ return r.sort((a,b)=>f==='sched'?new Date(a.date)-new Date(b.date):new Date(b.date)-new Date(a.date))}
+
+/* ================= rail / tabs ================= */
+const NAV=[['mail','inbox'],['dash','dash'],['track','chart'],['auto','bolt'],['people','users'],['tpl','tpl'],['set','set']];
+const TABS=[['mail','inbox'],['track','chart'],['dash','dash'],['auto','bolt'],['menu','menu']];
+function idSwitch(){return `<div class="seg">${[['all',t('all')],['santoro','Santoro'],['hanif','Hanif H.']].map(([v,l])=>`<button data-v="${v}" data-ident="${v}" class="${S.ident===v?'on':''}">${l}</button>`).join('')}</div>`}
+function renderRail(){
+ $('#rail').innerHTML=`
+  <div class="brand">${rider()}<div><b>SANTORO</b><small>Hanif Hawlader · Mail</small></div></div>
+  ${idSwitch()}
+  <button class="btn-compose" data-act="compose">${ic('pen')} ${t('compose')}</button>
+  <div class="grp"><span class="cap">${t('inboxes')}</span><div class="nav">
+   <button class="${S.view==='mail'&&S.folder==='inbox'&&!S.alias?'on':''}" data-alias="">${ic('inbox')} ${t('all_inb')}<span class="n">${mails.filter(m=>m.folder==='inbox'&&m.unread).length||''}</span></button>
+   ${ALIASES.map(a=>`<button class="${S.alias===a.email?'on':''}" data-alias="${a.email}"><span class="tag ${a.id==='hanif'?'h':''}" style="min-width:24px;text-align:center">${esc(aMark(a))}</span> ${esc(a.email.split('@')[0])}@<span class="n">${mails.filter(m=>m.folder==='inbox'&&m.unread&&m.to===a.email).length||''}</span></button>`).join('')}
+   <button data-act="addalias" class="acc">${ic('pen')} ${t('add_alias')}</button></div></div>
+  <div class="grp"><span class="cap">${t('folders')}</span><div class="nav">${FOLDERS.filter(([f])=>f!=='inbox').map(([f,i])=>{const n=folderCount(f);return `<button class="${S.view==='mail'&&S.folder===f&&!(f==='inbox'&&S.alias)?'on':''}" data-folder="${f}">${ic(i)} ${t('fo_'+f)}<span class="n">${n||''}</span></button>`}).join('')}</div></div>
+  <div class="grp"><span class="cap">${t('labels')}</span><div class="nav">${['pri','prov','cli','ped','col'].map(f=>`<button class="${S.view==='mail'&&S.folder==='inbox'&&S.filter===f?'on':''}" data-filter="${f}">${t('f_'+f)}<span class="n">${applyFilter(mails.filter(m=>m.folder==='inbox'&&!m.snz&&identOK(m.to)),f).length||''}</span></button>`).join('')}</div></div>
+  <div class="grp"><span class="cap">${t('tools')}</span><div class="nav">${NAV.slice(1).map(([v,i])=>`<button class="${S.view===v?'on':''}" data-go="${v}">${ic(i)} ${t(v)}</button>`).join('')}</div></div>
+  <div class="grp"><span class="cap">${t('accounts2')}</span>
+   <div class="acct"><span class="ms"><svg viewBox="0 0 21 21" width="13" height="13"><rect x="1" y="1" width="9" height="9" fill="#5B1A2C"/><rect x="11" y="1" width="9" height="9" fill="#5B1A2C" opacity=".7"/><rect x="1" y="11" width="9" height="9" fill="#5B1A2C" opacity=".7"/><rect x="11" y="11" width="9" height="9" fill="#5B1A2C" opacity=".45"/></svg></span><div style="min-width:0"><div style="color:var(--fg)">${esc((ALIASES.find(a=>a.main)||ALIASES[0]).email)}</div><div style="font-size:11px">${t('ms365')}</div></div></div>
+   <div class="nav"><button disabled style="opacity:.55">${ic('pen')} ${t('add_acct')}<span class="n">${t('soon')}</span></button></div></div>
+  <div class="foot">${footHTML()}</div>`;
+ $('#tabbar').innerHTML=TABS.map(([v,i])=>v==='menu'?`<button class="${['people','tpl','set'].includes(S.view)?'on':''}" data-act="drawer">${ic(i)}<span>${t('menu')}</span></button>`:`<button class="${S.view===v?'on':''}" data-go="${v}">${ic(i)}<span>${t(v==='mail'?'mail':v==='auto'?'auto':v)}</span></button>`).join('');
+ $('#mtop').innerHTML=`${rider('logo')}<b>SANTORO</b>${idSwitch()}`;
+}
+
+/* ================= mail view ================= */
+function renderList(){
+ const f=S.folder,unread=folderCount('inbox');
+ $('#listH').innerHTML=`
+  <div class="lh-row">${hb()}<h1>${S.alias&&f==='inbox'?esc(S.alias.split('@')[0])+'@':t('fo_'+f)} ${f==='inbox'&&!S.alias?`<span>${unread} ${t('f_unread').toLowerCase()}</span>`:''}</h1><span class="sp"></span>
+   ${f==='trash'&&rows().length?`<button class="btn" data-act="emptytrash">${t('empty_trash')}</button>`:''}</div>
+  <div class="search">${ic('search','muted')}<input id="q" placeholder="${t('search')}" value="${esc(S.q)}"></div>
+  ${f==='inbox'&&!S.contact&&!S.alias?favStrip():''}
+  ${S.contact?`<div class="cfilter">${ic('heart')} ${t('only_from')} ${esc(contactName(S.contact))}<button class="btn" data-act="clearc">${ic('x')} ${t('clear')}</button></div>`:''}
+  ${f==='inbox'?`<div class="chips">${['all','pri','unread','prov','cli','ped','col','otr'].map(x=>`<button class="chip ${S.filter===x?'on':''}" data-filter="${x}">${t('f_'+x)}</button>`).join('')}</div>`:''}`;
+ const c={n:unread,p:mails.filter(m=>m.folder==='inbox'&&m.pri&&identOK(m.to)).length,w:sent.filter(s=>s.wait&&!s.replied).length};
+ const AL=S.alias&&ALIASES.find(a=>a.email===S.alias);
+ if(AL){const n=mails.filter(m=>m.folder==='inbox'&&m.to===AL.email).length,u=mails.filter(m=>m.folder==='inbox'&&m.unread&&m.to===AL.email).length,sn=sent.filter(x=>x.from===AL.email);
+  $('#pulse').innerHTML=`<div class="pulse" ${AL.id==='hanif'?'style="background:var(--hf);color:var(--onh)"':''}>${rider('pat')}<span class="cap" ${AL.id==='hanif'?'style="color:inherit;opacity:.6"':''}>${esc(AL.lbl)} · ${esc(AL.desc)}</span>
+   <p style="font-size:19px;letter-spacing:.04em">${esc(AL.email)}</p>
+   <p style="opacity:.75">${n} ${t('p_mails')} · ${u} ${t('f_unread').toLowerCase()} · ${sn.length} ${t('fo_sent').toLowerCase()} · ${t('st_open').toLowerCase()} ${sn.length?Math.round(sn.filter(x=>x.opens.some(o=>!o.auto)).length/sn.length*100):0}%</p>
+   <button data-act="compose" ${AL.id==='hanif'?'style="border-color:currentColor;color:inherit"':''}>${ic('pen')} ${t('compose')} · ${esc(AL.email.split('@')[0])}@</button></div>`}
+ else $('#pulse').innerHTML=f==='inbox'&&S.filter==='all'&&!S.q?`<div class="pulse">${rider('pat')}<span class="cap">${t('pulse')}</span><p id="pulseTxt">${esc(S.pulse||t('pulse_def').replace('{n}',c.n).replace('{p}',c.p).replace('{w}',c.w))}</p><button data-act="pulse">${ic('ai')} ${t('pulse_btn')}</button></div>`
+  :f==='spam'?`<div class="banner">${ic('shield','acc')} ${t('spam_note')}</div>`:'';
+ const r=rows();
+ const itemHTML=x=>`
+  <div class="item ${x.unread?'unread':''} ${S.sel&&S.sel.k===x.k&&S.sel.id===x.id?'sel':''}" data-k="${x.k}" data-open="${x.id}">
+   <div class="av ${x.idn==='hanif'?'h':''}">${x.draft?ic('pen'):x.sched?ic('cal'):esc(ini(x.name.replace(t('to')+': ','')))}</div>
+   <div style="min-width:0"><div class="who">${x.draft?`<span class="acc">${t('c_draft')}</span> · `:''}${esc(x.name)}</div><div class="sub">${esc(x.sub)}</div><div class="snip">${esc(String(x.snip).replace(/\n+/g,' '))}</div></div>
+   <div class="meta"><span>${x.snz?ic('clock'):''}${rel(x.date)}</span>
+    <span class="row">${x.att?ic('file'):''}${x.spam?'<span class="tag warn">!</span>':''}<span class="tag ${x.idn==='hanif'?'h':''}">${x.idn==='hanif'?'HH':'S'}</span></span>
+    ${x.trk?miniTrk(x.trk):`<span class="row">${x.fav?`<span class="heart">${ic('heart')}</span>`:''}${x.star?`<span class="starred">${ic('star')}</span>`:''}</span>`}</div>
+  </div>`;
+ let html='';
+ if(!r.length)html=`<div class="empty">${rider()}<div>—</div></div>`;
+ else if(['inbox','archive','sent','star'].includes(f)){
+  const pins=r.filter(x=>x.pin),rest=r.filter(x=>!x.pin);
+  if(pins.length)html+=`<div class="grp-h pin">${ic('pin')} ${t('pinned')}</div>`+pins.map(x=>itemHTML(x).replace('class="item ','class="item pinned ')).join('');
+  const day=d=>{const x=new Date(d),n=new Date();n.setHours(0,0,0,0);const y=new Date(n);y.setDate(y.getDate()-1);return x>=n?'today':x>=y?'yest':'older'};
+  let cur=null;rest.forEach(x=>{const g=day(x.date);if(g!==cur){cur=g;html+=`<div class="grp-h">${t(g)}</div>`}html+=itemHTML(x)});
+ } else html=r.map(itemHTML).join('');
+ $('#items').innerHTML=html;
+ renderReader();
+}
+function miniTrk(s){const o=s.opens.filter(x=>!x.auto).length;return `<span class="bdg ${o?'':'off'}" style="font-size:10px">${ic('eye')}${o||'0'}</span>`}
+function renderReader(){
+ const sel=S.sel;const R=$('#reader');
+ if(!sel){R.innerHTML=`<div class="empty" style="margin:auto">${rider()}<div>${t('sel_mail')}</div></div>`;return}
+ if(sel.k==='s'||sel.k==='p')return renderSentReader();
+ const m=mails.find(x=>x.id===sel.id);if(!m){R.innerHTML='';return}
+ const idn=idOf(m.to),ai=S.ai[m.id]||{},thread=sent.find(s=>s.to.e===m.from.e);
+ const trashOrSpam=m.folder==='trash'||m.folder==='spam';
+ R.innerHTML=`
+  <div class="rd-bar">
+   <button class="ib back" data-act="back">${ic('back')}</button>
+   ${trashOrSpam?`<button class="ib" data-act="restore">${ic('undo')}<span class="lbl">${m.folder==='spam'?t('notspam'):t('restore')}</span></button>`:`
+   <button class="ib dsk" data-act="reply">${ic('reply')}<span class="lbl">${t('reply')}</span></button>
+   <button class="ib dsk" data-act="arch">${ic('arch')}<span class="lbl">${t('arch')}</span></button>
+   <button class="ib dsk" data-act="del">${ic('trash')}<span class="lbl">${t('del')}</span></button>
+   <span class="sp"></span>
+   <button class="ib ${m.star?'on':''}" data-act="star" title="${t('star')}">${ic('star')}</button>
+   <button class="ib ${m.pin?'on':''}" data-act="pin" title="${t('pin')}">${ic('pin')}</button>
+   <button class="ib ${favs.includes(m.from.e)?'on':''}" data-fav="${esc(m.from.e)}" title="${t('fav')}">${ic('heart')}</button>`}
+   <button class="ib" data-act="more">${ic('more')}</button>
+  </div>
+  ${trashOrSpam?'':`<div class="rd-mob"><button class="pri" data-act="reply">${ic('reply')}${t('reply')}</button><button data-act="aireply">${ic('ai')}${t('aireply')}</button><button data-act="arch">${ic('arch')}${t('arch')}</button><button data-act="del">${ic('trash')}${t('del')}</button></div>`}
+  <div class="rd-body">
+   <h2>${esc(m.sub)}</h2>
+   <div class="rd-from"><div class="av ${idn==='hanif'?'h':''}">${esc(ini(m.from.n))}</div>
+    <div style="flex:1;min-width:0"><div class="nm">${esc(m.from.n)} <span class="em">&lt;${esc(m.from.e)}&gt;</span></div><div class="em">${t('received_on')} ${esc(m.to)} · ${fdt(m.date)}</div></div>
+    <span class="tag ${idn==='hanif'?'h':''}">${idn==='hanif'?'Hanif Hawlader':'Santoro'}</span></div>
+   <div class="aichips">${m.folder==='spam'?`<button data-act="safe">${ic('shield')} ${t('safe')}</button>`:`<button data-act="sum">${ic('ai')} ${t('summ')}</button><button data-act="aireply">${ic('ai')} ${t('aireply')}</button>`}<button data-act="tr">${ic('tr')} ${t('trbn')}</button></div>
+   ${ai.safe!=null?`<div class="aibox ${ai.safeLvl==='bad'?'warn':''}"><div class="cap">${ic('shield')} ${t('safe_t')}</div><div class="out" id="safeOut">${esc(ai.safe)}</div></div>`:''}
+   ${ai.sum!=null?`<div class="aibox"><div class="cap">${ic('ai')} ${t('ai_sum')}</div><div class="out" id="sumOut">${esc(ai.sum)}</div></div>`:''}
+   ${ai.tr!=null?`<div class="aibox"><div class="cap">${ic('tr')} ${t('trbn')}</div><div class="row" style="margin:0 0 8px"><select class="sel-s" id="trLang"><option value="bn">বাংলা</option><option value="en">English</option><option value="es">Español</option></select><button class="btn" data-act="trgo">${t('gen')}</button></div><div class="out" id="trOut">${esc(ai.tr)}</div></div>`:''}
+   ${ai.reply!=null?`<div class="aibox"><div class="cap">${ic('ai')} ${t('ai_reply')}</div>
+     <div class="row" style="margin:0 0 10px"><select class="sel-s" id="rLang"><option value="es">Español</option><option value="en">English</option><option value="bn">বাংলা</option></select>
+      <select class="sel-s" id="rTone"><option value="lux">${t('t_lux')}</option><option value="formal">${t('t_formal')}</option><option value="warm">${t('t_warm')}</option></select>
+      <button class="btn" data-act="replygo">${ic('ai')} ${t('gen')}</button></div>
+     <div class="out" id="replyOut">${esc(ai.reply)}</div><div class="row"><button class="btn pri" data-act="usereply">${ic('reply')} ${t('use_reply')}</button></div></div>`:''}
+   ${bodyHTML(m)}
+   ${m.att.length?`<div class="att">${m.att.map(a=>`<span>${ic('file','acc')} ${esc(a)} <b>PDF</b></span>`).join('')}</div>`:''}
+   ${!trashOrSpam?`<div class="qr"><span class="cap">${ic('reply')} ${t('quick')}</span>${quickReplies(m).map((q,i)=>`<button data-qr="${i}">${esc(q)}</button>`).join('')}<button data-act="qrgen" class="acc">${ic('ai')} ${t('quick_gen')}</button></div>`:''}
+   ${thread?`<div class="qr" style="display:block"><span class="cap" style="color:var(--fg3)">${t('track')}</span>${trkBadges(thread)}<div class="hint">${ic('eye')} ${esc(thread.sub)} · ${rel(thread.date)}</div></div>`:''}
+  </div>`;
+ if(ai.reply!=null){$('#rLang').value=ai.rl||'es';$('#rTone').value=ai.rt||'lux'}
+ if(ai.tr!=null)$('#trLang').value=ai.tl||'bn';
+}
+function quickReplies(m){const a=S.ai[m.id]||{};if(a.qr)return a.qr;const l=guessLang(m.body);
+ return l==='en'?['Thank you, James. Next week works well for me.','Thanks! I will send you the details today.','Could we schedule a call on Tuesday?']
+ :['Gracias, lo reviso y te contesto hoy.','Perfecto, confirmado. ¡Gracias!','¿Lo hablamos por teléfono esta semana?']}
+function renderSentReader(){
+ const sel=S.sel,isP=sel.k==='p',s=isP?scheduled.find(x=>x.id===sel.id):sent.find(x=>x.id===sel.id);if(!s){$('#reader').innerHTML='';return}
+ const idn=idOf(s.from);
+ $('#reader').innerHTML=`
+  <div class="rd-bar"><button class="ib back" data-act="back">${ic('back')}</button>
+   ${isP?`<button class="ib" data-sendnow="${s.id}">${ic('send')}<span class="lbl">${t('send_now')}</span></button><button class="ib" data-unsched="${s.id}">${ic('x')}<span class="lbl">${t('cancel')}</span></button>`
+   :`<button class="ib" data-act="fwdsent">${ic('fwd')}<span class="lbl">${t('fwd')}</span></button>${s.wait&&!s.replied?`<button class="ib ai" data-remind="${s.id}">${ic('bell')}<span class="lbl">${t('send_rem')}</span></button>`:''}`}</div>
+  <div class="rd-body"><h2>${esc(s.sub)}</h2>
+   <div class="rd-from"><div class="av ${idn==='hanif'?'h':''}">${esc(ini(s.to.n))}</div>
+    <div style="flex:1;min-width:0"><div class="nm">${t('to')}: ${esc(s.to.n)} <span class="em">&lt;${esc(s.to.e)}&gt;</span></div><div class="em">${t('sent_from')} ${esc(s.from)} · ${isP?ic('cal')+' '+fdt(s.at):fdt(s.date)}</div></div>
+    <span class="tag ${idn==='hanif'?'h':''}">${idn==='hanif'?'Hanif Hawlader':'Santoro'}</span></div>
+   ${bodyHTML(s)}
+   <div style="max-width:640px;margin-top:22px">${sigHTML(idn,true)}</div>
+   ${isP?'':`<div class="qr" style="display:block"><span class="cap">${ic('eye')} ${t('track')}</span>${trkBadges(s)}${timeline(s)}</div>`}
+  </div>`;
+}
+function trkBadges(s){if(s.untracked)return '';const o=s.opens.filter(x=>!x.auto).length,auto=s.opens.some(x=>x.auto),tp=temp(s);
+ return `<div class="badges" style="margin-top:8px"><span class="temp" title="${t('temp')}">${[1,2,3].map(i=>`<i class="${tp>=i?'f':''}"></i>`).join('')}</span>
+  ${o?`<span class="bdg solid">${ic('eye')} ${t('opened')} ${o} ${t('times')}</span>`:auto?`<span class="bdg">${ic('eye')} ${t('ev_auto')}</span>`:`<span class="bdg off">${ic('eye')} ${t('not_opened')}</span>`}
+  ${s.clicks.length?`<span class="bdg">${ic('link')} ${t('clicked')} ${s.clicks.length}</span>`:''}
+  ${s.replied?`<span class="bdg">${ic('check')} ${t('replied')}</span>`:s.wait?`<span class="bdg off">${ic('bell')} ${t('wait_reply')}</span>`:''}</div>`}
+function timeline(s){const tp=temp(s),bh=bestHour(s);
+ const ev=[{t:s.date,k:'sent'}].concat(s.opens.map(o=>({t:o.t,k:o.auto?'auto':'open',o}))).concat(s.clicks.map(c=>({t:c.t,k:'click',c}))).sort((a,b)=>new Date(b.t)-new Date(a.t));
+ return `<div class="hint" style="margin-top:12px">${ic('star')} ${t('temp')}: ${[t('cold'),t('cold'),t('warm'),t('hot')][tp]}${bh?` · ${t('best_time')} ${bh}`:''}</div>
+ <ul class="tl">${ev.map(e=>`<li><span class="t">${ftime(e.t)}</span><span class="ev">${e.k==='sent'?ic('send')+' '+t('ev_sent'):e.k==='open'?ic('eye')+` ${t('ev_open')} · <span class="muted">${esc(e.o.d)} · ${esc(e.o.p)}</span>`:e.k==='auto'?ic('eye')+` <span class="muted">${t('ev_auto')}</span>`:ic('link')+` ${t('ev_click')} «${esc(e.c.u)}»`}</span></li>`).join('')}</ul>`}
+function temp(s){const o=s.opens.filter(x=>!x.auto).length,sc=o+s.clicks.length*3+(s.replied?4:0);return sc>=8?3:sc>=3?2:sc>=1?1:0}
+function bestHour(s){const hs=s.opens.filter(x=>!x.auto).map(x=>new Date(x.t).getHours());if(hs.length<2)return null;const c={};hs.forEach(h=>c[h]=(c[h]||0)+1);const h=+Object.keys(c).sort((a,b)=>c[b]-c[a])[0];return `${h}:00–${h+1}:00`}
+
+/* ================= dashboard ================= */
+function renderDash(){
+ const inb=mails.filter(m=>m.folder==='inbox'&&identOK(m.to)),snt=sent.filter(s=>!s.untracked&&identOK(s.from));
+ const unread=inb.filter(m=>m.unread).length,opened=snt.filter(s=>s.opens.some(x=>!x.auto)).length,rate=snt.length?Math.round(opened/snt.length*100):0,wait=snt.filter(s=>s.wait&&!s.replied).length;
+ const cats=Object.keys(catLbl).map(c=>[c,inb.filter(m=>m.cat===c).length]),mx=Math.max(1,...cats.map(c=>c[1]));
+ const dayN=(arr,i)=>arr.filter(x=>{const d=new Date(x.date),a=new Date();a.setHours(0,0,0,0);a.setDate(a.getDate()-6+i);const b=new Date(a);b.setDate(b.getDate()+1);return d>=a&&d<b}).length;
+ const recv=LIVE?[0,1,2,3,4,5,6].map(i=>dayN(mails.filter(m=>m.folder!=='spam'),i)):[6,9,4,11,8,3,inb.length],snd=LIVE?[0,1,2,3,4,5,6].map(i=>dayN(sent,i)):[3,5,2,6,4,1,snt.filter(s=>(Date.now()-new Date(s.date))<864e5).length+1],wm=Math.max(1,...recv,...snd);
+ const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d.toLocaleDateString(loc(),{weekday:'short'})});
+ const hot=snt.slice().sort((a,b)=>temp(b)-temp(a)||b.opens.length-a.opens.length).slice(0,4);
+ const next=scheduled.map(p=>({t:p.at,txt:`${ic('cal')} ${esc(p.sub)}`})).concat(snt.filter(s=>s.follow&&!s.replied).map(s=>({t:s.follow,txt:`${ic('bell')} ${t('follow_on')}: ${esc(s.to.n)}`}))).sort((a,b)=>new Date(a.t)-new Date(b.t));
+ $('#dashPage').innerHTML=`
+  <div class="page-h">${hb()}<h1>${t('d_title')}</h1><p>${t('d_sub')}</p></div>
+  <div class="stats">
+   <div class="stat dark"><span class="cap">${t('d_unread')}</span><b>${unread}</b><small>${inb.filter(m=>m.pri&&m.unread).length} ${t('f_pri').toLowerCase()}</small></div>
+   <div class="stat"><span class="cap">${t('st_open')}</span><b>${rate}%</b><small>${opened}/${snt.length}</small></div>
+   <div class="stat"><span class="cap">${t('st_wait')}</span><b>${wait}</b><small>${t('fo_sent').toLowerCase()}</small></div>
+   <div class="stat"><span class="cap">${t('d_resp')}</span><b>${LIVE?'—':'2 h 40'}</b><small>${LANG==='bn'?'গড়':'media'}</small></div>
+  </div>
+  <div class="panel" style="margin-bottom:14px;position:relative;overflow:hidden">
+   <span class="cap acc" style="display:flex;gap:6px;align-items:center">${ic('ai')} ${t('d_ask')}</span>
+   <div class="ask"><input id="askIn" placeholder="${t('d_ask_ph')}" value="${esc(S.ask)}"><button class="btn pri" data-act="ask">${t('ask')}</button></div>
+   <div class="sugs">${['d_q1','d_q2','d_q3'].map(k=>`<button class="chip" data-askq="${k}">${t(k)}</button>`).join('')}</div>
+   <div class="ask-out" id="askOut">${esc(S.askOut||'')}</div>
+  </div>
+  <div class="dgrid">
+   <div class="panel"><span class="cap">${t('d_week')}</span>
+    <div class="week">${days.map((d,i)=>`<div class="d"><div class="cols"><i style="height:${recv[i]/wm*100}%"></i><i class="s" style="height:${snd[i]/wm*100}%"></i></div><small>${d}</small></div>`).join('')}</div>
+    <div class="legend"><span><i style="background:var(--line2)"></i>${t('d_recv')}</span><span><i style="background:var(--acc)"></i>${t('d_sent')}</span></div></div>
+   <div class="panel"><span class="cap">${t('d_cats')}</span>
+    <div class="bars">${cats.map(([c,n])=>`<div class="bar"><span>${t(catLbl[c])}</span><span class="tr"><i style="width:${n/mx*100}%"></i></span><span>${n}</span></div>`).join('')}</div></div>
+  </div>
+  <div class="dgrid">
+   <div class="panel"><span class="cap">${t('d_hot')}</span>${hot.map(s=>`<div class="mini" data-k="s" data-open="${s.id}" style="cursor:pointer"><div class="av ${idOf(s.from)==='hanif'?'h':''}" style="width:30px;height:30px;font-size:11px">${esc(ini(s.to.n))}</div><div style="flex:1;min-width:0"><div>${esc(s.to.n)}</div><div class="muted" style="font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.sub)}</div></div><span class="temp">${[1,2,3].map(i=>`<i class="${temp(s)>=i?'f':''}"></i>`).join('')}</span></div>`).join('')}</div>
+   <div class="panel"><span class="cap">${t('d_next')}</span>${next.length?next.map(n=>`<div class="mini"><span class="muted" style="width:96px;flex:none;font-size:11.5px">${ftime(n.t)}</span><span style="display:flex;gap:6px;align-items:center;min-width:0">${n.txt}</span></div>`).join(''):'<div class="muted">—</div>'}</div>
+  </div>`;
+}
+async function askInbox(q){
+ S.ask=q;const ctx=mails.filter(m=>m.folder==='inbox'||m.folder==='archive').map(m=>`[RECIBIDO ${ftime(m.date)}] De ${m.from.n} a ${m.to} · ${m.sub}\n${m.body}`).join('\n---\n')
+  +'\n===\n'+sent.map(s=>`[ENVIADO ${ftime(s.date)}] A ${s.to.n} · ${s.sub} · abierto ${s.opens.filter(x=>!x.auto).length} veces, clics ${s.clicks.length}, ${s.replied?'respondió':'sin respuesta'}`).join('\n');
+ await ask(`Eres el asistente de correo de Hanif (marca Santoro). Responde en ${outLang()} de forma breve y concreta usando SOLO estos correos. Si no está en los correos, dilo.\n\nPregunta: ${q}\n\nCORREOS:\n${ctx}`,txt=>{S.askOut=txt;const o=$('#askOut');if(o)o.textContent=txt})}
+
+/* ================= tracking ================= */
+function renderTrack(){
+ const list=sent.filter(s=>!s.untracked&&identOK(s.from)).sort((a,b)=>new Date(b.date)-new Date(a.date));
+ const opened=list.filter(s=>s.opens.some(x=>!x.auto)).length,clicks=list.reduce((a,s)=>a+s.clicks.length,0),wait=list.filter(s=>s.wait&&!s.replied).length,rate=list.length?Math.round(opened/list.length*100):0;
+ $('#trackPage').innerHTML=`
+  <div class="page-h">${hb()}<h1>${t('track')}</h1><p>${t('track_note')}</p></div>
+  <div class="stats"><div class="stat dark"><span class="cap">${t('st_sent')}</span><b>${list.length}</b></div><div class="stat"><span class="cap">${t('st_open')}</span><b>${rate}%</b></div><div class="stat"><span class="cap">${t('st_click')}</span><b>${clicks}</b></div><div class="stat"><span class="cap">${t('st_wait')}</span><b>${wait}</b></div></div>
+  <div class="sec"><span class="cap">${t('tracked')}</span>
+  ${list.map(s=>`<div class="trow ${S.openRow===s.id?'open':''}"><div class="trow-h" data-row="${s.id}">
+    <div style="min-width:0"><div class="sub">${esc(s.sub)}</div><div class="to">${t('to')}: ${esc(s.to.n)} · ${esc(s.from.split('@')[0])}@ · ${rel(s.date)}</div></div>${trkBadges(s).replace('margin-top:8px','')}</div>
+   <div class="trow-d">${timeline(s)}${s.wait&&!s.replied?`<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn pri" data-remind="${s.id}">${ic('bell')} ${t('send_rem')}</button>${s.follow?`<span class="muted" style="font-size:11.5px">${t('follow_on')}: ${fdt(s.follow)}</span>`:''}</div>`:''}</div></div>`).join('')}</div>
+  <div class="sec"><span class="cap">${t('scheduled')}</span>
+   ${scheduled.length?scheduled.map(p=>`<div class="trow"><div class="trow-h" style="cursor:default"><div style="min-width:0"><div class="sub">${esc(p.sub)}</div><div class="to">${t('to')}: ${esc(p.to.n)} · ${fdt(p.at)}</div></div><div class="badges"><button class="btn" data-sendnow="${p.id}">${t('send_now')}</button><button class="btn" data-unsched="${p.id}">${t('cancel')}</button></div></div></div>`).join(''):'<div class="muted">—</div>'}</div>`;
+}
+
+/* ================= templates & signatures ================= */
+function sigHTML(k){const s=sigs[k];
+ if(k==='santoro')return `<div class="pv" style="background:#fff;color:#000;padding:16px;border-radius:5px"><table cellpadding="0" cellspacing="0" style="font-family:'El Messiri',Georgia,serif;color:#000;border-collapse:collapse"><tr>
+  <td style="padding-right:16px;border-right:1px solid #5B1A2C;vertical-align:middle"><svg viewBox="0 0 900 843" width="44" height="41" style="color:#5B1A2C;display:block"><use href="#rider"/></svg></td>
+  <td style="padding-left:16px;vertical-align:middle"><div style="font-size:14px">${esc(s.n)}</div>
+   <div style="font-size:10.5px;letter-spacing:.24em;color:#5B1A2C;margin:2px 0 6px">${esc(s.r).toUpperCase()} · SANTORO</div>
+   <div style="font-size:11.5px;color:rgba(0,0,0,.6)">${esc(s.e)} · ${esc(s.w)}</div><div style="font-size:11.5px;color:rgba(0,0,0,.6)">${esc(s.c)}</div>
+   ${s.l?`<div style="font-size:11px;color:#5B1A2C;font-style:italic;margin-top:6px">${esc(s.l)}</div>`:''}</td></tr></table></div>`;
+ return `<div class="pv" style="background:#fff;color:#000;padding:16px;border-radius:5px;font-family:'El Messiri',Georgia,serif">
+  <div style="font-size:15px;letter-spacing:.14em">${esc(s.n).toUpperCase()}</div><div style="width:28px;height:1px;background:#5B1A2C;margin:6px 0 7px"></div>
+  <div style="font-size:11.5px;color:rgba(0,0,0,.66)">${esc(s.r)}</div><div style="font-size:11.5px;color:rgba(0,0,0,.6)">${esc(s.e)} · ${esc(s.w)} · ${esc(s.c)}</div>
+  ${s.l?`<div style="font-size:11px;color:#5B1A2C;margin-top:5px">${esc(s.l)}</div>`:''}<div style="font-size:9.5px;letter-spacing:.22em;color:#5B1A2C;margin-top:8px">FUNDADOR DE SANTORO</div></div>`}
+function renderTpl(){
+ $('#tplPage').innerHTML=`
+  <div class="page-h">${hb()}<h1>${t('tpl_t')}</h1><p>${t('tpl_p')}</p><span class="sp"></span><button class="btn pri" data-tpledit="new">${ic('pen')} ${t('new_tpl')}</button></div>
+  <div class="sec"><div class="grid2">${templates.map(x=>`<div class="card" data-tpledit="${x.id}"><div style="display:flex;gap:6px;align-items:center"><span class="tag ${x.id_==='hanif'?'h':''}">${x.id_==='hanif'?'HH':'S'}</span><span class="cap">${t(catLbl[x.cat]||'f_otr')}</span></div><h3>${esc(x.name)}</h3><p>${esc(x.body)}</p></div>`).join('')}</div></div>
+  <div class="sec"><span class="cap">${t('bm_t')}</span><p class="muted" style="font-size:12px;margin:-4px 0 12px">${t('bm_p')}</p><div class="bmails">${['order','ship','club'].map(k=>`<div class="bmail"><div class="hd">${ic('mail','acc')} ${t('bm_'+k)}<span class="sp"></span><span class="tag solid">${ic('bolt')}</span></div><div class="pv">${brandEmail(k)}</div></div>`).join('')}</div></div>
+  <div class="sec"><span class="cap">${t('sigs')}</span><div class="sigs">${['santoro','hanif'].map(k=>`<div class="sigcard"><div class="hd"><span class="tag ${k==='hanif'?'h':'solid'}">${k==='hanif'?'HH':'S'}</span><span style="font-size:13px">${t(k==='hanif'?'sig_h':'sig_s')}</span></div>
+   <div id="pv-${k}" style="padding:10px">${sigHTML(k)}</div>
+   <div class="fm">${[['n','name'],['r','role'],['e','email'],['w','web'],['c','city'],['l','line']].map(([f,l])=>`<div class="fld"><label>${t(l)}</label><input data-sig="${k}" data-f="${f}" value="${esc(sigs[k][f])}"></div>`).join('')}</div></div>`).join('')}</div></div>`;
+}
+function openTplEditor(id){
+ const x=id==='new'?{id:'t'+Date.now(),cat:'prov',id_:'santoro',name:'',sub:'',body:''}:templates.find(z=>z.id===id);
+ $('#sheet').className='sheet';
+ $('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${t('edit_tpl').toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div>
+  <div class="sh-body" style="padding:16px 18px;display:grid;gap:12px">
+   <div class="fld"><label>${t('name')}</label><input id="te-n" value="${esc(x.name)}"></div>
+   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div class="fld"><label>${t('cat')}</label><select id="te-c">${Object.keys(catLbl).map(c=>`<option value="${c}" ${x.cat===c?'selected':''}>${t(catLbl[c])}</option>`).join('')}</select></div>
+    <div class="fld"><label>${t('identity')}</label><select id="te-i"><option value="santoro" ${x.id_==='santoro'?'selected':''}>Santoro</option><option value="hanif" ${x.id_==='hanif'?'selected':''}>Hanif Hawlader</option></select></div></div>
+   <div class="fld"><label>${t('subject')}</label><input id="te-s" value="${esc(x.sub)}"></div>
+   <div class="fld"><label>${t('body')}</label><textarea id="te-b" rows="10">${esc(x.body)}</textarea></div></div>
+  <div class="sh-foot">${id!=='new'?`<button class="btn" data-tpldel="${x.id}">${t('delete')}</button>`:''}<span class="sp"></span><button class="send" data-tplsave="${x.id}">${ic('check')} ${t('save')}</button></div>`;
+ $('#scrim').classList.add('on');
+}
+
+/* ================= settings ================= */
+function renderSet(){
+ const seg=(key,opts,cur)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${cur===v?'on':''}" data-setk="${key}" data-setv="${v}">${l}</button>`).join('')}</div>`;
+ $('#setPage').innerHTML=`
+  <div class="page-h">${hb()}<h1>${t('set_t')}</h1></div>
+  <div class="sec">
+   <div class="set-row"><div class="lb"><b>${t('theme')}</b><span>${t('theme_d')}</span></div>${seg('theme',[['auto',t('th_auto')],['light',t('th_light')],['dark',t('th_dark')]],S.theme)}</div>
+   <div class="set-row"><div class="lb"><b>${t('lang')}</b><span>Español · বাংলা</span></div>${seg('lang',[['es','Español'],['bn','বাংলা']],LANG)}</div>
+   <div class="set-row"><div class="lb"><b>${t('undo_s')}</b></div>${seg('undo',[[5,'5 s'],[10,'10 s'],[20,'20 s']],S.undoSec)}</div>
+   <div class="set-row"><div class="lb"><b>${t('notif')}</b></div><span class="sw ${S.notif?'on':''}" data-act="notif"></span></div>
+  </div>
+  ${LIVE?`<div class="sec"><span class="cap">${t('conn')}</span>
+   <div class="step"><span class="no ok">${ic('check')}</span><div><b>${t('c_ms')}</b><div class="d">${esc((ALIASES.find(a=>a.main)||{}).email||'')}</div></div><span class="bdg solid">${t('done')}</span></div>
+   <div class="step"><span class="no ${AI?'ok':''}">${ic('ai')}</span><div><b>${t('ai_step')}</b><div class="d">${t('ai_stepd')}</div></div><span class="bdg ${AI?'solid':'off'}">${AI?t('done'):t('pending')}</span></div>
+   <div class="step"><span class="no">${ic('bell')}</span><div><b>Notificaciones</b><div class="d">iPhone / Mac</div></div><span class="bdg off">${t('soon')}</span></div></div>`:''}
+  <div class="sec" ${LIVE?'style="display:none"':''}><span class="cap">${t('conn')}</span>
+   ${[['c_ms','c_ms_s',1],['step_alias','step_aliasd',0],['step_send','step_sendd',0],['step2','step2d',0],['step3','step3d',0],['step4','step4d',0]].map(([a,b,ok],i)=>`<div class="step"><span class="no ${ok?'ok':''}">${ok?ic('check'):i+1}</span><div><b>${t(a)}</b><div class="d">${t(b)}</div></div><span class="bdg ${ok?'solid':'off'}">${ok?t('done'):t('pending')}</span></div>`).join('')}
+   <div class="step"><span class="no ${AI?'ok':''}">${ic('ai')}</span><div><b>${t('ai_step')}</b><div class="d">${t('ai_stepd')}</div></div><span class="bdg ${AI?'solid':'off'}">${AI?t('in_claude'):t('pending')}</span></div>
+  </div>
+  <div class="sec"><span class="cap">${t('install')}</span>
+   ${[['inst_ios','inst_ios_s','mail'],['inst_mac','inst_mac_s','dl'],['inst_now','inst_now_s','eye']].map(([a,b,i])=>`<div class="step"><span class="no">${ic(i)}</span><div><b>${t(a)}</b><div class="d">${t(b)}</div></div><span></span></div>`).join('')}
+  </div>
+  <div class="sec" id="aliasSec"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span class="cap">${t('accounts')}</span><span class="sp"></span>${LIVE?`<button class="btn" data-act="alcheck">${ic('undo')} ${t('al_check')}</button>`:''}<button class="btn pri" data-act="addalias">${ic('pen')} ${t('add_alias')}</button></div>
+   ${ALIASES.map(a=>{const ok=!window.MS_ALIASES||window.MS_ALIASES.includes(a.email);return `<div class="alrow"><span class="mk ${a.id==='hanif'?'h':''}">${esc(aMark(a))}</span><div style="min-width:0"><b>${esc(a.email)}</b><span>${esc(a.lbl||'')}${a.desc?' · '+esc(a.desc):''} · ${a.id==='hanif'?'Hanif Hawlader':'Santoro'}</span><br><span class="${ok?'acc':''}" style="${ok?'':'color:var(--fg3)'}">${ok?'● '+t('al_status_ok'):'○ '+t('al_status_wait')}</span></div><button class="ib" data-editalias="${a.email}">${ic('pen')}</button></div>`}).join('')}</div>
+  <div class="sec"><span class="cap">${t('keys')}</span><div class="keys">${[['C','k_c'],['R','k_r'],['E','k_e'],['#','k_del'],['S','k_s'],['/','k_slash'],['J K','k_jk']].map(([k,l])=>`<div><span class="kbd">${k}</span>${t(l)}</div>`).join('')}</div></div>
+  <div class="note">${t('track_note')}</div>`;
+}
+
+/* ================= compose ================= */
+let C=null;
+const defaultFrom=idn=>(ALIASES.find(a=>a.id===idn&&a.def)||ALIASES[0]).email;
+function openCompose(o={}){const idn=S.ident==='all'?'santoro':S.ident;
+ C=Object.assign({from:S.alias||defaultFrom(idn),to:'',toName:'',sub:'',body:'',trackO:true,trackC:true,at:'',follow:'3',ai:false,tpl:false,tone:false},o);
+ $('#sheet').className='sheet';renderCompose();$('#scrim').classList.add('on');setTimeout(()=>{const f=C&&(C.to?$('#c-body'):$('#c-to'));f&&!isMobile()&&f.focus()},40)}
+function renderCompose(){const idn=idOf(C.from),h=idn==='hanif';
+ $('#sheet').innerHTML=`
+  <div class="sh-top ${h?'h':''}">${rider('logo')}<b>${h?'HANIF HAWLADER':'SANTORO'}</b><span style="font-size:11px;opacity:.7">· ${C.draftId?t('c_draft'):t('c_new')}</span><button class="x" data-act="close">${ic('x')}</button></div>
+  <div class="sh-body">
+   <div class="cf"><label>${t('from')}</label><select id="c-from">${ALIASES.map(a=>`<option value="${a.email}" ${a.email===C.from?'selected':''}>${a.id==='hanif'?'Hanif Hawlader':'Santoro'} — ${a.email}</option>`).join('')}</select><span></span></div>
+   <div class="cf"><label>${t('to')}</label><input id="c-to" value="${esc(C.to)}" placeholder="nombre@empresa.com" list="contacts"><span></span></div>
+   <datalist id="contacts">${[...new Map(mails.map(m=>[m.from.e,m.from.n])).entries()].map(([e,n])=>`<option value="${esc(e)}">${esc(n)}</option>`).join('')}</datalist>
+   <div class="cf"><label>${t('subject')}</label><input id="c-sub" value="${esc(C.sub)}"><button class="ib ai" data-act="c-subj" title="${t('c_subj')}">${ic('ai')}</button></div>
+   <div class="c-tools">
+    <button class="ib" data-act="c-tpl">${ic('tpl')} ${t('c_tpl')}</button>
+    <button class="ib ai" data-act="c-ai">${ic('ai')} ${t('c_ai')}</button>
+    <button class="ib ai" data-act="c-tone">${ic('pen')} ${t('c_tone')}</button>
+    <button class="ib ai" data-act="c-tr">${ic('tr')} ${t('c_tr')}</button>
+    <select class="sel-s" id="c-lang" style="margin-left:auto"><option value="es">ES</option><option value="en">EN</option><option value="bn">বাংলা</option></select>
+   </div>
+   <div class="tplpick ${C.tpl?'on':''}">${templates.map(x=>`<button data-usetpl="${x.id}"><span class="tag ${x.id_==='hanif'?'h':''}">${x.id_==='hanif'?'HH':'S'}</span> ${esc(x.name)}</button>`).join('')}</div>
+   <div class="c-ai ${C.ai?'on':''}"><input id="c-idea" placeholder="${t('c_idea')}"><button class="btn pri" data-act="c-aigo">${ic('ai')} ${t('gen')}</button></div>
+   ${C.tone?`<div class="c-tones">${[['short','to_short'],['formal','to_formal'],['warm','to_warm'],['lux','to_lux'],['fix','to_fix']].map(([v,l])=>`<button class="chip" data-tone="${v}">${t(l)}</button>`).join('')}</div>`:''}
+   <textarea class="cbody" id="c-body">${esc(C.body)}</textarea>
+   <div class="c-sig"><span class="cap" style="display:block;margin-bottom:10px">${t('sig_preview')}</span>${sigHTML(idn)}</div>
+   <div class="c-opts">
+    <label class="opt"><span class="sw ${C.trackO?'on':''}" data-sw="trackO"></span>${ic('eye')} ${t('c_track_o')}</label>
+    <label class="opt"><span class="sw ${C.trackC?'on':''}" data-sw="trackC"></span>${ic('link')} ${t('c_track_c')}</label>
+    <label class="opt">${ic('cal')} ${t('c_sched')} <input type="datetime-local" id="c-at" value="${esc(C.at)}"></label>
+    <label class="opt">${ic('bell')} ${t('c_follow')} <select id="c-follow">${[['0','never'],['2','d2'],['3','d3'],['7','d7']].map(([v,l])=>`<option value="${v}" ${C.follow===v?'selected':''}>${t(l)}</option>`).join('')}</select></label>
+   </div></div>
+  <div class="sh-foot"><span class="muted" style="font-size:11px">${C.trackO?ic('eye')+' ':''}${C.trackC?ic('link'):''}</span><span class="sp"></span>
+   <button class="send ${h?'h':''}" data-act="c-send">${ic(C.at?'cal':'send')} ${C.at?t('sched_btn'):t('send')}</button></div>`;
+ $('#c-lang').value=C.lang||guessLang(C.body||'')}
+function syncC(){if(!C||!$('#c-from'))return;C.from=$('#c-from').value;C.to=$('#c-to').value;C.sub=$('#c-sub').value;C.body=$('#c-body').value;C.at=$('#c-at').value;C.follow=$('#c-follow').value;C.lang=$('#c-lang').value}
+function fillVars(s,name){name=(name||'').trim();if(!name)return s;const nm=name.includes('·')?name.split('·').pop().trim().split(/\s+/)[0]:name.split(/\s+/)[0];const emp=name.includes('·')?name.split('·')[0].trim():name;return s.replace(/\{\{nombre\}\}/g,nm).replace(/\{\{empresa\}\}/g,emp)}
+function closeCompose(save=true){
+ if(C&&$('#c-from'))syncC();
+ if(save&&C&&(C.body.trim()||C.sub.trim())){
+  const d={id:C.draftId||'d'+Date.now(),from:C.from,to:C.to,toName:C.toName,sub:C.sub,body:C.body,date:new Date().toISOString()};
+  const i=drafts.findIndex(x=>x.id===d.id);if(i>=0)drafts[i]=d;else drafts.push(d);toast(t('draft_ok'))}
+ $('#scrim').classList.remove('on');C=null;renderAll()}
+function doSend(){
+ syncC();if(!C.to.trim()){toast(t('need_to'));return}
+ const name=C.toName||(mails.find(m=>m.from.e===C.to.trim())||{from:{}}).from.n||C.to.split('@')[0];C.body=fillVars(C.body,name);
+ const rec={id:'s'+Date.now(),from:C.from,to:{n:name,e:C.to.trim()},sub:C.sub||'(sin asunto)',body:C.body,date:new Date().toISOString(),opens:[],clicks:[],replied:false,wait:C.follow!=='0',follow:C.follow!=='0'?new Date(Date.now()+(+C.follow)*864e5).toISOString():null};
+ if(C.draftId)drafts=drafts.filter(d=>d.id!==C.draftId);
+ const at=C.at,track=C.trackO;$('#scrim').classList.remove('on');C=null;
+ if(at){scheduled.push({id:'p'+Date.now(),from:rec.from,to:rec.to,sub:rec.sub,body:rec.body,at:new Date(at).toISOString()});toast(t('sched_ok'),{wine:true});renderAll();return}
+ let undone=false,left=S.undoSec;
+ const el=toast(`${t('sending')} <b class="cd">${left}</b>`,{action:t('undo'),ms:S.undoSec*1000+400,onAction:()=>{undone=true;drafts.push({id:'d'+Date.now(),from:rec.from,to:rec.to.e,toName:rec.to.n,sub:rec.sub,body:rec.body,date:new Date().toISOString()});toast(t('undone'));renderAll()}});
+ const iv=setInterval(()=>{left--;const b=el.querySelector('.cd');if(b)b.textContent=left;if(left<=0)clearInterval(iv)},1000);
+ renderAll();
+ setTimeout(()=>{if(undone)return;sent.push(rec);toast(t('sent_ok'),{wine:true});renderAll();
+  if(track)setTimeout(()=>{rec.opens.push({t:new Date().toISOString(),d:'iPhone',p:'España'});if(S.notif)toast(`${esc(rec.to.n)} ${t('demo_open')} <span style="opacity:.6">${t('demo_tag')}</span>`,{wine:true,ms:5000});renderAll()},14000)},S.undoSec*1000+200)}
+
+/* ================= AI actions ================= */
+const mailCtx=m=>`De: ${m.from.n} <${m.from.e}>\nPara: ${m.to}\nAsunto: ${m.sub}\n\n${m.body}`;
+const curMail=()=>S.sel&&S.sel.k==='m'?mails.find(x=>x.id===S.sel.id):null;
+async function aiSum(m){const a=S.ai[m.id]=Object.assign(S.ai[m.id]||{},{sum:''});renderReader();
+ await ask(`${BRAND}\nResume este correo en ${outLang()}: máximo 2 frases. Después "Datos:" con precios, fechas o cantidades si aparecen, y "Acciones:" con 1-3 puntos cortos.\n\n${mailCtx(m)}`,x=>{a.sum=x;const o=$('#sumOut');if(o)o.textContent=x})}
+async function aiReply(m){const a=S.ai[m.id]=Object.assign(S.ai[m.id]||{},{reply:a0(m).reply||''});a.rl=($('#rLang')||{}).value||a.rl||guessLang(m.body);a.rt=($('#rTone')||{}).value||a.rt||'lux';renderReader();
+ const tone={lux:'elegante y exclusivo, propio de una casa de lujo',formal:'formal y profesional',warm:'cercano y amable'}[a.rt];
+ await ask(`${BRAND}\nEscribe la respuesta a este correo en ${langName[a.rl]}, tono ${tone}. Firma solo con "Hanif" (la firma completa se añade sola). No inventes precios ni fechas: deja [corchetes] donde Hanif deba completar. Devuelve solo el cuerpo.\n\n${mailCtx(m)}`,x=>{a.reply=x;const o=$('#replyOut');if(o)o.textContent=x})}
+const a0=m=>S.ai[m.id]||{};
+async function aiTr(m){const a=S.ai[m.id]=Object.assign(S.ai[m.id]||{},{tr:''});a.tl=($('#trLang')||{}).value||a.tl||'bn';renderReader();
+ await ask(`Traduce este correo al ${langName[a.tl]}. Devuelve solo la traducción.\n\n${m.sub}\n\n${m.body}`,x=>{a.tr=x;const o=$('#trOut');if(o)o.textContent=x})}
+async function aiQR(m){if(!AI){toast(t('ai_off'),{ms:5000});return}const a=S.ai[m.id]=S.ai[m.id]||{};
+ const txt=await ask(`${BRAND}\nPropón 3 respuestas MUY cortas (máx. 12 palabras cada una) a este correo, en el idioma del correo, distintas entre sí (aceptar, pedir más información, proponer llamada o similar). Una por línea, sin numeración ni comillas.\n\n${mailCtx(m)}`,()=>{});
+ if(txt){a.qr=txt.split('\n').map(s=>s.replace(/^[-•\d.\s"]+|"$/g,'').trim()).filter(Boolean).slice(0,3);renderReader()}}
+function safeCheck(m){const a=S.ai[m.id]=S.ai[m.id]||{};const sig=[];
+ if(/\d/.test(m.from.e.split('@')[1]||''))sig.push(LANG==='bn'?'ঠিকানায় অদ্ভুত সংখ্যা/বানান':'Dirección con números o letras cambiadas');
+ if(/urgente|bloquead|24 horas|suspend|inmediat/i.test(m.sub+m.body))sig.push(LANG==='bn'?'ভয় দেখিয়ে তাড়াহুড়ো করাচ্ছে':'Mete prisa o amenaza');
+ if(/contraseña|password|datos bancarios|tarjeta|verifica/i.test(m.body))sig.push(LANG==='bn'?'পাসওয়ার্ড বা ব্যাংকের তথ্য চাইছে':'Pide contraseña o datos bancarios');
+ if(/http:\/\//i.test(m.body))sig.push(LANG==='bn'?'অনিরাপদ লিংক (http)':'Enlace no seguro (http)');
+ if(/premio|ganado|felicidades/i.test(m.sub+m.body))sig.push(LANG==='bn'?'অবাস্তব পুরস্কারের প্রতিশ্রুতি':'Promete premios');
+ a.safeLvl=sig.length>=2?'bad':sig.length?'mid':'ok';
+ a.safe=(a.safeLvl==='bad'?t('safe_bad'):a.safeLvl==='mid'?t('safe_mid'):t('safe_ok'))+(sig.length?'\n\n· '+sig.join('\n· '):'');
+ renderReader()}
+async function aiPulse(){const l=mails.filter(m=>m.folder==='inbox'&&identOK(m.to)&&(m.unread||m.pri));
+ const w=sent.filter(s=>s.wait&&!s.replied).map(s=>`- Esperando respuesta: ${s.to.n} («${s.sub}»), abierto ${s.opens.filter(x=>!x.auto).length} veces`).join('\n');
+ await ask(`${BRAND}\nEres el asistente de correo de Hanif. En ${outLang()}, resume el día en máximo 4 líneas cortas: lo más importante, a quién responder primero y por qué.\n\nCorreos:\n${l.map(m=>`- ${m.from.n}: ${m.sub} — ${m.body.slice(0,180).replace(/\n/g,' ')}`).join('\n')}\n${w}`,x=>{S.pulse=x;const o=$('#pulseTxt');if(o)o.textContent=x})}
+async function cAI(kind,arg){syncC();const lang=$('#c-lang').value,box=$('#c-body');let p;
+ if(kind==='write'){const idea=$('#c-idea').value.trim();if(!idea)return;p=`${BRAND}\nEscribe un correo en ${langName[lang]} a partir de esta idea: "${idea}". Destinatario: ${C.toName||C.to||'—'}. Firma solo "Hanif". Devuelve primero una línea "Asunto: ..." y luego el cuerpo.`}
+ else if(kind==='tone'){if(!C.body.trim())return;const how={short:'mucho más corto (la mitad), sin perder datos',formal:'más formal y profesional',warm:'más cálido y cercano',lux:'más elegante y exclusivo, voz de casa de lujo',fix:'solo corrige ortografía, gramática y puntuación, sin cambiar el estilo'}[arg];
+  p=`${BRAND}\nReescribe este correo ${how}. Mantén el idioma original. Devuelve solo el cuerpo.\n\n${C.body}`}
+ else if(kind==='subj'){if(!C.body.trim())return;await ask(`Propón un asunto breve (máx. 7 palabras), elegante y claro para este correo, en su idioma. Solo el asunto.\n\n${C.body}`,x=>{if(x!==t('thinking'))$('#c-sub').value=x.replace(/^asunto:\s*/i,'').replace(/^"|"$/g,'').trim()});syncC();return}
+ else{if(!C.body.trim())return;p=`Traduce este correo al ${langName[lang]} manteniendo el tono. Devuelve solo la traducción.\n\n${C.body}`}
+ await ask(p,x=>{let b=x;if(kind==='write'){const mm=x.match(/^\s*(Asunto|Subject|বিষয়)\s*:\s*(.+)\n+/i);if(mm){$('#c-sub').value=mm[2].trim();b=x.slice(mm[0].length)}}box.value=b});syncC()}
+
+window.MS_ALIASES=null;
+const hb=()=>`<button class="hamb" data-act="drawer" aria-label="Menú">${ic('menu')}</button>`;
+const aMark=a=>a.main?'HH':(a.lbl||a.email)[0].toUpperCase();
+function aliasSheet(edit){const a=edit?ALIASES.find(x=>x.email===edit):null;$('#sheet').className='sheet';
+ $('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${(a?t('al_edit'):t('add_alias')).toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div>
+ <div class="bld">
+  <div class="fld"><label>${t('al_local')}</label><div style="display:flex;align-items:center;gap:6px"><input id="al-l" placeholder="ventas" style="flex:1" value="${a?esc(a.email.split('@')[0]):''}" ${a?'disabled':''}><span class="muted">@hanifhawlader.com</span></div></div>
+  <div class="fld"><label>${t('al_label')}</label><input id="al-n" placeholder="Ventas" value="${a?esc(a.lbl||''):''}"></div>
+  <div class="fld"><label>${t('al_desc')}</label><input id="al-d" placeholder="Mayoristas, prensa, tienda…" value="${a?esc(a.desc||''):''}"></div>
+  <div class="fld"><label>${t('al_id')}</label><select id="al-i"><option value="santoro" ${a&&a.id==='santoro'?'selected':''}>Santoro</option><option value="hanif" ${a&&a.id==='hanif'?'selected':''}>Hanif Hawlader</option></select></div>
+  ${a?'':`<div class="note">${t('al_note')}</div><ol class="stp"><li>${t('al_how1')}</li><li>${t('al_how2')}</li></ol>
+  <a class="btn" href="https://productivity.godaddy.com" target="_blank" rel="noopener" style="justify-content:center;text-decoration:none">${ic('globe')} ${t('al_open')}</a>`}
+ </div>
+ <div class="sh-foot">${a&&!a.main?`<button class="btn" data-rmalias="${a.email}">${t('al_rm')}</button>`:''}<span class="sp"></span><button class="send" data-act="savealias" data-edit="${a?a.email:''}">${ic('check')} ${t('save')}</button></div>`;
+ $('#scrim').classList.add('on')}
+function saveAlias(edit){
+ if(edit){const a=ALIASES.find(x=>x.email===edit);a.lbl=$('#al-n').value.trim()||a.lbl;a.desc=$('#al-d').value.trim();if(!a.main)a.id=$('#al-i').value;saveAliases();$('#scrim').classList.remove('on');renderAll();return}
+ const l=$('#al-l').value.trim().toLowerCase().replace(/@.*$/,'').replace(/[^a-z0-9._-]/g,'');if(!l)return;const email=l+'@hanifhawlader.com';
+ if(!ALIASES.find(a=>a.email===email)){ALIASES.push({email,id:$('#al-i').value,lbl:$('#al-n').value.trim()||l.charAt(0).toUpperCase()+l.slice(1),desc:$('#al-d').value.trim()});saveAliases()}
+ $('#scrim').classList.remove('on');toast(t('al_added'),{wine:true});renderAll()}
+/* ================= favourites & contacts ================= */
+function contacts(){const map=new Map();
+ mails.filter(m=>m.folder!=='spam').forEach(m=>{const c=map.get(m.from.e)||{e:m.from.e,n:m.from.n,inN:0,outN:0,last:m.date,idn:idOf(m.to)};c.inN++;if(new Date(m.date)>new Date(c.last))c.last=m.date;map.set(m.from.e,c)});
+ sent.forEach(s=>{const c=map.get(s.to.e)||{e:s.to.e,n:s.to.n,inN:0,outN:0,last:s.date,idn:idOf(s.from)};c.outN++;c.trk=c.trk&&temp(c.trk)>=temp(s)?c.trk:s;if(new Date(s.date)>new Date(c.last))c.last=s.date;map.set(s.to.e,c)});
+ return [...map.values()].sort((a,b)=>(favs.includes(b.e)-favs.includes(a.e))||new Date(b.last)-new Date(a.last))}
+const contactName=e=>{const c=contacts().find(x=>x.e===e);return c?c.n:e};
+const short=n=>{const w=n.split('·')[0].trim().split(/\s+/);return w[0].length<=3&&w[1]?w[0]+' '+w[1]:w[0]};
+function favStrip(){const cs=contacts().filter(c=>favs.includes(c.e));if(!cs.length)return '';
+ return `<div class="favs">${cs.map(c=>`<button class="fav ${S.contact===c.e?'on':''}" data-contact="${esc(c.e)}"><div class="av ${c.idn==='hanif'?'h':''}">${esc(ini(c.n))}</div><span class="hb">${ic('heart')}</span><span>${esc(short(c.n))}</span></button>`).join('')}</div>`}
+function renderPeople(){const cs=contacts();
+ $('#peoplePage').innerHTML=`<div class="page-h">${hb()}<h1>${t('people')}</h1><p>${t('p_sub')}</p></div>
+ <div class="people">${cs.map(c=>{const fv=favs.includes(c.e),tp=c.trk?temp(c.trk):0,bh=c.trk?bestHour(c.trk):null;return `<div class="pcard ${fv?'fv':''}">
+  <div class="top"><div class="av ${c.idn==='hanif'?'h':''}">${esc(ini(c.n))}</div><div style="min-width:0"><div class="nm">${esc(c.n)}</div><div class="em">${esc(c.e)}</div></div>
+   <button class="hbtn ${fv?'on':''}" data-fav="${esc(c.e)}">${ic('heart')}</button></div>
+  <div class="st"><span><b>${c.inN+c.outN}</b> ${t('p_mails')}</span><span>${t('p_last')} <b>${rel(c.last)}</b></span>${c.trk?`<span class="temp">${[1,2,3].map(i=>`<i class="${tp>=i?'f':''}"></i>`).join('')}</span>`:''}</div>
+  ${bh?`<div class="hint" style="margin:0">${ic('clock')} ${t('best_time')} ${bh}</div>`:''}
+  <div style="display:flex;gap:8px"><button class="btn pri" data-writeto="${esc(c.e)}">${ic('pen')} ${t('write')}</button><button class="btn" data-contact="${esc(c.e)}">${ic('inbox')} ${t('see_mails')}</button></div></div>`}).join('')}</div>`}
+
+/* ================= branded emails ================= */
+function brandEmail(k,d={}){const W='#5B1A2C',C='#F7F5E9';
+ const name=d.name||'Javier',order=d.order||'#0012';
+ const logo=`<svg viewBox="0 0 900 843" width="46" height="43" style="color:${C};display:block;margin:0 auto"><use href="#rider"/></svg>`;
+ const head=`<tr><td style="background:${W};padding:30px 24px 22px;text-align:center">${logo}<div style="color:${C};font-size:13px;letter-spacing:.42em;margin-top:12px">SANTORO</div></td></tr>`;
+ const foot=`<tr><td style="padding:22px 28px;text-align:center;font-size:10.5px;letter-spacing:.14em;color:rgba(0,0,0,.45);border-top:1px solid rgba(91,26,44,.12)">SANTANDER · ESPAÑA<br><span style="letter-spacing:.04em">hanifhawlader.com · pedidos@hanifhawlader.com</span></td></tr>`;
+ const btn=l=>`<a style="display:inline-block;background:${W};color:${C};text-decoration:none;font-size:12px;letter-spacing:.18em;padding:12px 26px;border-radius:6px">${l}</a>`;
+ let body='';
+ if(k==='order')body=`<div style="font-size:10px;letter-spacing:.3em;color:${W}">PEDIDO ${order}</div><div style="font-size:22px;margin:8px 0 14px">Gracias, ${name}.</div>
+  <div style="font-size:13.5px;line-height:1.7;color:rgba(0,0,0,.72)">Tu pedido está confirmado. Cada prenda Santoro se revisa a mano antes de salir del taller.</div>
+  <table cellpadding="0" cellspacing="0" width="100%" style="margin:22px 0;font-size:13px;border-top:1px solid rgba(91,26,44,.15)">
+   <tr><td style="padding:12px 0;border-bottom:1px solid rgba(91,26,44,.1)">Camisa Oxford crema · M</td><td style="text-align:right;border-bottom:1px solid rgba(91,26,44,.1)">89,00 €</td></tr>
+   <tr><td style="padding:12px 0;border-bottom:1px solid rgba(91,26,44,.1)">Envío</td><td style="text-align:right;border-bottom:1px solid rgba(91,26,44,.1)">Gratis</td></tr>
+   <tr><td style="padding:12px 0;letter-spacing:.14em;font-size:11px;color:${W}">TOTAL</td><td style="text-align:right;font-size:15px">89,00 €</td></tr></table>
+  <div style="text-align:center">${btn('VER MI PEDIDO')}</div>`;
+ if(k==='ship')body=`<div style="font-size:10px;letter-spacing:.3em;color:${W}">PEDIDO ${order}</div><div style="font-size:22px;margin:8px 0 14px">Tu pedido va de camino.</div>
+  <div style="font-size:13.5px;line-height:1.7;color:rgba(0,0,0,.72)">Hola ${name}, tu pedido ha salido hoy del taller. Lo recibirás en 24–48 horas.</div>
+  <div style="margin:22px 0;padding:16px;background:${C};border-radius:6px;font-size:12.5px"><span style="letter-spacing:.16em;font-size:10px;color:${W}">SEGUIMIENTO</span><br>Correos Express · 4471 0029 8812</div>
+  <div style="text-align:center">${btn('SEGUIR MI ENVÍO')}</div>`;
+ if(k==='club')body=`<div style="font-size:10px;letter-spacing:.3em;color:${W}">SANTORO CLUB</div><div style="font-size:22px;margin:8px 0 14px">Bienvenido a la casa, ${name}.</div>
+  <div style="font-size:13.5px;line-height:1.7;color:rgba(0,0,0,.72)">Serás el primero en ver cada colección, tendrás acceso a ediciones limitadas y a encuentros privados.</div>
+  <div style="text-align:center;margin-top:22px">${btn('DESCUBRIR')}</div>`;
+ return `<table cellpadding="0" cellspacing="0" width="100%" style="max-width:520px;margin:0 auto;background:#fff;color:#000;font-family:'El Messiri',Georgia,serif;border-radius:8px;overflow:hidden">${head}<tr><td style="padding:30px 32px">${body}</td></tr>${foot}</table>`}
+
+/* ================= automations ================= */
+const W_OPTS=['from','to','has','order','ship','signup','noreply','opened','off'],D_OPTS=['ai','tpl','brand','pin','star','label','notify','fwd','remind'];
+const needsVal=w=>['from','to','has','noreply','opened'].includes(w);
+const ruleIcon=r=>({ai:'ai',brand:'mail',tpl:'tpl',pin:'pin',star:'star',label:'tpl',notify:'bell',fwd:'fwd',remind:'bell'})[r.d]||'bolt';
+function ruleFlow(r){const tone={lux:t('t_lux'),formal:t('t_formal'),warm:t('t_warm')};
+ const what=r.d==='brand'?t('bm_'+r.dv):r.d==='tpl'||r.d==='remind'?((templates.find(x=>x.id===r.dv)||{}).name||''):r.d==='ai'?tone[r.dv]||'':r.dv||'';
+ return `<span>${t('a_when')}</span><b>${t('w_'+r.w)}${r.wv?' '+esc(r.wv):''}</b><span>→</span><b>${t('d_'+r.d)}${what?' · '+esc(what):''}</b>${['ai','tpl','remind','brand'].includes(r.d)?`<span class="pill ${r.mode==='send'?'ok':''}">${r.mode==='send'?t('m_send'):t('m_draft')}</span>`:''}`}
+function renderAuto(){
+ $('#autoPage').innerHTML=`<div class="page-h">${hb()}<h1>${t('auto')}</h1><p>${t('a_sub')}</p><span class="sp"></span><button class="btn pri" data-act="newrule">${ic('bolt')} ${t('a_new')}</button></div>
+ <div class="sec"><span class="cap">${t('a_rules')}</span>
+  ${rules.map(r=>`<div class="rule ${r.on?'':'off'}"><div class="ico">${ic(ruleIcon(r))}</div>
+   <div style="min-width:0"><div class="nm">${esc(r.name)}</div><div class="flow">${ruleFlow(r)}</div></div>
+   <div class="rt"><span class="muted" style="font-size:11px">${r.runs} ${t('a_runs')}</span><button class="btn" data-test="${r.id}">${ic('play')} ${t('a_test')}</button><button class="ib" data-editrule="${r.id}">${ic('pen')}</button><span class="sw ${r.on?'on':''}" data-rtog="${r.id}"></span></div></div>`).join('')}
+  <div class="note">${t('a_safe')}</div></div>
+ <div class="dgrid"><div class="panel"><span class="cap">${t('a_log')}</span><ul class="log" style="margin-top:8px">${alog.slice().sort((a,b)=>new Date(b.t)-new Date(a.t)).slice(0,8).map(l=>`<li><span class="muted">${ftime(l.t)}</span><span>${esc(l.txt)}</span></li>`).join('')}</ul></div>
+  <div class="panel"><span class="cap">${t('a_conn')}</span><div class="conn" style="margin-top:10px;grid-template-columns:1fr">
+   <div class="c"><b>${ic('mail','acc')} ${t('c_ms')}<span class="sp"></span><span class="bdg solid">${t('detected')}</span></b><small>${t('c_ms_s')}</small></div>
+   <div class="c"><b>${ic('ai','acc')} ${t('c_claude')}<span class="sp"></span><span class="bdg ${AI?'solid':'off'}">${AI?t('in_claude'):t('pending')}</span></b><small>${t('c_claude_s')}</small></div>
+   <div class="c"><b>${ic('globe','acc')} ${t('c_web')}<span class="sp"></span><span class="bdg off">${t('pending')}</span></b><small>${t('c_web_s')}</small><span class="code">POST https://mail.hanifhawlader.com/api/pedido</span></div>
+  </div></div></div>`}
+function ruleSheet(id){const r=id?rules.find(x=>x.id===id):{id:'r'+Date.now(),on:true,name:'',w:'to',wv:'hola@hanifhawlader.com',d:'ai',dv:'lux',mode:'draft',runs:0,last:null,isNew:true};
+ const dvOpts=d=>d==='brand'?['order','ship','club'].map(k=>[k,t('bm_'+k)]):d==='ai'?[['lux',t('t_lux')],['formal',t('t_formal')],['warm',t('t_warm')]]:['tpl','remind'].includes(d)?templates.map(x=>[x.id,x.name]):null;
+ const draw=()=>{const o=dvOpts(r.d);$('#sheet').className='sheet';$('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${t('a_new').toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div>
+  <div class="bld">
+   <div class="fld"><label>${t('a_name')}</label><input id="rb-n" value="${esc(r.name)}" placeholder="${t('a_name')}…"></div>
+   <div class="flowrow"><span>${t('a_when')}</span><select id="rb-w">${W_OPTS.map(w=>`<option value="${w}" ${r.w===w?'selected':''}>${t('w_'+w)}</option>`).join('')}</select></div>
+   ${needsVal(r.w)?`<div class="flowrow"><span></span>${r.w==='to'?`<select id="rb-wv">${ALIASES.map(a=>`<option ${r.wv===a.email?'selected':''}>${a.email}</option>`).join('')}</select>`:`<input id="rb-wv" value="${esc(r.wv)}" placeholder="${r.w==='from'?'proveedor@empresa.com':r.w==='has'?'factura, pedido, muestra…':'3'}">`}</div>`:''}
+   <div class="flowrow"><span>${t('a_do')}</span><select id="rb-d">${D_OPTS.map(d=>`<option value="${d}" ${r.d===d?'selected':''}>${t('d_'+d)}</option>`).join('')}</select></div>
+   ${o?`<div class="flowrow"><span></span><select id="rb-dv">${o.map(([v,l])=>`<option value="${v}" ${r.dv===v?'selected':''}>${esc(l)}</option>`).join('')}</select></div>`:['label','fwd'].includes(r.d)?`<div class="flowrow"><span></span><input id="rb-dv" value="${esc(r.dv)}" placeholder="${r.d==='fwd'?'correo@…':'Proveedores'}"></div>`:''}
+   ${['ai','tpl','remind','brand'].includes(r.d)?`<div class="flowrow"><span>${t('a_mode')}</span><select id="rb-m"><option value="draft" ${r.mode==='draft'?'selected':''}>${t('m_draft')}</option><option value="send" ${r.mode==='send'?'selected':''}>${t('m_send')}</option></select></div>`:''}
+   <div class="note">${t('a_safe')}</div></div>
+  <div class="sh-foot">${!r.isNew?`<button class="btn" data-delrule="${r.id}">${t('delete')}</button>`:''}<span class="sp"></span><button class="send" data-act="saverule">${ic('check')} ${t('save')}</button></div>`;
+  const sync=()=>{r.name=$('#rb-n').value;r.w=$('#rb-w').value;r.wv=$('#rb-wv')?$('#rb-wv').value:'';const nd=$('#rb-d').value;if(nd!==r.d){r.d=nd;const oo=dvOpts(nd);r.dv=oo?oo[0][0]:''}else r.dv=$('#rb-dv')?$('#rb-dv').value:'';r.mode=$('#rb-m')?$('#rb-m').value:'send'};
+  $('#rb-w').onchange=()=>{sync();if(!needsVal(r.w))r.wv='';draw()};$('#rb-d').onchange=()=>{sync();draw()};
+  RB={r,sync}};
+ draw();$('#scrim').classList.add('on')}
+let RB=null;
+function saveRule(){RB.sync();const r=RB.r;if(!r.name.trim())r.name=`${t('w_'+r.w)} → ${t('d_'+r.d)}`;delete r.isNew;const i=rules.findIndex(x=>x.id===r.id);if(i>=0)rules[i]=r;else rules.unshift(r);saveRules();$('#scrim').classList.remove('on');RB=null;toast(t('a_saved'),{wine:true});renderAll()}
+function matchRule(r){const inb=mails.filter(m=>m.folder==='inbox');
+ if(r.w==='from')return inb.find(m=>m.from.e.includes(r.wv)||m.from.n.toLowerCase().includes((r.wv||'').toLowerCase()));
+ if(r.w==='to')return inb.find(m=>m.to===r.wv);
+ if(r.w==='has')return mails.find(m=>(m.sub+m.body).toLowerCase().includes((r.wv||'').toLowerCase()));
+ if(['order','ship','signup'].includes(r.w))return {from:{n:'Javier Ruiz',e:'javier@cliente.demo'},to:'pedidos@hanifhawlader.com',sub:'Pedido #0012',body:'Pedido web #0012'};
+ if(r.w==='noreply'){const s=sent.find(x=>x.wait&&!x.replied);return s&&{from:{n:s.to.n,e:s.to.e},to:s.from,sub:s.sub,body:s.body,_s:s}}
+ if(r.w==='opened'){const s=sent.find(x=>x.opens.filter(o=>!o.auto).length>=(+r.wv||3));return s&&{from:{n:s.to.n,e:s.to.e},to:s.from,sub:s.sub,body:s.body,_s:s}}
+ return inb[0]}
+function testSheet(title,html){$('#sheet').className='sheet';$('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${t('a_result').toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div><div class="sh-body" style="padding:0"><div style="padding:14px 18px 0" class="muted">${title}</div>${html}</div>`;$('#scrim').classList.add('on')}
+async function testRule(id){const r=rules.find(x=>x.id===id),m=matchRule(r);
+ if(!m){toast(t('a_nomatch'));return}
+ const log=txt=>{alog.push({t:new Date().toISOString(),r:r.id,txt});r.runs++;r.last=new Date().toISOString();saveRules()};
+ const head=`${esc(r.name)} · ${esc(m.from.n)} · «${esc(m.sub)}»`;
+ if(r.d==='brand'){testSheet(head,`<div style="background:#EFEDE2;padding:16px">${brandEmail(r.dv,{name:short(m.from.n)})}</div>`);log(`${t('bm_'+r.dv)} → ${m.from.n}`)}
+ else if(r.d==='ai'){testSheet(head,`<div class="testout" id="tOut">${t('thinking')}</div><div class="sh-foot"><span class="pill ${r.mode==='send'?'ok':''}">${r.mode==='send'?t('m_send'):t('m_draft')}</span><span class="sp"></span><button class="btn pri" id="tUse">${ic('pen')} ${t('use_reply')}</button></div>`);
+  const tone={lux:'elegante y exclusivo, propio de una casa de lujo',formal:'formal y profesional',warm:'cercano y amable'}[r.dv]||'elegante';
+  const txt=await ask(`${BRAND}\nEres la respuesta automática de Santoro. Responde a este correo en su mismo idioma, tono ${tone}. No inventes precios ni fechas: usa [corchetes]. Firma "Hanif". Solo el cuerpo.\n\n${mailCtx(m)}`,x=>{const o=$('#tOut');if(o)o.textContent=x});
+  const u=$('#tUse');if(u)u.onclick=()=>openCompose({from:m.to,to:m.from.e,toName:m.from.n,sub:'Re: '+m.sub,body:txt||''});log(`Claude preparó una respuesta para ${m.from.n}`)}
+ else if(r.d==='tpl'||r.d==='remind'){const tp=templates.find(x=>x.id===r.dv)||templates[0];openCompose({from:m.to,to:m.from.e,toName:m.from.n,sub:'Re: '+m.sub,body:fillVars(tp.body,m.from.n)});log(`${t('d_'+r.d)} → ${m.from.n}`)}
+ else if(r.d==='pin'||r.d==='star'){const mm=mails.find(x=>x===m);if(mm){mm[r.d]=true}toast(`${t('a_ran')} · ${t('d_'+r.d)}: ${esc(m.sub)}`,{wine:true});log(`${t('d_'+r.d)}: ${m.sub}`)}
+ else{toast(`${t('a_ran')} · ${esc(m.from.n)}`,{wine:true});log(`${t('d_'+r.d)} · ${m.from.n}`)}
+ renderAll()}
+function moreSheet(){$('#sheet').className='sheet sm';$('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${t('moreTab').toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div>
+ <div class="flist">${[['people','users'],['tpl','tpl'],['set','set']].map(([v,i])=>`<button class="${S.view===v?'on':''}" data-go="${v}">${ic(i)} ${t(v)}</button>`).join('')}</div>`;$('#scrim').classList.add('on')}
+
+/* ================= menus ================= */
+function popMenu(btn,items){document.querySelectorAll('.menu').forEach(x=>x.remove());
+ const r=btn.getBoundingClientRect(),mn=document.createElement('div');mn.className='menu';
+ mn.innerHTML=items.map((it,i)=>`<button data-i="${i}">${it[0]} ${it[1]}</button>`).join('');document.body.appendChild(mn);
+ const w=mn.offsetWidth;mn.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px';mn.style.top=Math.min(r.bottom+6,innerHeight-mn.offsetHeight-8)+'px';
+ mn.onclick=e=>{const b=e.target.closest('button');if(!b)return;mn.remove();items[+b.dataset.i][2]()};
+ setTimeout(()=>document.addEventListener('click',function h(ev){if(!mn.contains(ev.target)){mn.remove();document.removeEventListener('click',h)}}),0)}
+function moveMail(m,folder,msg){const prev=m.folder;hook('move',{m,folder});m.folder=folder;m.snz=null;closeReader();toast(msg,{action:t('undo'),onAction:()=>{hook('move',{m,folder:prev});m.folder=prev;renderAll()}});renderAll()}
+function closeReader(){S.sel=null;document.body.classList.remove('reading')}
+function folderSheet(){$('#sheet').className='sheet sm';
+ $('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${t('folders').toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div>
+  <div class="flist">${FOLDERS.map(([f,i])=>`<button class="${S.folder===f?'on':''}" data-folder="${f}">${ic(i)} ${t('fo_'+f)}<span class="n">${folderCount(f)||''}</span></button>`).join('')}</div>`;
+ $('#scrim').classList.add('on')}
+
+/* ================= events ================= */
+document.addEventListener('click',e=>{
+ const g=e.target.closest('[data-go]');if(g){S.view=g.dataset.go;closeReader();$('#scrim').classList.remove('on');renderAll();return}
+ const al=e.target.closest('[data-alias]');if(al){S.view='mail';S.folder='inbox';S.filter='all';S.contact=null;S.alias=al.dataset.alias||null;closeReader();renderAll();return}
+ const ea=e.target.closest('[data-editalias]');if(ea){aliasSheet(ea.dataset.editalias);return}
+ const ra=e.target.closest('[data-rmalias]');if(ra){ALIASES=ALIASES.filter(a=>a.email!==ra.dataset.rmalias);saveAliases();if(S.alias===ra.dataset.rmalias)S.alias=null;aliasSheet();renderAll();return}
+ const fv=e.target.closest('[data-fav]');if(fv){const em=fv.dataset.fav;favs=favs.includes(em)?favs.filter(x=>x!==em):[...favs,em];LS.set('favs',favs);hook('prefs');renderAll();return}
+ const ct=e.target.closest('[data-contact]');if(ct){S.view='mail';S.folder='inbox';S.filter='all';S.contact=S.contact===ct.dataset.contact?null:ct.dataset.contact;closeReader();renderAll();return}
+ const wt=e.target.closest('[data-writeto]');if(wt){openCompose({to:wt.dataset.writeto,toName:contactName(wt.dataset.writeto)});return}
+ const rt=e.target.closest('[data-rtog]');if(rt){const r=rules.find(x=>x.id===rt.dataset.rtog);r.on=!r.on;saveRules();renderAuto();return}
+ const er=e.target.closest('[data-editrule]');if(er){ruleSheet(er.dataset.editrule);return}
+ const dr=e.target.closest('[data-delrule]');if(dr){rules=rules.filter(x=>x.id!==dr.dataset.delrule);saveRules();$('#scrim').classList.remove('on');renderAll();return}
+ const tr=e.target.closest('[data-test]');if(tr){testRule(tr.dataset.test);return}
+ const fo=e.target.closest('[data-folder]');if(fo){S.view='mail';S.alias=null;S.folder=fo.dataset.folder;S.filter='all';closeReader();$('#scrim').classList.remove('on');renderAll();return}
+ const f=e.target.closest('[data-filter]');if(f){S.view='mail';S.folder='inbox';S.filter=f.dataset.filter;renderAll();return}
+ const idb=e.target.closest('[data-ident]');if(idb){S.ident=idb.dataset.ident;renderAll();return}
+ const op=e.target.closest('[data-open]');if(op){const k=op.dataset.k,id=op.dataset.open;
+  if(k==='d'){const d=drafts.find(x=>x.id===id);if(LIVE)return hook('opendraft',d);openCompose({from:d.from,to:d.to,toName:d.toName,sub:d.sub,body:d.body,draftId:d.id});return}
+  S.view='mail';if(k==='s'&&S.folder!=='sent')S.folder='sent';S.sel={k,id};if(k==='m'){const m=mails.find(x=>x.id===id);hook('open',m);m.unread=false}document.body.classList.add('reading');renderAll();return}
+ const row=e.target.closest('[data-row]');if(row){S.openRow=S.openRow===row.dataset.row?null:row.dataset.row;renderTrack();return}
+ const sk=e.target.closest('[data-setk]');if(sk){const k=sk.dataset.setk,v=sk.dataset.setv;
+  if(k==='theme'){S.theme=v;LS.set('theme',v);applyTheme()}if(k==='lang'){LANG=v;LS.set('lang',v);document.documentElement.lang=v;S.pulse=null}if(k==='undo'){S.undoSec=+v;LS.set('undo',+v)}renderAll();return}
+ const rm=e.target.closest('[data-remind]');if(rm){const s=sent.find(x=>x.id===rm.dataset.remind),tp=templates.find(x=>x.id==='t3')||{body:''};openCompose({from:s.from,to:s.to.e,toName:s.to.n,sub:'Re: '+s.sub,body:fillVars(tp.body,s.to.n)});return}
+ const sn=e.target.closest('[data-sendnow]');if(sn){const p=scheduled.find(x=>x.id===sn.dataset.sendnow);if(LIVE)return hook('schednow',p);scheduled=scheduled.filter(x=>x!==p);sent.push({id:'s'+Date.now(),from:p.from,to:p.to,sub:p.sub,body:p.body,date:new Date().toISOString(),opens:[],clicks:[],replied:false,wait:true});closeReader();toast(t('sent_ok'),{wine:true});renderAll();return}
+ const us=e.target.closest('[data-unsched]');if(us){const p=scheduled.find(x=>x.id===us.dataset.unsched);hook('scheddel',p);scheduled=scheduled.filter(x=>x!==p);drafts.push({id:'d'+Date.now(),from:p.from,to:p.to.e,toName:p.to.n,sub:p.sub,body:p.body,date:new Date().toISOString()});closeReader();toast(t('draft_ok'));renderAll();return}
+ const te=e.target.closest('[data-tpledit]');if(te){openTplEditor(te.dataset.tpledit);return}
+ const ts=e.target.closest('[data-tplsave]');if(ts){const id=ts.dataset.tplsave,x={id,name:$('#te-n').value||'—',cat:$('#te-c').value,id_:$('#te-i').value,sub:$('#te-s').value,body:$('#te-b').value};const i=templates.findIndex(z=>z.id===id);if(i>=0)templates[i]=x;else templates.push(x);persist();$('#scrim').classList.remove('on');renderAll();return}
+ const td=e.target.closest('[data-tpldel]');if(td){templates=templates.filter(z=>z.id!==td.dataset.tpldel);persist();$('#scrim').classList.remove('on');renderAll();return}
+ const ut=e.target.closest('[data-usetpl]');if(ut){syncC();const x=templates.find(z=>z.id===ut.dataset.usetpl);C.sub=C.sub||x.sub;C.body=fillVars(x.body,C.toName||'');if(!C.to)C.from=defaultFrom(x.id_);C.tpl=false;renderCompose();return}
+ const sw=e.target.closest('[data-sw]');if(sw){e.preventDefault();syncC();C[sw.dataset.sw]=!C[sw.dataset.sw];renderCompose();return}
+ const tn=e.target.closest('[data-tone]');if(tn){cAI('tone',tn.dataset.tone);return}
+ const qr=e.target.closest('[data-qr]');if(qr){const m=curMail();if(!m)return;openCompose({from:m.to,to:m.from.e,toName:m.from.n,sub:/^re:/i.test(m.sub)?m.sub:'Re: '+m.sub,body:quickReplies(m)[+qr.dataset.qr]+'\n\n'+(guessLang(m.body)==='en'?'Best,':'Un saludo,')+'\nHanif'});return}
+ const aq=e.target.closest('[data-askq]');if(aq){const q=t(aq.dataset.askq);$('#askIn').value=q;askInbox(q);return}
+ const a=e.target.closest('[data-act]');if(!a)return;
+ const act=a.dataset.act,m=curMail();
+ switch(act){
+  case 'compose':openCompose();break;
+  case 'pin':if(m){m.pin=!m.pin;hook('prefs');renderAll()}break;
+  case 'clearc':S.contact=null;renderAll();break;
+  case 'newrule':ruleSheet(null);break;
+  case 'saverule':saveRule();break;
+  case 'moretab':moreSheet();break;
+  case 'addalias':aliasSheet();break;
+  case 'savealias':saveAlias(a.dataset.edit||null);break;
+  case 'drawer':document.body.classList.toggle('drawer');break;
+  case 'closedrawer':document.body.classList.remove('drawer');break;
+  case 'alcheck':hook('alcheck');break;
+  case 'close':if(C)closeCompose(true);else $('#scrim').classList.remove('on');break;
+  case 'folders':folderSheet();break;
+  case 'back':closeReader();renderList();break;
+  case 'pulse':aiPulse();break;
+  case 'ask':{const q=$('#askIn').value.trim();if(q)askInbox(q);break}
+  case 'notif':S.notif=!S.notif;LS.set('notif',S.notif);renderSet();break;
+  case 'emptytrash':hook('emptytrash');mails=mails.filter(x=>x.folder!=='trash');closeReader();renderAll();break;
+  case 'reply':if(m)openCompose({from:m.to,to:m.from.e,toName:m.from.n,sub:/^re:/i.test(m.sub)?m.sub:'Re: '+m.sub});break;
+  case 'arch':if(m)moveMail(m,'archive',t('archived'));break;
+  case 'del':if(m)moveMail(m,'trash',t('deleted'));break;
+  case 'restore':if(m){hook('move',{m,folder:'inbox'});m.folder='inbox';closeReader();toast(t('restored'));renderAll()}break;
+  case 'star':if(m){m.star=!m.star;hook('star',m);renderAll()}break;
+  case 'more':if(m)popMenu(a,[[ic('fwd'),t('fwd'),()=>openCompose({from:m.to,sub:'Fwd: '+m.sub,body:`\n\n---------- ${t('fwd')} ----------\n${t('from')}: ${m.from.n} <${m.from.e}>\n${t('subject')}: ${m.sub}\n\n${m.body}`})],
+    [ic('mail'),t('unread'),()=>{m.unread=true;hook('unread',m);closeReader();renderAll()}],
+    ...['prov','cli','ped','col'].map(c=>[ic('tpl'),t('d_label')+': '+t('f_'+c),()=>{m.cat=c;hook('label',m);renderAll()}]),
+    [ic('clock'),t('sn_eve'),()=>snz(m,()=>{const d=new Date();d.setHours(18,0,0,0);return d})],[ic('clock'),t('sn_tom'),()=>snz(m,()=>{const d=new Date();d.setDate(d.getDate()+1);d.setHours(9,0,0,0);return d})],[ic('clock'),t('sn_mon'),()=>snz(m,()=>new Date(nextMon9()))],
+    m.folder==='spam'?[ic('undo'),t('notspam'),()=>{m.folder='inbox';closeReader();renderAll()}]:[ic('shield'),t('spam'),()=>moveMail(m,'spam',t('spammed'))],[ic('trash'),t('del'),()=>moveMail(m,'trash',t('deleted'))]]);
+   else{const s=S.sel&&sent.find(x=>x.id===S.sel.id);}break;
+  case 'fwdsent':{const s=sent.find(x=>x.id===S.sel.id);openCompose({from:s.from,sub:'Fwd: '+s.sub,body:'\n\n'+s.body});break}
+  case 'sum':if(m)aiSum(m);break;
+  case 'aireply':if(m){S.ai[m.id]=Object.assign(S.ai[m.id]||{},{reply:a0(m).reply||''});aiReply(m)}break;
+  case 'replygo':if(m)aiReply(m);break;
+  case 'tr':if(m)aiTr(m);break;
+  case 'trgo':if(m)aiTr(m);break;
+  case 'safe':if(m)safeCheck(m);break;
+  case 'qrgen':if(m)aiQR(m);break;
+  case 'usereply':if(m)openCompose({from:m.to,to:m.from.e,toName:m.from.n,sub:/^re:/i.test(m.sub)?m.sub:'Re: '+m.sub,body:a0(m).reply||''});break;
+  case 'c-tpl':syncC();C.tpl=!C.tpl;C.ai=false;C.tone=false;renderCompose();break;
+  case 'c-ai':syncC();C.ai=!C.ai;C.tpl=false;C.tone=false;renderCompose();if(C.ai)setTimeout(()=>$('#c-idea').focus(),30);break;
+  case 'c-tone':syncC();C.tone=!C.tone;C.ai=false;C.tpl=false;renderCompose();break;
+  case 'c-aigo':cAI('write');break;
+  case 'c-tr':cAI('tr');break;
+  case 'c-subj':cAI('subj');break;
+  case 'c-send':doSend();break;
+ }
+});
+function snz(m,fn){m.snz=fn().toISOString();hook('prefs');closeReader();toast(`${t('snoozed_until')} ${fdt(m.snz)}`);renderAll()}
+document.addEventListener('input',e=>{
+ if(e.target.id==='q'){S.q=e.target.value;const p=e.target.selectionStart;renderList();const q=$('#q');q.focus();q.setSelectionRange(p,p)}
+ if(e.target.id==='askIn')S.ask=e.target.value;
+ if(e.target.dataset.sig){sigs[e.target.dataset.sig][e.target.dataset.f]=e.target.value;$('#pv-'+e.target.dataset.sig).innerHTML=sigHTML(e.target.dataset.sig);persist()}
+});
+document.addEventListener('change',e=>{if(e.target.id==='c-from'||e.target.id==='c-at'){syncC();renderCompose()}});
+document.addEventListener('keydown',e=>{
+ if(e.target.id==='askIn'&&e.key==='Enter'){const q=e.target.value.trim();if(q)askInbox(q);return}
+ if(e.key==='Escape'&&$('#scrim').classList.contains('on')){if(C)closeCompose(true);else $('#scrim').classList.remove('on');return}
+ if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)||e.metaKey||e.ctrlKey||$('#scrim').classList.contains('on'))return;
+ const m=curMail(),r=rows();
+ if(e.key==='c'){e.preventDefault();openCompose()}
+ else if(e.key==='/'){e.preventDefault();S.view='mail';renderAll();$('#q').focus()}
+ else if((e.key==='j'||e.key==='k')&&S.view==='mail'&&r.length){const i=S.sel?r.findIndex(x=>x.k===S.sel.k&&x.id===S.sel.id):-1;const n=r[Math.max(0,Math.min(r.length-1,i+(e.key==='j'?1:-1)))];if(n.k!=='d'){S.sel={k:n.k,id:n.id};if(n.k==='m')mails.find(x=>x.id===n.id).unread=false;renderAll()}}
+ else if(m&&e.key==='r')openCompose({from:m.to,to:m.from.e,toName:m.from.n,sub:'Re: '+m.sub});
+ else if(m&&e.key==='e')moveMail(m,'archive',t('archived'));
+ else if(m&&e.key==='#')moveMail(m,'trash',t('deleted'));
+ else if(m&&e.key==='s'){m.star=!m.star;renderAll()}
+});
+$('#rail').addEventListener('click',e=>{if(e.target.closest('button,a')&&!e.target.closest('.seg'))setTimeout(()=>document.body.classList.remove('drawer'),60)});
+$('#scrim').addEventListener('click',e=>{if(e.target.id==='scrim'){if(C)closeCompose(true);else $('#scrim').classList.remove('on')}});
+
+function renderAll(){
+ document.body.dataset.view=S.view;
+ document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));$('#v-'+S.view).classList.add('on');
+ renderRail();
+ if(S.view==='mail')renderList();if(S.view==='dash')renderDash();if(S.view==='track')renderTrack();if(S.view==='tpl')renderTpl();if(S.view==='auto')renderAuto();if(S.view==='people')renderPeople();if(S.view==='set')renderSet();
+}
+document.documentElement.lang=LANG;
+if(!LIVE){if(!isMobile())S.sel={k:'m',id:'m1'};renderAll();}
+</script>
+</body>
+</html>

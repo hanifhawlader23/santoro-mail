@@ -1,0 +1,14 @@
+{
+  // Santoro Mail · Cloudflare Worker «hanif»
+  "name": "hanif",
+  "main": "worker.js",
+  "compatibility_date": "2025-11-01",
+  "keep_vars": true,
+  "kv_namespaces": [{ "binding": "DB", "id": "d5d07afc408b4f7c8899a66c5c96cc1c" }],
+  "triggers": { "crons": ["*/10 * * * *"] },
+  "vars": {
+    "CLIENT_ID": "9833c30f-8c0d-433f-bea6-ede9cc640fa0",
+    "TENANT_ID": "653146ba-37e3-40d6-9991-a67ef175ac9b",
+    "ALLOWED_EMAIL": "contacto@hanifhawlader.com"
+  }
+}
