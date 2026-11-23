@@ -6,3 +6,7 @@ Correo de Hanif Hawlader / Santoro sobre Microsoft 365, con seguimiento de apert
 - `python3 build.py` — genera `worker.js`.
 - Cloudflare despliega `worker.js` automáticamente con cada cambio en `main` (`wrangler.jsonc`).
 - Secretos (en Cloudflare, nunca en el repositorio): `CLIENT_SECRET`, `ANTHROPIC_API_KEY` (opcional), `WEBHOOK_KEY` (opcional).
+
+## Firmas animadas
+`src/sig-santoro.gif` y `src/sig-hanif.gif` se generan con `tools/mkgif.py` (Pillow + fuente El Messiri).
+El primer fotograma es la firma completa, así Outlook de escritorio la muestra bien aunque no anime.

@@ -58,13 +58,15 @@ const lc=s=>String(s||'').toLowerCase();
 
 /* ---------- prefs ---------- */
 let saveT=null;
-function collectPrefs(){return {templates,sigs,favs,rules,aliases:ALIASES,pins:mails.filter(m=>m.pin).map(m=>m.id).concat((prefs.pins||[]).filter(id=>!mails.find(m=>m.id===id))),snz:Object.fromEntries(mails.filter(m=>m.snz).map(m=>[m.id,m.snz])),theme:S.theme,lang:LANG}}
+function collectPrefs(){return {templates,sigs,favs,rules,aliases:ALIASES,pins:mails.filter(m=>m.pin).map(m=>m.id).concat((prefs.pins||[]).filter(id=>!mails.find(m=>m.id===id))),snz:Object.fromEntries(mails.filter(m=>m.snz).map(m=>[m.id,m.snz])),theme:S.theme,lang:LANG,av:AVV}}
 function savePrefs(){clearTimeout(saveT);saveT=setTimeout(()=>{prefs=collectPrefs();A('/prefs',{method:'PUT',body:prefs}).catch(fail)},700)}
 
 /* ---------- hooks from the UI ---------- */
 hook=function(kind,x){
   if(!loaded)return;
   if(kind==='prefs')return savePrefs();
+  if(kind==='avatar'){const k=x.k;(x.data?A('/avatar/'+k,{method:'PUT',body:{data:x.data}}):A('/avatar/'+k,{method:'DELETE'})).then(r=>{if(x.data)AVV[k]=r.v;else delete AVV[k];savePrefs();toast(x.data?t('av_ok'):t('av_rm'),{wine:true});renderAll()}).catch(fail);return}
+  if(kind==='readall'){(async()=>{for(let i=0;i<x.length;i+=6)await Promise.all(x.slice(i,i+6).map(m=>A('/message/'+encodeURIComponent(m.id),{method:'PATCH',body:{read:true}}).catch(()=>{})))})();return}
   if(kind==='alcheck'){A('/me').then(me=>{window.MS_ALIASES=[ME.email,...(me.aliases||[])];(me.aliases||[]).filter(e=>e.endsWith('@hanifhawlader.com')&&!ALIASES.find(x=>x.email===e)).forEach(e=>ALIASES.push({email:e,id:'santoro',lbl:e.split('@')[0],desc:''}));savePrefs();toast(t('al_checked'),{wine:true});renderAll()}).catch(fail);return}
   if(kind==='open'){if(x.unread)A('/message/'+encodeURIComponent(x.id),{method:'PATCH',body:{read:true}}).catch(fail);return}
   if(kind==='unread')return A('/message/'+encodeURIComponent(x.id),{method:'PATCH',body:{read:false}}).catch(fail);
@@ -100,9 +102,7 @@ ask=async function(prompt,onText){
 };
 
 /* ---------- email-safe signature ---------- */
-function sigEmail(k){const s=sigs[k],o=location.origin;
-  if(k==='santoro')return `<table cellpadding="0" cellspacing="0" style="font-family:Georgia,serif;color:#000;border-collapse:collapse;margin-top:8px"><tr><td style="padding-right:16px;border-right:1px solid #5B1A2C;vertical-align:middle"><img src="${o}/brand/rider-wine.png" width="46" alt="Santoro" style="display:block"></td><td style="padding-left:16px;vertical-align:middle"><div style="font-size:14px">${esc(s.n)}</div><div style="font-size:10px;letter-spacing:3px;color:#5B1A2C;margin:2px 0 6px">${esc(s.r).toUpperCase()} · SANTORO</div><div style="font-size:12px;color:#666">${esc(s.e)} · ${esc(s.w)}</div><div style="font-size:12px;color:#666">${esc(s.c)}</div>${s.l?`<div style="font-size:11px;color:#5B1A2C;font-style:italic;margin-top:6px">${esc(s.l)}</div>`:''}</td></tr></table>`;
-  return `<div style="font-family:Georgia,serif;color:#000;margin-top:8px"><div style="font-size:15px;letter-spacing:2px">${esc(s.n).toUpperCase()}</div><div style="width:28px;height:1px;background:#5B1A2C;margin:6px 0 7px"></div><div style="font-size:12px;color:#555">${esc(s.r)}</div><div style="font-size:12px;color:#666">${esc(s.e)} · ${esc(s.w)} · ${esc(s.c)}</div>${s.l?`<div style="font-size:11px;color:#5B1A2C;margin-top:5px">${esc(s.l)}</div>`:''}<div style="font-size:9.5px;letter-spacing:3px;color:#5B1A2C;margin-top:8px">FUNDADOR DE SANTORO</div></div>`}
+function sigEmail(k){return `<div style="margin-top:10px">${sigBuild(k,true)}</div>`}
 
 /* ---------- sending ---------- */
 doSend=function(){
@@ -145,7 +145,7 @@ async function poll(){
     const me=await A('/me');Object.assign(ME,me);
     prefs=await A('/prefs');
     if(prefs.templates)templates=prefs.templates;if(prefs.sigs)sigs=prefs.sigs;if(prefs.rules)rules=prefs.rules;
-    favs=prefs.favs||[];
+    favs=prefs.favs||[];AVV=prefs.av||{};
     if(prefs.theme){S.theme=prefs.theme;applyTheme()}
     // aliases: lo que diga Microsoft + lo guardado
     const known=Object.fromEntries((prefs.aliases||ALIASES).map(a=>[a.email,a]));

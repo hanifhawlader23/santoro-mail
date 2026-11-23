@@ -84,7 +84,50 @@ main{position:relative;overflow:hidden;height:100%}
 .item{display:grid;grid-template-columns:36px 1fr auto;gap:12px;padding:13px 20px;border-bottom:1px solid var(--line);cursor:pointer;position:relative}
 .item:hover{background:var(--wash)}
 .item.sel{background:var(--wash2)}
-.item.unread::before{content:"";position:absolute;left:8px;top:22px;width:5px;height:5px;border-radius:1px;background:var(--at)}
+.item::after{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--ac,transparent);opacity:.45}
+.item.unread{background:color-mix(in srgb,var(--ac,var(--acc)) 8%,var(--bg))}
+.item.unread:hover{background:color-mix(in srgb,var(--ac,var(--acc)) 13%,var(--bg))}
+.item.unread::after{top:0;bottom:0;width:5px;border-radius:0;opacity:1}
+.item.unread .av{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--ac,var(--acc))}
+.item.unread .sub{font-weight:600;color:var(--fg)}
+.item.unread .meta>span:first-child{color:var(--ac,var(--at));font-weight:600}
+.item:not(.unread) .who,.item:not(.unread) .sub{color:var(--fg2)}
+.item .newdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ac,var(--acc));margin-right:6px;vertical-align:middle}
+.tag.ac{color:var(--ac);border-color:color-mix(in srgb,var(--ac) 45%,transparent)}
+[data-theme="dark"] .tag.ac{color:color-mix(in srgb,var(--ac) 55%,#fff)}
+.av img,.avimg{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+.av.pic{padding:0;overflow:hidden;background:none}
+.amk{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:20px;padding:0 4px;border-radius:5px;background:var(--ac);color:#fff;font-size:9.5px;letter-spacing:.08em}
+.achips{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}
+@media(max-width:860px){.lh-row .btn .lbl{display:none}}
+[data-theme="dark"] .achip i,[data-theme="dark"] .item .newdot{background:color-mix(in srgb,var(--ac) 62%,#fff)}
+[data-theme="dark"] .achip b,[data-theme="dark"] .item.unread .meta>span:first-child{color:color-mix(in srgb,var(--ac) 55%,#fff)}
+[data-theme="dark"] .item.unread::after{background:color-mix(in srgb,var(--ac) 75%,#fff)}
+[data-theme="dark"] .achip.on{background:color-mix(in srgb,var(--ac) 80%,#fff 0%)}
+.achips::-webkit-scrollbar{display:none}
+.achip{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;border:1px solid var(--line2);border-radius:999px;padding:5px 11px 5px 7px;font-size:12px;color:var(--fg2)}
+.achip i{width:9px;height:9px;border-radius:50%;background:var(--ac);display:block}
+.achip b{font-weight:600;color:var(--ac);font-size:11px}
+.achip.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.achip.on i{background:#fff}.achip.on b{color:#fff}
+.rd-alias{height:4px;background:var(--ac);border-radius:0 0 3px 3px;margin:0 0 4px}
+.rd-to{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ac);border:1px solid color-mix(in srgb,var(--ac) 40%,transparent);border-radius:999px;padding:2px 9px}
+[data-theme="dark"] .rd-to{color:color-mix(in srgb,var(--ac) 55%,#fff)}
+.swatches{display:flex;flex-wrap:wrap;gap:8px}
+.swatches button{width:34px;height:34px;border-radius:9px;background:var(--c);border:2px solid transparent;box-shadow:inset 0 0 0 2px var(--bg);display:flex;align-items:center;justify-content:center;color:#fff}
+.swatches button.on{border-color:var(--c)}
+.swatches button svg.i{width:16px;height:16px;opacity:0}
+.swatches button.on svg.i{opacity:1}
+.prof{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.profcard{border:1px solid var(--line);border-radius:var(--r);background:var(--bg2);padding:16px;display:flex;gap:14px;align-items:center}
+.profcard .ph{width:72px;height:72px;border-radius:14px;flex:none;overflow:hidden;background:var(--wash2);display:flex;align-items:center;justify-content:center;color:var(--at);font-size:20px;letter-spacing:.06em}
+.profcard .ph.h{background:var(--hw);color:var(--fg)}
+.profcard b{display:block;font-weight:500;font-size:14px}
+.profcard small{display:block;color:var(--fg3);font-size:11.5px;margin:2px 0 8px}
+.profcard .bt{display:flex;gap:6px;flex-wrap:wrap}
+.sigst{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}
+.me-av{width:28px;height:28px;border-radius:7px;overflow:hidden;flex:none}
+@media(max-width:860px){.prof{grid-template-columns:1fr}}
 .av{width:36px;height:36px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;font-size:12.5px;letter-spacing:.04em;background:var(--wash2);color:var(--at);flex:none}
 .av.h{background:var(--hw);color:var(--fg)}
 .item .who{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -598,7 +641,7 @@ bn:{mail:'মেইল',inbox:'ইনবক্স',dash:'ড্যাশবো�
  safe_t:'নিরাপত্তা চেক',safe_ok:'প্রতারণার কোনো চিহ্ন নেই।',safe_bad:'সাবধান: প্রতারণা মনে হচ্ছে।',safe_mid:'ধীরে দেখে নাও।',
  sec_ago:'এখন',min:'মি',h:'ঘ',yesterday:'গতকাল',days:'দি'}
 };
-Object.assign(T.es,{menu:'Menú',accounts2:'Cuentas',add_acct:'Añadir cuenta (Gmail, iCloud…)',soon:'pronto',ms365:'Microsoft 365',tools:'Herramientas',al_status_ok:'Activo en Microsoft',al_status_wait:'Falta crearlo en GoDaddy',al_check:'Comprobar',al_edit:'Editar alias',al_how1:'Pulsa «Abrir GoDaddy» → Admin → Email aliases → Add alias, con el mismo nombre.',al_how2:'Vuelve aquí y pulsa «Comprobar»: aparecerá como activo.',al_label:'Nombre visible',al_checked:'Alias actualizados',
+Object.assign(T.es,{profile:'Perfil y fotos',profile_d:'Tu foto aparece en el menú, al redactar, en los enviados y en la firma «Tarjeta». Puede ser una foto o un GIF animado.',av_hint:'JPG, PNG o GIF animado',av_up:'Subir foto',av_change:'Cambiar',av_ok:'Foto guardada',av_rm:'Foto quitada',av_big:'El GIF es muy grande (máx. 2,5 MB)',al_color:'Color de la bandeja',read_all:'Marcar leídos',read_done:'marcados como leídos',sg_anim:'Animada',sg_card:'Tarjeta con foto',sg_classic:'Clásica',sg_min:'Mínima',sg_play:'Ver animación',sg_anim_note:'Animación de 2 s que termina en la firma completa. En Outlook de escritorio se ve fija, sin perder nada.',sg_card_note:'Sube tu foto en Ajustes → Perfil para verla aquí.',menu:'Menú',accounts2:'Cuentas',add_acct:'Añadir cuenta (Gmail, iCloud…)',soon:'pronto',ms365:'Microsoft 365',tools:'Herramientas',al_status_ok:'Activo en Microsoft',al_status_wait:'Falta crearlo en GoDaddy',al_check:'Comprobar',al_edit:'Editar alias',al_how1:'Pulsa «Abrir GoDaddy» → Admin → Email aliases → Add alias, con el mismo nombre.',al_how2:'Vuelve aquí y pulsa «Comprobar»: aparecerá como activo.',al_label:'Nombre visible',al_checked:'Alias actualizados',
 inboxes:'Bandejas',all_inb:'Todas',add_alias:'Añadir alias',al_local:'Nombre del alias',al_desc:'Para qué es',al_id:'Identidad',al_note:'Microsoft no deja crear alias desde apps externas. Créalo en GoDaddy (Email y Office → Admin → Email aliases) y añádelo aquí: tendrá su propia bandeja, firma y color.',al_open:'Abrir GoDaddy',al_added:'Alias añadido',al_main:'Principal',al_rm:'Quitar de la app',
 auto:'Automatización',people:'Contactos',moreTab:'Más',pinned:'Fijados',today:'Hoy',yest:'Ayer',older:'Anteriores',pin:'Fijar',unpin:'Quitar',fav:'Favorito',favs:'Favoritos',
  only_from:'Solo de',clear:'Quitar',write:'Escribir',see_mails:'Ver correos',p_mails:'correos',p_last:'último',p_sub:'Marca con el corazón a quien más te importa: aparece arriba en tu bandeja.',
@@ -611,7 +654,7 @@ auto:'Automatización',people:'Contactos',moreTab:'Más',pinned:'Fijados',today:
  detected:'Detectado',bm_t:'Emails de marca',bm_p:'Se envían solos desde pedidos@ con el diseño Santoro.',bm_order:'Confirmación de pedido',bm_ship:'Pedido enviado',bm_club:'Bienvenida Santoro Club',
  step_alias:'Crear los alias en GoDaddy',step_aliasd:'Email y Office → Admin → Email aliases → Add alias: santoro@, pedidos@, club@, hola@. Hoy solo existe contacto@.',
  step_send:'Activar «enviar desde alias»',step_sendd:'Exchange admin center → Settings → Mail flow → «Turn on sending from aliases». Por eso Spark no podía enviar desde santoro@.',done:'Hecho'});
-Object.assign(T.bn,{menu:'মেনু',accounts2:'অ্যাকাউন্ট',add_acct:'অ্যাকাউন্ট যোগ (Gmail, iCloud…)',soon:'শীঘ্রই',ms365:'Microsoft 365',tools:'টুলস',al_status_ok:'Microsoft-এ চালু',al_status_wait:'GoDaddy-তে বানানো বাকি',al_check:'চেক করো',al_edit:'এলিয়াস এডিট',al_how1:'«GoDaddy খোলো» চাপো → Admin → Email aliases → Add alias, একই নাম দিয়ে।',al_how2:'এখানে ফিরে «চেক করো» চাপো: চালু দেখাবে।',al_label:'দেখানোর নাম',al_checked:'এলিয়াস আপডেট হয়েছে',
+Object.assign(T.bn,{profile:'প্রোফাইল ও ছবি',profile_d:'তোমার ছবি মেনুতে, মেইল লেখার সময়, পাঠানো মেইলে আর «কার্ড» সিগনেচারে দেখাবে। ছবি বা অ্যানিমেটেড GIF—দুটোই চলবে।',av_hint:'JPG, PNG বা অ্যানিমেটেড GIF',av_up:'ছবি দাও',av_change:'বদলাও',av_ok:'ছবি সেভ হয়েছে',av_rm:'ছবি সরানো হয়েছে',av_big:'GIF অনেক বড় (সর্বোচ্চ ২.৫ MB)',al_color:'ইনবক্সের রং',read_all:'সব পড়া হয়েছে',read_done:'টা পড়া হিসেবে চিহ্নিত',sg_anim:'অ্যানিমেটেড',sg_card:'ছবিসহ কার্ড',sg_classic:'ক্লাসিক',sg_min:'মিনিমাল',sg_play:'অ্যানিমেশন দেখো',sg_anim_note:'২ সেকেন্ডের অ্যানিমেশন, শেষে পুরো সিগনেচার থেকে যায়। Outlook ডেস্কটপে স্থির দেখায়, কিছু হারায় না।',sg_card_note:'ছবি দেখাতে সেটিংস → প্রোফাইলে ছবি দাও।',menu:'মেনু',accounts2:'অ্যাকাউন্ট',add_acct:'অ্যাকাউন্ট যোগ (Gmail, iCloud…)',soon:'শীঘ্রই',ms365:'Microsoft 365',tools:'টুলস',al_status_ok:'Microsoft-এ চালু',al_status_wait:'GoDaddy-তে বানানো বাকি',al_check:'চেক করো',al_edit:'এলিয়াস এডিট',al_how1:'«GoDaddy খোলো» চাপো → Admin → Email aliases → Add alias, একই নাম দিয়ে।',al_how2:'এখানে ফিরে «চেক করো» চাপো: চালু দেখাবে।',al_label:'দেখানোর নাম',al_checked:'এলিয়াস আপডেট হয়েছে',
 inboxes:'ইনবক্সগুলো',all_inb:'সব',add_alias:'এলিয়াস যোগ',al_local:'এলিয়াসের নাম',al_desc:'কীসের জন্য',al_id:'পরিচয়',al_note:'Microsoft বাইরের অ্যাপ থেকে এলিয়াস বানাতে দেয় না। GoDaddy-তে বানাও (Email & Office → Admin → Email aliases), তারপর এখানে যোগ করো: নিজের ইনবক্স, সিগনেচার আর রং পাবে।',al_open:'GoDaddy খোলো',al_added:'এলিয়াস যোগ হয়েছে',al_main:'প্রধান',al_rm:'অ্যাপ থেকে সরাও',
 auto:'অটোমেশন',people:'কন্টাক্ট',moreTab:'আরও',pinned:'পিন করা',today:'আজ',yest:'গতকাল',older:'আগের',pin:'পিন',unpin:'পিন সরাও',fav:'প্রিয়',favs:'প্রিয়',
  only_from:'শুধু',clear:'সরাও',write:'লেখো',see_mails:'মেইল দেখো',p_mails:'মেইল',p_last:'শেষ',p_sub:'যাদের বেশি দরকার তাদের হার্ট দাও: ইনবক্সের একদম উপরে দেখাবে।',
@@ -710,8 +753,8 @@ let templates=[
  {id:'t7',cat:'col',id_:'hanif',name:'Propuesta de colaboración',sub:'Colaboración con Santoro',body:'Hola {{nombre}},\n\nTe escribo porque me gusta mucho lo que hacéis en {{empresa}} y creo que encaja con Santoro. Me encantaría proponeros una colaboración.\n\n¿Tendrías 20 minutos esta semana para hablarlo?\n\nUn saludo,'},
  {id:'t8',cat:'prov',id_:'santoro',name:'Supplier inquiry (English)',sub:'Sourcing inquiry · Santoro',body:'Dear {{nombre}},\n\nI am Hanif Hawlader, founder of Santoro, a luxury menswear brand from Santander, Spain. I spent six years as head of production and partner at a fashion company.\n\nWe are sourcing for our first collection and would like to know more about {{empresa}}: price list, minimum order and lead times.\n\nKind regards,'}
 ];
-let sigs={santoro:{n:'Hanif Hawlader',r:'Fundador',e:'santoro@hanifhawlader.com',w:'hanifhawlader.com',c:'Santander · España',l:'Elegancia, hecha a mano.'},
- hanif:{n:'Hanif Hawlader',r:'Producción y dirección creativa',e:'contacto@hanifhawlader.com',w:'hanifhawlader.com',c:'Cantabria · España',l:''}};
+let sigs={santoro:{st:'anim',n:'Hanif Hawlader',r:'Fundador',e:'santoro@hanifhawlader.com',w:'hanifhawlader.com',c:'Santander · España',l:'Elegancia, hecha a mano.'},
+ hanif:{st:'anim',n:'Hanif Hawlader',r:'Producción y dirección creativa',e:'contacto@hanifhawlader.com',w:'hanifhawlader.com',c:'Cantabria · España',l:''}};
 templates=LS.get('templates',templates);sigs=LS.get('sigs',sigs);
 const persist=()=>{LS.set('templates',templates);LS.set('sigs',sigs);hook('prefs')};
 
@@ -774,8 +817,8 @@ function rows(){
  else if(f==='star')r=mails.filter(m=>m.star&&m.folder!=='trash'&&identOK(m.to)).map(mm);
  else if(f==='snz')r=mails.filter(m=>m.snz&&m.folder==='inbox'&&identOK(m.to)).map(mm);
  else if(f==='sent')r=sent.filter(s=>identOK(s.from)).map(s=>({from:s.from,k:'s',em:s.to.e,id:s.id,name:t('to')+': '+s.to.n,sub:s.sub,snip:s.body,date:s.date,idn:idOf(s.from),trk:s}));
- else if(f==='drafts')r=drafts.filter(d=>identOK(d.from)).map(d=>({k:'d',id:d.id,name:d.toName||d.to||'—',sub:d.sub||'—',snip:d.body,date:d.date,idn:idOf(d.from),draft:true}));
- else if(f==='sched')r=scheduled.filter(p=>identOK(p.from)).map(p=>({k:'p',id:p.id,name:t('to')+': '+p.to.n,sub:p.sub,snip:p.body,date:p.at,idn:idOf(p.from),sched:true}));
+ else if(f==='drafts')r=drafts.filter(d=>identOK(d.from)).map(d=>({k:'d',id:d.id,name:d.toName||d.to||'—',sub:d.sub||'—',snip:d.body,date:d.date,idn:idOf(d.from),from:d.from,draft:true}));
+ else if(f==='sched')r=scheduled.filter(p=>identOK(p.from)).map(p=>({k:'p',id:p.id,name:t('to')+': '+p.to.n,sub:p.sub,snip:p.body,date:p.at,from:p.from,idn:idOf(p.from),sched:true}));
  if(q)r=r.filter(x=>(x.name+x.sub+x.snip).toLowerCase().includes(q));
  if(S.alias)r=r.filter(x=>x.to===S.alias||x.from===S.alias);
  if(S.contact)r=r.filter(x=>x.em===S.contact||(x.trk&&x.trk.to.e===S.contact));
@@ -787,12 +830,12 @@ const TABS=[['mail','inbox'],['track','chart'],['dash','dash'],['auto','bolt'],[
 function idSwitch(){return `<div class="seg">${[['all',t('all')],['santoro','Santoro'],['hanif','Hanif H.']].map(([v,l])=>`<button data-v="${v}" data-ident="${v}" class="${S.ident===v?'on':''}">${l}</button>`).join('')}</div>`}
 function renderRail(){
  $('#rail').innerHTML=`
-  <div class="brand">${rider()}<div><b>SANTORO</b><small>Hanif Hawlader · Mail</small></div></div>
+  <div class="brand">${avSrc('santoro')?`<div class="me-av" style="width:40px;height:40px;border-radius:10px"><img class="avimg" src="${avSrc('santoro')}" alt=""></div>`:rider()}<div><b>SANTORO</b><small>Hanif Hawlader · Mail</small></div></div>
   ${idSwitch()}
   <button class="btn-compose" data-act="compose">${ic('pen')} ${t('compose')}</button>
   <div class="grp"><span class="cap">${t('inboxes')}</span><div class="nav">
    <button class="${S.view==='mail'&&S.folder==='inbox'&&!S.alias?'on':''}" data-alias="">${ic('inbox')} ${t('all_inb')}<span class="n">${mails.filter(m=>m.folder==='inbox'&&m.unread).length||''}</span></button>
-   ${ALIASES.map(a=>`<button class="${S.alias===a.email?'on':''}" data-alias="${a.email}"><span class="tag ${a.id==='hanif'?'h':''}" style="min-width:24px;text-align:center">${esc(aMark(a))}</span> ${esc(a.email.split('@')[0])}@<span class="n">${mails.filter(m=>m.folder==='inbox'&&m.unread&&m.to===a.email).length||''}</span></button>`).join('')}
+   ${ALIASES.map(a=>`<button class="${S.alias===a.email?'on':''}" data-alias="${a.email}"><span class="amk" ${acStyle(a.email)}>${esc(aMark(a))}</span> ${esc(a.email.split('@')[0])}@<span class="n">${mails.filter(m=>m.folder==='inbox'&&m.unread&&m.to===a.email).length||''}</span></button>`).join('')}
    <button data-act="addalias" class="acc">${ic('pen')} ${t('add_alias')}</button></div></div>
   <div class="grp"><span class="cap">${t('folders')}</span><div class="nav">${FOLDERS.filter(([f])=>f!=='inbox').map(([f,i])=>{const n=folderCount(f);return `<button class="${S.view==='mail'&&S.folder===f&&!(f==='inbox'&&S.alias)?'on':''}" data-folder="${f}">${ic(i)} ${t('fo_'+f)}<span class="n">${n||''}</span></button>`}).join('')}</div></div>
   <div class="grp"><span class="cap">${t('labels')}</span><div class="nav">${['pri','prov','cli','ped','col'].map(f=>`<button class="${S.view==='mail'&&S.folder==='inbox'&&S.filter===f?'on':''}" data-filter="${f}">${t('f_'+f)}<span class="n">${applyFilter(mails.filter(m=>m.folder==='inbox'&&!m.snz&&identOK(m.to)),f).length||''}</span></button>`).join('')}</div></div>
@@ -810,27 +853,29 @@ function renderList(){
  const f=S.folder,unread=folderCount('inbox');
  $('#listH').innerHTML=`
   <div class="lh-row">${hb()}<h1>${S.alias&&f==='inbox'?esc(S.alias.split('@')[0])+'@':t('fo_'+f)} ${f==='inbox'&&!S.alias?`<span>${unread} ${t('f_unread').toLowerCase()}</span>`:''}</h1><span class="sp"></span>
+   ${f==='inbox'&&rows().some(x=>x.unread)?`<button class="btn" data-act="readall" title="${t('read_all')}">${ic('check')}<span class="lbl"> ${t('read_all')}</span></button>`:''}
    ${f==='trash'&&rows().length?`<button class="btn" data-act="emptytrash">${t('empty_trash')}</button>`:''}</div>
   <div class="search">${ic('search','muted')}<input id="q" placeholder="${t('search')}" value="${esc(S.q)}"></div>
+  ${f==='inbox'&&ALIASES.length>1?`<div class="achips"><button class="achip ${!S.alias?'on':''}" data-alias="" style="--ac:var(--acc)"><i></i>${t('all')}<b>${mails.filter(m=>m.folder==='inbox'&&m.unread&&identOK(m.to)).length||''}</b></button>${ALIASES.filter(a=>identOK(a.email)).map(a=>{const u=mails.filter(m=>m.folder==='inbox'&&m.unread&&m.to===a.email).length;return `<button class="achip ${S.alias===a.email?'on':''}" data-alias="${a.email}" ${acStyle(a.email)}><i></i>${esc(a.email.split('@')[0])}<b>${u||''}</b></button>`}).join('')}</div>`:''}
   ${f==='inbox'&&!S.contact&&!S.alias?favStrip():''}
   ${S.contact?`<div class="cfilter">${ic('heart')} ${t('only_from')} ${esc(contactName(S.contact))}<button class="btn" data-act="clearc">${ic('x')} ${t('clear')}</button></div>`:''}
   ${f==='inbox'?`<div class="chips">${['all','pri','unread','prov','cli','ped','col','otr'].map(x=>`<button class="chip ${S.filter===x?'on':''}" data-filter="${x}">${t('f_'+x)}</button>`).join('')}</div>`:''}`;
  const c={n:unread,p:mails.filter(m=>m.folder==='inbox'&&m.pri&&identOK(m.to)).length,w:sent.filter(s=>s.wait&&!s.replied).length};
  const AL=S.alias&&ALIASES.find(a=>a.email===S.alias);
  if(AL){const n=mails.filter(m=>m.folder==='inbox'&&m.to===AL.email).length,u=mails.filter(m=>m.folder==='inbox'&&m.unread&&m.to===AL.email).length,sn=sent.filter(x=>x.from===AL.email);
-  $('#pulse').innerHTML=`<div class="pulse" ${AL.id==='hanif'?'style="background:var(--hf);color:var(--onh)"':''}>${rider('pat')}<span class="cap" ${AL.id==='hanif'?'style="color:inherit;opacity:.6"':''}>${esc(AL.lbl)} · ${esc(AL.desc)}</span>
+  $('#pulse').innerHTML=`<div class="pulse" style="background:${colOf(AL.email)};color:#F7F5E9">${rider('pat')}<span class="cap" style="color:inherit;opacity:.7">${esc(AL.lbl)} · ${esc(AL.desc)}</span>
    <p style="font-size:19px;letter-spacing:.04em">${esc(AL.email)}</p>
    <p style="opacity:.75">${n} ${t('p_mails')} · ${u} ${t('f_unread').toLowerCase()} · ${sn.length} ${t('fo_sent').toLowerCase()} · ${t('st_open').toLowerCase()} ${sn.length?Math.round(sn.filter(x=>x.opens.some(o=>!o.auto)).length/sn.length*100):0}%</p>
-   <button data-act="compose" ${AL.id==='hanif'?'style="border-color:currentColor;color:inherit"':''}>${ic('pen')} ${t('compose')} · ${esc(AL.email.split('@')[0])}@</button></div>`}
+   <button data-act="compose" style="border-color:currentColor;color:inherit">${ic('pen')} ${t('compose')} · ${esc(AL.email.split('@')[0])}@</button></div>`}
  else $('#pulse').innerHTML=f==='inbox'&&S.filter==='all'&&!S.q?`<div class="pulse">${rider('pat')}<span class="cap">${t('pulse')}</span><p id="pulseTxt">${esc(S.pulse||t('pulse_def').replace('{n}',c.n).replace('{p}',c.p).replace('{w}',c.w))}</p><button data-act="pulse">${ic('ai')} ${t('pulse_btn')}</button></div>`
   :f==='spam'?`<div class="banner">${ic('shield','acc')} ${t('spam_note')}</div>`:'';
  const r=rows();
  const itemHTML=x=>`
-  <div class="item ${x.unread?'unread':''} ${S.sel&&S.sel.k===x.k&&S.sel.id===x.id?'sel':''}" data-k="${x.k}" data-open="${x.id}">
-   <div class="av ${x.idn==='hanif'?'h':''}">${x.draft?ic('pen'):x.sched?ic('cal'):esc(ini(x.name.replace(t('to')+': ','')))}</div>
-   <div style="min-width:0"><div class="who">${x.draft?`<span class="acc">${t('c_draft')}</span> · `:''}${esc(x.name)}</div><div class="sub">${esc(x.sub)}</div><div class="snip">${esc(String(x.snip).replace(/\n+/g,' '))}</div></div>
+  <div class="item ${x.unread?'unread':''} ${S.sel&&S.sel.k===x.k&&S.sel.id===x.id?'sel':''}" data-k="${x.k}" data-open="${x.id}" ${acStyle(x.to||x.from)}>
+   ${x.k!=='m'&&!x.draft&&!x.sched&&avSrc(x.idn)?avBox(x.idn):`<div class="av ${x.idn==='hanif'?'h':''}">${x.draft?ic('pen'):x.sched?ic('cal'):esc(ini(x.name.replace(t('to')+': ','')))}</div>`}
+   <div style="min-width:0"><div class="who">${x.unread?'<span class="newdot"></span>':''}${x.draft?`<span class="acc">${t('c_draft')}</span> · `:''}${esc(x.name)}</div><div class="sub">${esc(x.sub)}</div><div class="snip">${esc(String(x.snip).replace(/\n+/g,' '))}</div></div>
    <div class="meta"><span>${x.snz?ic('clock'):''}${rel(x.date)}</span>
-    <span class="row">${x.att?ic('file'):''}${x.spam?'<span class="tag warn">!</span>':''}<span class="tag ${x.idn==='hanif'?'h':''}">${x.idn==='hanif'?'HH':'S'}</span></span>
+    <span class="row">${x.att?ic('file'):''}${x.spam?'<span class="tag warn">!</span>':''}${(()=>{const A=ALIASES.find(a=>a.email===(x.to||x.from));return A?`<span class="tag ac">${esc(aMark(A))}</span>`:`<span class="tag ${x.idn==='hanif'?'h':''}">${x.idn==='hanif'?'HH':'S'}</span>`})()}</span>
     ${x.trk?miniTrk(x.trk):`<span class="row">${x.fav?`<span class="heart">${ic('heart')}</span>`:''}${x.star?`<span class="starred">${ic('star')}</span>`:''}</span>`}</div>
   </div>`;
  let html='';
@@ -866,10 +911,11 @@ function renderReader(){
    <button class="ib" data-act="more">${ic('more')}</button>
   </div>
   ${trashOrSpam?'':`<div class="rd-mob"><button class="pri" data-act="reply">${ic('reply')}${t('reply')}</button><button data-act="aireply">${ic('ai')}${t('aireply')}</button><button data-act="arch">${ic('arch')}${t('arch')}</button><button data-act="del">${ic('trash')}${t('del')}</button></div>`}
-  <div class="rd-body">
+  <div class="rd-body" ${acStyle(m.to)}>
+   ${colOf(m.to)?'<div class="rd-alias"></div>':''}
    <h2>${esc(m.sub)}</h2>
    <div class="rd-from"><div class="av ${idn==='hanif'?'h':''}">${esc(ini(m.from.n))}</div>
-    <div style="flex:1;min-width:0"><div class="nm">${esc(m.from.n)} <span class="em">&lt;${esc(m.from.e)}&gt;</span></div><div class="em">${t('received_on')} ${esc(m.to)} · ${fdt(m.date)}</div></div>
+    <div style="flex:1;min-width:0"><div class="nm">${esc(m.from.n)} <span class="em">&lt;${esc(m.from.e)}&gt;</span></div><div class="em" style="margin-top:3px">${colOf(m.to)?`<span class="rd-to">${ic('inbox')} ${esc(m.to)}</span>`:esc(t('received_on')+' '+m.to)} · ${fdt(m.date)}</div></div>
     <span class="tag ${idn==='hanif'?'h':''}">${idn==='hanif'?'Hanif Hawlader':'Santoro'}</span></div>
    <div class="aichips">${m.folder==='spam'?`<button data-act="safe">${ic('shield')} ${t('safe')}</button>`:`<button data-act="sum">${ic('ai')} ${t('summ')}</button><button data-act="aireply">${ic('ai')} ${t('aireply')}</button>`}<button data-act="tr">${ic('tr')} ${t('trbn')}</button></div>
    ${ai.safe!=null?`<div class="aibox ${ai.safeLvl==='bad'?'warn':''}"><div class="cap">${ic('shield')} ${t('safe_t')}</div><div class="out" id="safeOut">${esc(ai.safe)}</div></div>`:''}
@@ -976,24 +1022,42 @@ function renderTrack(){
 }
 
 /* ================= templates & signatures ================= */
-function sigHTML(k){const s=sigs[k];
- if(k==='santoro')return `<div class="pv" style="background:#fff;color:#000;padding:16px;border-radius:5px"><table cellpadding="0" cellspacing="0" style="font-family:'El Messiri',Georgia,serif;color:#000;border-collapse:collapse"><tr>
-  <td style="padding-right:16px;border-right:1px solid #5B1A2C;vertical-align:middle"><svg viewBox="0 0 900 843" width="44" height="41" style="color:#5B1A2C;display:block"><use href="#rider"/></svg></td>
+/* one builder for the in-app preview and the real e-mail (abs = absolute URLs, e-mail safe) */
+function sigBuild(k,abs){const s=sigs[k]||{},st=s.st||'anim',o=abs?location.origin:'',W='#5B1A2C';
+ const logo=abs?`<img src="${o}/brand/rider-wine.png" width="46" alt="Santoro" style="display:block;border:0">`:`<svg viewBox="0 0 900 843" width="44" height="41" style="color:${W};display:block"><use href="#rider"/></svg>`;
+ const av=AVV[k]?(abs?`${o}/brand/avatar-${k}?v=${AVV[k]}`:avSrc(k)):null;
+ const ff=`font-family:'El Messiri',Georgia,serif`,mut='color:#6b6560';
+ const contact=`<div style="font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a></div><div style="font-size:12px;${mut}">${esc(s.c)}</div>`;
+ if(st==='anim'){const g=abs?`${o}/brand/sig-${k}.gif`:SIGGIF[k];
+  return `<div style="${ff};color:#000"><img src="${g}${abs?'':'#'+(window.__sigt||0)}" width="440" alt="${esc(s.n)} · ${k==='santoro'?'Santoro':'Hanif Hawlader'}" style="display:block;width:440px;max-width:100%;height:auto;border:0;border-radius:6px">
+   <div style="padding:8px 2px 0;font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a> · ${esc(s.c)}</div></div>`}
+ if(st==='card'){const pic=av?`<img src="${av}" width="64" height="64" alt="" style="display:block;width:64px;height:64px;border-radius:12px;object-fit:cover;border:0">`:logo;
+  return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse;background:#F7F5E9;border-radius:10px"><tr>
+   <td style="padding:14px 14px 14px 16px;vertical-align:middle">${pic}</td>
+   <td style="padding:14px 18px 14px 4px;vertical-align:middle;border-left:3px solid ${W}"><div style="padding-left:12px"><div style="font-size:15px">${esc(s.n)}</div>
+    <div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()}${k==='santoro'?' · SANTORO':''}</div>${contact}
+    ${s.l?`<div style="font-size:11px;color:${W};font-style:italic;margin-top:5px">${esc(s.l)}</div>`:''}</div></td></tr></table>`}
+ if(st==='min')return `<div style="${ff};color:#000;font-size:13px;line-height:1.5"><b style="font-weight:500">${esc(s.n)}</b> <span style="color:${W}">—</span> ${esc(s.r)}${k==='santoro'?' · Santoro':''}<br><span style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)}</span></div>`;
+ // classic
+ if(k==='santoro')return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse"><tr>
+  <td style="padding-right:16px;border-right:1px solid ${W};vertical-align:middle">${logo}</td>
   <td style="padding-left:16px;vertical-align:middle"><div style="font-size:14px">${esc(s.n)}</div>
-   <div style="font-size:10.5px;letter-spacing:.24em;color:#5B1A2C;margin:2px 0 6px">${esc(s.r).toUpperCase()} · SANTORO</div>
-   <div style="font-size:11.5px;color:rgba(0,0,0,.6)">${esc(s.e)} · ${esc(s.w)}</div><div style="font-size:11.5px;color:rgba(0,0,0,.6)">${esc(s.c)}</div>
-   ${s.l?`<div style="font-size:11px;color:#5B1A2C;font-style:italic;margin-top:6px">${esc(s.l)}</div>`:''}</td></tr></table></div>`;
- return `<div class="pv" style="background:#fff;color:#000;padding:16px;border-radius:5px;font-family:'El Messiri',Georgia,serif">
-  <div style="font-size:15px;letter-spacing:.14em">${esc(s.n).toUpperCase()}</div><div style="width:28px;height:1px;background:#5B1A2C;margin:6px 0 7px"></div>
-  <div style="font-size:11.5px;color:rgba(0,0,0,.66)">${esc(s.r)}</div><div style="font-size:11.5px;color:rgba(0,0,0,.6)">${esc(s.e)} · ${esc(s.w)} · ${esc(s.c)}</div>
-  ${s.l?`<div style="font-size:11px;color:#5B1A2C;margin-top:5px">${esc(s.l)}</div>`:''}<div style="font-size:9.5px;letter-spacing:.22em;color:#5B1A2C;margin-top:8px">FUNDADOR DE SANTORO</div></div>`}
+   <div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()} · SANTORO</div>${contact}
+   ${s.l?`<div style="font-size:11px;color:${W};font-style:italic;margin-top:6px">${esc(s.l)}</div>`:''}</td></tr></table>`;
+ return `<div style="${ff};color:#000"><div style="font-size:15px;letter-spacing:2px">${esc(s.n).toUpperCase()}</div><div style="width:28px;height:1px;background:${W};margin:6px 0 7px"></div>
+  <div style="font-size:12px;color:#555">${esc(s.r)}</div><div style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)} · ${esc(s.c)}</div>
+  ${s.l?`<div style="font-size:11px;color:${W};margin-top:5px">${esc(s.l)}</div>`:''}<div style="font-size:9.5px;letter-spacing:3px;color:${W};margin-top:8px">FUNDADOR DE SANTORO</div></div>`}
+function sigHTML(k){return `<div class="pv" style="background:#fff;color:#000;padding:16px;border-radius:5px">${sigBuild(k,false)}</div>`}
 function renderTpl(){
  $('#tplPage').innerHTML=`
   <div class="page-h">${hb()}<h1>${t('tpl_t')}</h1><p>${t('tpl_p')}</p><span class="sp"></span><button class="btn pri" data-tpledit="new">${ic('pen')} ${t('new_tpl')}</button></div>
   <div class="sec"><div class="grid2">${templates.map(x=>`<div class="card" data-tpledit="${x.id}"><div style="display:flex;gap:6px;align-items:center"><span class="tag ${x.id_==='hanif'?'h':''}">${x.id_==='hanif'?'HH':'S'}</span><span class="cap">${t(catLbl[x.cat]||'f_otr')}</span></div><h3>${esc(x.name)}</h3><p>${esc(x.body)}</p></div>`).join('')}</div></div>
   <div class="sec"><span class="cap">${t('bm_t')}</span><p class="muted" style="font-size:12px;margin:-4px 0 12px">${t('bm_p')}</p><div class="bmails">${['order','ship','club'].map(k=>`<div class="bmail"><div class="hd">${ic('mail','acc')} ${t('bm_'+k)}<span class="sp"></span><span class="tag solid">${ic('bolt')}</span></div><div class="pv">${brandEmail(k)}</div></div>`).join('')}</div></div>
   <div class="sec"><span class="cap">${t('sigs')}</span><div class="sigs">${['santoro','hanif'].map(k=>`<div class="sigcard"><div class="hd"><span class="tag ${k==='hanif'?'h':'solid'}">${k==='hanif'?'HH':'S'}</span><span style="font-size:13px">${t(k==='hanif'?'sig_h':'sig_s')}</span></div>
+   <div class="sigst">${[['anim','sg_anim'],['card','sg_card'],['classic','sg_classic'],['min','sg_min']].map(([v,l])=>`<button class="chip ${(sigs[k].st||'anim')===v?'on':''}" data-sigst="${k}" data-v="${v}">${v==='anim'?ic('ai')+' ':''}${t(l)}</button>`).join('')}${(sigs[k].st||'anim')==='anim'?`<button class="chip" data-sigplay="${k}" style="margin-left:auto">▶ ${t('sg_play')}</button>`:''}</div>
    <div id="pv-${k}" style="padding:10px">${sigHTML(k)}</div>
+   ${(sigs[k].st||'anim')==='anim'?`<p class="muted" style="font-size:11px;padding:0 14px 8px;margin:0">${t('sg_anim_note')}</p>`:''}
+   ${(sigs[k].st)==='card'&&!avSrc(k)?`<p class="muted" style="font-size:11px;padding:0 14px 8px;margin:0">${t('sg_card_note')}</p>`:''}
    <div class="fm">${[['n','name'],['r','role'],['e','email'],['w','web'],['c','city'],['l','line']].map(([f,l])=>`<div class="fld"><label>${t(l)}</label><input data-sig="${k}" data-f="${f}" value="${esc(sigs[k][f])}"></div>`).join('')}</div></div>`).join('')}</div></div>`;
 }
 function openTplEditor(id){
@@ -1015,6 +1079,10 @@ function renderSet(){
  const seg=(key,opts,cur)=>`<div class="seg">${opts.map(([v,l])=>`<button class="${cur===v?'on':''}" data-setk="${key}" data-setv="${v}">${l}</button>`).join('')}</div>`;
  $('#setPage').innerHTML=`
   <div class="page-h">${hb()}<h1>${t('set_t')}</h1></div>
+  <div class="sec"><span class="cap">${t('profile')}</span><p class="muted" style="font-size:12px;margin:-4px 0 12px">${t('profile_d')}</p><div class="prof">
+   ${[['santoro','Santoro'],['hanif','Hanif Hawlader']].map(([k,l])=>`<div class="profcard"><div class="ph ${k==='hanif'?'h':''}">${avSrc(k)?`<img class="avimg" src="${avSrc(k)}" alt="">`:k==='hanif'?'HH':rider()}</div><div style="min-width:0"><b>${l}</b><small>${t('av_hint')}</small><div class="bt"><button class="btn pri" data-avpick="${k}">${ic('pen')} ${avSrc(k)?t('av_change'):t('av_up')}</button>${avSrc(k)?`<button class="btn" data-avrm="${k}">${ic('x')}</button>`:''}</div></div></div>`).join('')}</div></div>
+  <div class="sec" id="aliasSec"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span class="cap">${t('accounts')}</span><span class="sp"></span>${LIVE?`<button class="btn" data-act="alcheck">${ic('undo')} ${t('al_check')}</button>`:''}<button class="btn pri" data-act="addalias">${ic('pen')} ${t('add_alias')}</button></div>
+   ${ALIASES.map(a=>{const ok=!window.MS_ALIASES||window.MS_ALIASES.includes(a.email);return `<div class="alrow"><span class="mk" style="background:${colOf(a.email)};color:#fff">${esc(aMark(a))}</span><div style="min-width:0"><b>${esc(a.email)}</b><span>${esc(a.lbl||'')}${a.desc?' · '+esc(a.desc):''} · ${a.id==='hanif'?'Hanif Hawlader':'Santoro'}</span><br><span class="${ok?'acc':''}" style="${ok?'':'color:var(--fg3)'}">${ok?'● '+t('al_status_ok'):'○ '+t('al_status_wait')}</span></div><button class="ib" data-editalias="${a.email}">${ic('pen')}</button></div>`}).join('')}</div>
   <div class="sec">
    <div class="set-row"><div class="lb"><b>${t('theme')}</b><span>${t('theme_d')}</span></div>${seg('theme',[['auto',t('th_auto')],['light',t('th_light')],['dark',t('th_dark')]],S.theme)}</div>
    <div class="set-row"><div class="lb"><b>${t('lang')}</b><span>Español · বাংলা</span></div>${seg('lang',[['es','Español'],['bn','বাংলা']],LANG)}</div>
@@ -1032,8 +1100,6 @@ function renderSet(){
   <div class="sec"><span class="cap">${t('install')}</span>
    ${[['inst_ios','inst_ios_s','mail'],['inst_mac','inst_mac_s','dl'],['inst_now','inst_now_s','eye']].map(([a,b,i])=>`<div class="step"><span class="no">${ic(i)}</span><div><b>${t(a)}</b><div class="d">${t(b)}</div></div><span></span></div>`).join('')}
   </div>
-  <div class="sec" id="aliasSec"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span class="cap">${t('accounts')}</span><span class="sp"></span>${LIVE?`<button class="btn" data-act="alcheck">${ic('undo')} ${t('al_check')}</button>`:''}<button class="btn pri" data-act="addalias">${ic('pen')} ${t('add_alias')}</button></div>
-   ${ALIASES.map(a=>{const ok=!window.MS_ALIASES||window.MS_ALIASES.includes(a.email);return `<div class="alrow"><span class="mk ${a.id==='hanif'?'h':''}">${esc(aMark(a))}</span><div style="min-width:0"><b>${esc(a.email)}</b><span>${esc(a.lbl||'')}${a.desc?' · '+esc(a.desc):''} · ${a.id==='hanif'?'Hanif Hawlader':'Santoro'}</span><br><span class="${ok?'acc':''}" style="${ok?'':'color:var(--fg3)'}">${ok?'● '+t('al_status_ok'):'○ '+t('al_status_wait')}</span></div><button class="ib" data-editalias="${a.email}">${ic('pen')}</button></div>`}).join('')}</div>
   <div class="sec"><span class="cap">${t('keys')}</span><div class="keys">${[['C','k_c'],['R','k_r'],['E','k_e'],['#','k_del'],['S','k_s'],['/','k_slash'],['J K','k_jk']].map(([k,l])=>`<div><span class="kbd">${k}</span>${t(l)}</div>`).join('')}</div></div>
   <div class="note">${t('track_note')}</div>`;
 }
@@ -1046,9 +1112,9 @@ function openCompose(o={}){const idn=S.ident==='all'?'santoro':S.ident;
  $('#sheet').className='sheet';renderCompose();$('#scrim').classList.add('on');setTimeout(()=>{const f=C&&(C.to?$('#c-body'):$('#c-to'));f&&!isMobile()&&f.focus()},40)}
 function renderCompose(){const idn=idOf(C.from),h=idn==='hanif';
  $('#sheet').innerHTML=`
-  <div class="sh-top ${h?'h':''}">${rider('logo')}<b>${h?'HANIF HAWLADER':'SANTORO'}</b><span style="font-size:11px;opacity:.7">· ${C.draftId?t('c_draft'):t('c_new')}</span><button class="x" data-act="close">${ic('x')}</button></div>
+  <div class="sh-top ${h?'h':''}">${avSrc(idn)?`<div class="me-av"><img class="avimg" src="${avSrc(idn)}" alt=""></div>`:rider('logo')}<b>${h?'HANIF HAWLADER':'SANTORO'}</b><span style="font-size:11px;opacity:.7">· ${C.draftId?t('c_draft'):t('c_new')}</span><button class="x" data-act="close">${ic('x')}</button></div>
   <div class="sh-body">
-   <div class="cf"><label>${t('from')}</label><select id="c-from">${ALIASES.map(a=>`<option value="${a.email}" ${a.email===C.from?'selected':''}>${a.id==='hanif'?'Hanif Hawlader':'Santoro'} — ${a.email}</option>`).join('')}</select><span></span></div>
+   <div class="cf"><label>${t('from')}</label><select id="c-from">${ALIASES.map(a=>`<option value="${a.email}" ${a.email===C.from?'selected':''}>${a.id==='hanif'?'Hanif Hawlader':'Santoro'} — ${a.email}${a.lbl&&!a.main?' · '+esc(a.lbl):''}</option>`).join('')}</select><span></span></div>
    <div class="cf"><label>${t('to')}</label><input id="c-to" value="${esc(C.to)}" placeholder="nombre@empresa.com" list="contacts"><span></span></div>
    <datalist id="contacts">${[...new Map(mails.map(m=>[m.from.e,m.from.n])).entries()].map(([e,n])=>`<option value="${esc(e)}">${esc(n)}</option>`).join('')}</datalist>
    <div class="cf"><label>${t('subject')}</label><input id="c-sub" value="${esc(C.sub)}"><button class="ib ai" data-act="c-subj" title="${t('c_subj')}">${ic('ai')}</button></div>
@@ -1132,12 +1198,32 @@ async function cAI(kind,arg){syncC();const lang=$('#c-lang').value,box=$('#c-bod
 window.MS_ALIASES=null;
 const hb=()=>`<button class="hamb" data-act="drawer" aria-label="Menú">${ic('menu')}</button>`;
 const aMark=a=>a.main?'HH':(a.lbl||a.email)[0].toUpperCase();
+/* ---- alias colours ---- */
+const PAL=[['#5B1A2C','Vino'],['#24476B','Marino'],['#A0522D','Teja'],['#56602F','Oliva'],['#2F6A66','Petróleo'],['#7A4B78','Ciruela'],['#B2475E','Rosa'],['#8C6A43','Arena'],['#6E6862','Piedra']];
+const DEFCOL={santoro:'#5B1A2C',contacto:'#24476B',pedidos:'#A0522D',club:'#56602F',hola:'#7A4B78'};
+function colOf(email){if(!email)return '';const i=ALIASES.findIndex(a=>a.email===email);if(i<0)return '';const a=ALIASES[i];return a.col||DEFCOL[a.email.split('@')[0]]||PAL[(i+3)%PAL.length][0]}
+const acStyle=e=>{const c=colOf(e);return c?`style="--ac:${c}"`:''};
+/* ---- profile photos (per identity) ---- */
+let AVV=LS.get('avv',{});      // live: version per identity  ·  demo: data URL
+function avSrc(k){const v=AVV[k];if(!v)return null;return LIVE?`/brand/avatar-${k}?v=${v}`:v}
+function avBox(k,cls='av'){const src=avSrc(k);return src?`<div class="${cls} pic ${k==='hanif'?'h':''}"><img src="${src}" alt=""></div>`:''}
+function pickAvatar(k){const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+ inp.onchange=()=>{const f=inp.files[0];if(!f)return;
+  if(f.type==='image/gif'){if(f.size>2.5e6){toast(t('av_big'));return}const r=new FileReader();r.onload=()=>setAvatar(k,r.result);r.readAsDataURL(f);return}
+  const img=new Image();img.onload=()=>{const z=320,c=document.createElement('canvas');c.width=c.height=z;const m=Math.min(img.width,img.height);
+   c.getContext('2d').drawImage(img,(img.width-m)/2,(img.height-m)/2,m,m,0,0,z,z);setAvatar(k,c.toDataURL(f.type==='image/png'?'image/png':'image/jpeg',.9));URL.revokeObjectURL(img.src)};
+  img.src=URL.createObjectURL(f)};inp.click()}
+function setAvatar(k,data){if(LIVE){hook('avatar',{k,data});return}
+ if(data)AVV[k]=data;else delete AVV[k];LS.set('avv',AVV);toast(data?t('av_ok'):t('av_rm'),{wine:true});renderAll()}
+/* ---- animated signature banners ---- */
+const SIGGIF={santoro:'__GIF_S__',hanif:'__GIF_H__'};
 function aliasSheet(edit){const a=edit?ALIASES.find(x=>x.email===edit):null;$('#sheet').className='sheet';
  $('#sheet').innerHTML=`<div class="sh-top">${rider('logo')}<b>${(a?t('al_edit'):t('add_alias')).toUpperCase()}</b><button class="x" data-act="close">${ic('x')}</button></div>
  <div class="bld">
   <div class="fld"><label>${t('al_local')}</label><div style="display:flex;align-items:center;gap:6px"><input id="al-l" placeholder="ventas" style="flex:1" value="${a?esc(a.email.split('@')[0]):''}" ${a?'disabled':''}><span class="muted">@hanifhawlader.com</span></div></div>
   <div class="fld"><label>${t('al_label')}</label><input id="al-n" placeholder="Ventas" value="${a?esc(a.lbl||''):''}"></div>
   <div class="fld"><label>${t('al_desc')}</label><input id="al-d" placeholder="Mayoristas, prensa, tienda…" value="${a?esc(a.desc||''):''}"></div>
+  <div class="fld"><label>${t('al_color')}</label><div class="swatches" id="al-c" data-c="${a?colOf(a.email):PAL[(ALIASES.length+3)%PAL.length][0]}">${PAL.map(([c,n])=>`<button type="button" title="${n}" style="--c:${c}" data-swatch="${c}" class="${(a?colOf(a.email):PAL[(ALIASES.length+3)%PAL.length][0])===c?'on':''}">${ic('check')}</button>`).join('')}</div></div>
   <div class="fld"><label>${t('al_id')}</label><select id="al-i"><option value="santoro" ${a&&a.id==='santoro'?'selected':''}>Santoro</option><option value="hanif" ${a&&a.id==='hanif'?'selected':''}>Hanif Hawlader</option></select></div>
   ${a?'':`<div class="note">${t('al_note')}</div><ol class="stp"><li>${t('al_how1')}</li><li>${t('al_how2')}</li></ol>
   <a class="btn" href="https://productivity.godaddy.com" target="_blank" rel="noopener" style="justify-content:center;text-decoration:none">${ic('globe')} ${t('al_open')}</a>`}
@@ -1145,9 +1231,9 @@ function aliasSheet(edit){const a=edit?ALIASES.find(x=>x.email===edit):null;$('#
  <div class="sh-foot">${a&&!a.main?`<button class="btn" data-rmalias="${a.email}">${t('al_rm')}</button>`:''}<span class="sp"></span><button class="send" data-act="savealias" data-edit="${a?a.email:''}">${ic('check')} ${t('save')}</button></div>`;
  $('#scrim').classList.add('on')}
 function saveAlias(edit){
- if(edit){const a=ALIASES.find(x=>x.email===edit);a.lbl=$('#al-n').value.trim()||a.lbl;a.desc=$('#al-d').value.trim();if(!a.main)a.id=$('#al-i').value;saveAliases();$('#scrim').classList.remove('on');renderAll();return}
+ if(edit){const a=ALIASES.find(x=>x.email===edit);a.lbl=$('#al-n').value.trim()||a.lbl;a.desc=$('#al-d').value.trim();a.col=$('#al-c').dataset.c;if(!a.main)a.id=$('#al-i').value;saveAliases();$('#scrim').classList.remove('on');renderAll();return}
  const l=$('#al-l').value.trim().toLowerCase().replace(/@.*$/,'').replace(/[^a-z0-9._-]/g,'');if(!l)return;const email=l+'@hanifhawlader.com';
- if(!ALIASES.find(a=>a.email===email)){ALIASES.push({email,id:$('#al-i').value,lbl:$('#al-n').value.trim()||l.charAt(0).toUpperCase()+l.slice(1),desc:$('#al-d').value.trim()});saveAliases()}
+ if(!ALIASES.find(a=>a.email===email)){ALIASES.push({email,col:$('#al-c').dataset.c,id:$('#al-i').value,lbl:$('#al-n').value.trim()||l.charAt(0).toUpperCase()+l.slice(1),desc:$('#al-d').value.trim()});saveAliases()}
  $('#scrim').classList.remove('on');toast(t('al_added'),{wine:true});renderAll()}
 /* ================= favourites & contacts ================= */
 function contacts(){const map=new Map();
@@ -1272,6 +1358,11 @@ function folderSheet(){$('#sheet').className='sheet sm';
 document.addEventListener('click',e=>{
  const g=e.target.closest('[data-go]');if(g){S.view=g.dataset.go;closeReader();$('#scrim').classList.remove('on');renderAll();return}
  const al=e.target.closest('[data-alias]');if(al){S.view='mail';S.folder='inbox';S.filter='all';S.contact=null;S.alias=al.dataset.alias||null;closeReader();renderAll();return}
+ const swt=e.target.closest('[data-swatch]');if(swt){const box=swt.parentNode;box.dataset.c=swt.dataset.swatch;box.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===swt));return}
+ const ap=e.target.closest('[data-avpick]');if(ap){pickAvatar(ap.dataset.avpick);return}
+ const ar=e.target.closest('[data-avrm]');if(ar){setAvatar(ar.dataset.avrm,null);return}
+ const ss=e.target.closest('[data-sigst]');if(ss){sigs[ss.dataset.sigst].st=ss.dataset.v;persist();renderTpl();return}
+ const sp=e.target.closest('[data-sigplay]');if(sp){window.__sigt=Date.now();$('#pv-'+sp.dataset.sigplay).innerHTML=sigHTML(sp.dataset.sigplay);return}
  const ea=e.target.closest('[data-editalias]');if(ea){aliasSheet(ea.dataset.editalias);return}
  const ra=e.target.closest('[data-rmalias]');if(ra){ALIASES=ALIASES.filter(a=>a.email!==ra.dataset.rmalias);saveAliases();if(S.alias===ra.dataset.rmalias)S.alias=null;aliasSheet();renderAll();return}
  const fv=e.target.closest('[data-fav]');if(fv){const em=fv.dataset.fav;favs=favs.includes(em)?favs.filter(x=>x!==em):[...favs,em];LS.set('favs',favs);hook('prefs');renderAll();return}
@@ -1311,6 +1402,7 @@ document.addEventListener('click',e=>{
   case 'saverule':saveRule();break;
   case 'moretab':moreSheet();break;
   case 'addalias':aliasSheet();break;
+  case 'readall':{const l=rows().filter(x=>x.k==='m'&&x.unread).map(x=>mails.find(m=>m.id===x.id));l.forEach(m=>m.unread=false);hook('readall',l);toast(`${l.length} ${t('read_done')}`,{wine:true});renderAll();break}
   case 'savealias':saveAlias(a.dataset.edit||null);break;
   case 'drawer':document.body.classList.toggle('drawer');break;
   case 'closedrawer':document.body.classList.remove('drawer');break;
