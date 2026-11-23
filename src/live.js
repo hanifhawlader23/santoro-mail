@@ -175,6 +175,8 @@ async function poll(){
     if(!prefs.templates)savePrefs();
     loadingScreen(false);renderAll();
     setInterval(poll,60000);
+    window.__refresh=async()=>{await loadMail();await poll()};
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')poll()});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
   }catch(e){loadingScreen(false);if(e.message!=='login'){toast(`${t('err')}: ${esc(e.message)}`,{ms:10000});renderAll()}}
 })();

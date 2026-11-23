@@ -116,7 +116,14 @@ const BRAND_SUBJ = { order: d => `Tu pedido Santoro ${d.order || ''} está confi
 
 /* ---------------- AI ---------------- */
 async function claude(env, prompt, max = 900) {
-  if (!env.ANTHROPIC_API_KEY) throw new Error('NO_AI_KEY');
+  if (!env.ANTHROPIC_API_KEY) {
+    // free fallback: Cloudflare Workers AI (10,000 neurons/day included, no key, no card)
+    if (!env.AI) throw new Error('NO_AI_KEY');
+    const r = await env.AI.run(env.FREE_AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast', { messages: [{ role: 'system', content: 'Responde siempre en el idioma que se pida, sin preámbulos ni comentarios.' }, { role: 'user', content: prompt }], max_tokens: Math.min(max, 1500) });
+    const t = typeof r.response === 'string' ? r.response : (r.response ? JSON.stringify(r.response) : (r.result && r.result.response) || '');
+    if (!t) throw new Error('IA gratuita: límite diario alcanzado o sin respuesta');
+    return t.trim();
+  }
   const r = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' }, body: JSON.stringify({ model: env.AI_MODEL || 'claude-haiku-5-5', max_tokens: max, messages: [{ role: 'user', content: prompt }] }) });
   const d = await r.json(); if (!r.ok) throw new Error((d.error && d.error.message) || 'AI error');
   return (d.content || []).map(c => c.text || '').join('');
@@ -217,7 +224,7 @@ async function runAction(env, origin, r, m, prefs) {
 async function api(req, env, url, origin) {
   const p = url.pathname.replace(/^\/api/, ''), method = req.method;
   const body = method === 'GET' ? null : await req.json().catch(() => ({}));
-  if (p === '/me') { const me = await g(env, '/me?$select=displayName,mail,userPrincipalName,proxyAddresses'); return json({ name: me.displayName, email: lc(me.mail || me.userPrincipalName), aliases: (me.proxyAddresses || []).map(x => lc(x.replace(/^smtp:/i, ''))), ai: !!env.ANTHROPIC_API_KEY, origin }); }
+  if (p === '/me') { const me = await g(env, '/me?$select=displayName,mail,userPrincipalName,proxyAddresses'); return json({ name: me.displayName, email: lc(me.mail || me.userPrincipalName), aliases: (me.proxyAddresses || []).map(x => lc(x.replace(/^smtp:/i, ''))), ai: !!(env.ANTHROPIC_API_KEY || env.AI), aiPro: !!env.ANTHROPIC_API_KEY, origin }); }
   if (p === '/messages') {
     const f = FOLDERS[url.searchParams.get('folder') || 'inbox'] || 'inbox', top = Math.min(+url.searchParams.get('top') || 60, 200);
     const ord = f === 'sentitems' || f === 'drafts' ? 'sentDateTime' : 'receivedDateTime';
