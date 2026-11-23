@@ -38,6 +38,9 @@ function detectAliases(raw){const found=new Set();
   raw.forEach(x=>[...(x.to||[]),...(x.cc||[])].forEach(a=>{a=lc(a);if(a.endsWith('@'+DOM))found.add(a)}));
   let added=0;found.forEach(e=>{const a=ALIASES.find(z=>z.email===e);if(a){if(!a.main&&!a.seen){a.seen=true;added++}}else{ALIASES.push({email:e,id:'santoro',seen:true,lbl:e.split('@')[0].replace(/^./,c=>c.toUpperCase()),desc:''});added++}});
   return added}
+/* Mac app bridge (Santoro Mail.app): native notifications + Dock badge */
+const NATIVE=window.webkit&&window.webkit.messageHandlers&&window.webkit.messageHandlers.santoro;
+const nativeMsg=m=>{try{NATIVE&&NATIVE.postMessage(m)}catch(e){}};
 const CATN={prov:'Proveedores',cli:'Clientes',ped:'Pedidos',col:'Colaboraciones'};
 function pickTo(x){const all=[...(x.to||[]),...(x.cc||[])];const al=ALIASES.map(a=>a.email);return all.find(a=>al.includes(a))||ME.email}
 function catOf(x,to){for(const [k,v] of Object.entries(CATN))if((x.cats||[]).includes(v))return k;
@@ -136,12 +139,12 @@ async function poll(){
   try{
     const [inb,trk]=await Promise.all([A('/messages?folder=inbox&top=60'),A('/tracking?n=60')]);
     const known=new Set(mails.map(m=>m.id));const fresh=inb.filter(x=>!known.has(x.id));
-    if(fresh.length){mails=[...fresh.map(mapMail),...mails];if(S.notif)toast(`${fresh.length} ${t('new_mail')}: ${esc(fresh[0].from.n)} · ${esc(fresh[0].sub)}`,{wine:true,ms:5000})}
+    if(fresh.length){mails=[...fresh.map(mapMail),...mails];nativeMsg({type:'notify',title:fresh[0].from.n,body:fresh[0].sub});if(S.notif)toast(`${fresh.length} ${t('new_mail')}: ${esc(fresh[0].from.n)} · ${esc(fresh[0].sub)}`,{wine:true,ms:5000})}
     inb.forEach(x=>{const m=mails.find(y=>y.id===x.id);if(m){m.unread=x.unread;m.star=x.star}});
     for(const r of trk){const n=r.opens.filter(o=>!o.auto).length,prev=lastOpens[r.id];
-      if(prev!=null&&n>prev&&S.notif)toast(`${esc(r.to.n)} ${t('demo_open')} · ${esc(r.sub)}`,{wine:true,ms:6000});lastOpens[r.id]=n;
+      if(prev!=null&&n>prev)nativeMsg({type:'notify',title:t('demo_open')+' 👁',body:r.to.n+' · '+r.sub});if(prev!=null&&n>prev&&S.notif)toast(`${esc(r.to.n)} ${t('demo_open')} · ${esc(r.sub)}`,{wine:true,ms:6000});lastOpens[r.id]=n;
       const s=sent.find(x=>x.tid===r.id);if(s)Object.assign(s,{opens:r.opens,clicks:r.clicks,replied:r.replied,wait:r.wait});else sent.unshift(mapTrk(r))}
-    const u=mails.filter(m=>m.folder==='inbox'&&m.unread).length;document.title=(u?`(${u}) `:'')+'Santoro Mail';
+    const u=mails.filter(m=>m.folder==='inbox'&&m.unread).length;document.title=(u?`(${u}) `:'')+'Santoro Mail';nativeMsg({type:'badge',n:u});
     if(!document.querySelector('#scrim.on'))renderAll();
   }catch(e){}
 }
