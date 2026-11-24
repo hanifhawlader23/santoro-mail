@@ -4,7 +4,7 @@ r=lambda p:open('src/'+p).read()
 import hashlib
 BV={f:hashlib.md5(open('src/brand/'+f,'rb').read()).hexdigest()[:8] for f in sorted(os.listdir('src/brand'))}
 SIGJS=r('sig.js').replace('__BRANDV_JSON__',json.dumps(BV))
-html=r('app.html').replace('__RIDER__',r('rider.svgpath').strip()).replace('__GIF_S__','/brand/sig-santoro.gif').replace('__GIF_H__','/brand/sig-hanif.gif').replace('__AV_S__','/brand/av-santoro.gif?v='+BV['av-santoro.gif']).replace('__AV_H__','/brand/av-hanif.gif?v='+BV['av-hanif.gif']).replace('/*__SIG_JS__*/',SIGJS)
+html=r('app.html').replace('__RIDER__',r('rider.svgpath').strip()).replace('__GIF_S__','/brand/sig-santoro.gif').replace('__GIF_H__','/brand/sig-hanif.gif').replace('__AV_S__','/brand/av-santoro.gif?v='+BV['av-santoro.gif']).replace('__AV_H__','/brand/av-hanif.gif?v='+BV['av-hanif.gif']).replace('__AV_F__','/brand/av-flip.gif?v='+BV['av-flip.gif']).replace('/*__SIG_JS__*/',SIGJS)
 head='<link rel="manifest" href="/manifest.json"><link rel="apple-touch-icon" href="/brand/rider-wine.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Santoro"><meta name="theme-color" content="#5B1A2C">'
 html=html.replace('</head>',head+'</head>',1)
 import hashlib

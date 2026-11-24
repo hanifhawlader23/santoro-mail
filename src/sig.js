@@ -2,10 +2,10 @@
 const SIG_DEF = {
   santoro: { st: 'anim', n: 'Hanif Hawlader', r: 'Fundador', e: 'santoro@hanifhawlader.com', w: 'hanifhawlader.com', c: 'Santander · España', l: 'Elegancia, hecha a mano.',
     ph: '', ig: '', yt: '', tt: '', wa: '', li: '', cta: 'Descubre Santoro', cu: 'hanifhawlader.com',
-    legal: 'Este mensaje y sus adjuntos son confidenciales. Si lo has recibido por error, avísanos y elimínalo.' },
+    legal: '' },
   hanif: { st: 'anim', n: 'Hanif Hawlader', r: 'Producción y dirección creativa', e: 'contacto@hanifhawlader.com', w: 'hanifhawlader.com', c: 'Cantabria · España', l: '',
     ph: '', ig: '', yt: '', tt: '', wa: '', li: '', cta: '', cu: '',
-    legal: 'Este mensaje y sus adjuntos son confidenciales. Si lo has recibido por error, avísame y elimínalo.' }
+    legal: '' }
 };
 const BRANDV = __BRANDV_JSON__;   // versión de cada imagen: los móviles no se quedan con la vieja
 const SOCIALS = [['ig', 'instagram', 'Instagram'], ['yt', 'youtube', 'YouTube'], ['tt', 'tiktok', 'TikTok'], ['wa', 'whatsapp', 'WhatsApp'], ['li', 'linkedin', 'LinkedIn']];
@@ -33,7 +33,7 @@ function sigMarkup(s0, k, img, av) {
   const contactGrid = items.length ? `<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;${FF};font-size:12.5px;color:${INK}">${
     items.reduce((rows, it, i) => { if (i % 2 === 0) rows.push([]); rows[rows.length - 1].push(it); return rows; }, []).map(r =>
       `<tr>${r.map(([n, h]) => `<td style="padding:3px 18px 3px 0;white-space:nowrap">${ico(n, 16)}&nbsp;&nbsp;${h}</td>`).join('')}</tr>`).join('')}</table>` : '';
-  const soc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 6px 0 0"><img src="${img('s-' + n + '.png')}" width="28" height="28" alt="${label}" style="display:block;width:28px;height:28px;border:0"></a>`).join('');
+  const soc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 6px 0 0"><img src="${img('r-' + n + '.png')}" width="28" height="28" alt="${label}" style="display:block;width:28px;height:28px;border:0;border-radius:7px"></a>`).join('');
   const cta = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="display:inline-block;background:${W};color:#F7F5E9;${FF};font-size:12px;letter-spacing:2px;text-decoration:none;padding:8px 16px;border-radius:6px">${E(s.cta).toUpperCase()} &rarr;</a>` : '';
   const socRow = soc || cta ? `<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;width:100%;max-width:480px"><tr><td style="vertical-align:middle">${soc}</td><td style="vertical-align:middle;text-align:right">${cta}</td></tr></table>` : '';
   const foot = (s.l && st !== 'anim' ? `<div style="${FF};font-size:12px;color:${W};font-style:italic;margin-top:8px">${E(s.l)}</div>` : '')
@@ -41,22 +41,24 @@ function sigMarkup(s0, k, img, av) {
   const wrap = (inner) => `<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;${FF};color:${INK};max-width:480px">${inner}</table>`;
 
   if (st === 'anim') {
-    // Toda la firma dentro de un único marco: banner animado + datos + redes + aviso, con mucho aire.
-    const line = (n, h) => `<tr><td style="padding:0 0 7px 0;${FF};font-size:12px;letter-spacing:.3px;color:${INK};white-space:nowrap">${ico(n, 13)}&nbsp;&nbsp;&nbsp;${h}</td></tr>`;
-    const osoc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 8px 0 0"><img src="${img('o-' + n + '.png')}" width="24" height="24" alt="${label}" style="display:block;width:24px;height:24px;border:0"></a>`).join('');
-    const ctaLink = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="${FF};font-size:10.5px;letter-spacing:3px;color:${W};text-decoration:none;border-bottom:1px solid ${W};padding-bottom:2px;white-space:nowrap">${E(s.cta).toUpperCase()}&nbsp;&rarr;</a>` : '';
-    const who = isS ? `<span style="font-size:14px;color:${INK}">${E(s.n)}</span><span style="font-size:12px;color:${MUT}">&nbsp;&nbsp;·&nbsp;&nbsp;${E(s.r)}</span>`
-                    : `<span style="font-size:12.5px;color:${MUT};letter-spacing:.3px">${E(s.r)}</span>`;
-    const row = (inner, pt) => `<tr><td width="24%" style="width:24%;padding:0"></td><td style="padding:${pt}px 22px 0 0">${inner}</td></tr>`;
-    return `<table cellpadding="0" cellspacing="0" role="presentation" width="480" style="border-collapse:separate;width:480px;max-width:100%;background:#F7F5E9;border:3px double ${W};border-radius:3px;${FF};color:${INK}">
-<tr><td style="padding:14px 18px 0 18px"><img src="${img('sig-' + k + '.gif')}" width="440" alt="${E(s.n)} · ${isS ? 'Santoro' : 'Hanif Hawlader'}" style="display:block;width:440px;max-width:100%;height:auto;border:0"></td></tr>
-<tr><td style="padding:0 18px"><table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:collapse;width:100%">
-${row(who, 4)}
-${row(`<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse">${items.map(([n, h]) => line(n, h)).join('')}</table>`, 16)}
-${osoc ? row(`<div style="white-space:nowrap">${osoc}</div>`, 10) : ''}
-${ctaLink ? row(ctaLink, osoc ? 14 : 10) : ''}
-</table></td></tr>
-${s.legal ? `<tr><td style="padding:18px 22px 16px 22px"><div style="border-top:1px solid #e2d8d0;padding-top:10px;${FF};font-size:9.5px;line-height:1.5;color:#a39d97">${E(s.legal)}</div></td></tr>` : '<tr><td style="height:16px"></td></tr>'}
+    // Compacta y elegante: logo animado centrado, nombre y cargo centrados, datos en dos columnas, redes + botón.
+    const rsoc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 6px 0 0"><img src="${img('r-' + n + '.png')}" width="26" height="26" alt="${label}" style="display:block;width:26px;height:26px;border:0;border-radius:7px"></a>`).join('');
+    const ctaLink = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="${FF};font-size:10px;letter-spacing:2.5px;color:${W};text-decoration:none;border-bottom:1px solid ${W};padding-bottom:2px;white-space:nowrap">${E(s.cta).toUpperCase()}&nbsp;&rarr;</a>` : '';
+    const cell = (n, h, al) => `<div style="padding:3px 0;${FF};font-size:11.5px;color:${INK};white-space:nowrap;text-align:${al}">${ico(n, 12)}&nbsp;&nbsp;${h}</div>`;
+    const left = items.filter((_, i) => i % 2 === 0), right = items.filter((_, i) => i % 2 === 1);
+    const title = isS ? 'SANTORO' : E(s.n).toUpperCase();
+    const sub = isS ? `${E(s.n).toUpperCase()} &nbsp;·&nbsp; ${E(s.r).toUpperCase()}` : E(s.r).toUpperCase();
+    return `<table cellpadding="0" cellspacing="0" role="presentation" width="420" style="border-collapse:separate;width:420px;max-width:100%;background:#F7F5E9;border:3px double ${W};border-radius:4px;${FF};color:${INK}">
+<tr><td align="center" style="padding:16px 22px 0;text-align:center"><img src="${img('logo-' + k + '.gif')}" width="74" height="74" alt="${isS ? 'Santoro' : E(s.n)}" style="display:inline-block;width:74px;height:74px;border:0"></td></tr>
+<tr><td align="center" style="padding:6px 22px 0;text-align:center;font-size:15px;letter-spacing:5px;color:${INK}">${title}</td></tr>
+<tr><td align="center" style="padding:4px 22px 0;text-align:center;font-size:9.5px;letter-spacing:2.5px;color:${W}">${sub}</td></tr>
+<tr><td style="padding:12px 22px 0"><div style="height:1px;line-height:1px;font-size:0;background:#e2d8d0">&nbsp;</div></td></tr>
+<tr><td style="padding:9px 22px 0"><table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:collapse;width:100%"><tr>
+ <td width="50%" valign="top" style="vertical-align:top;padding-right:12px">${left.map(([n, h]) => cell(n, h, 'left')).join('')}</td>
+ <td width="50%" valign="top" align="right" style="vertical-align:top;text-align:right">${right.map(([n, h]) => cell(n, h, 'right')).join('')}</td></tr></table></td></tr>
+${rsoc || ctaLink ? `<tr><td style="padding:10px 22px 0"><table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:collapse;width:100%"><tr><td style="vertical-align:middle;white-space:nowrap">${rsoc}</td><td align="right" style="vertical-align:middle;text-align:right">${ctaLink}</td></tr></table></td></tr>` : ''}
+${s.legal ? `<tr><td align="center" style="padding:10px 22px 0;text-align:center;font-size:9px;line-height:1.4;color:#a39d97">${E(s.legal)}</td></tr>` : ''}
+<tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>
 </table>`;
   }
   const pic = av ? `<img src="${E(av)}" width="76" height="76" alt="" style="display:block;width:76px;height:76px;border-radius:14px;object-fit:cover;border:0">`

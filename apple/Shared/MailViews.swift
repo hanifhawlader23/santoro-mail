@@ -120,6 +120,7 @@ struct MailList: View {
     @State private var q = ""
     @State private var summary: String?
     @State private var summarizing = false
+    @State private var ask: (Mail, String)? = nil     // se confirma antes de hacer nada
 
     var rows: [Mail] {
         let l = s.current
@@ -146,15 +147,14 @@ struct MailList: View {
                     .tag(m.id)
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 12))
                     .listRowBackground(m.unread ? s.color(m).opacity(0.08) : Color.clear)
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) { Task { await s.move(m, to: "trash") } } label: { Label("Eliminar", systemImage: "trash") }
-                        Button { Task { await s.move(m, to: "archive") } } label: { Label("Archivar", systemImage: "archivebox") }.tint(.gray)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {      // ← responder · reenviar · borrar
+                        Button { ask = (m, "del") } label: { Label("Eliminar", systemImage: "trash") }.tint(Color(red: 0.56, green: 0.17, blue: 0.17))
+                        Button { s.composeNew(subject: "Fwd: " + m.sub, body: "\n\n---------- Reenviado ----------\nDe: \(m.from.n) <\(m.from.e)>\nAsunto: \(m.sub)\n\n" + m.snip) } label: { Label("Reenviar", systemImage: "arrowshape.turn.up.right") }.tint(Color(red: 0.34, green: 0.38, blue: 0.18))
+                        Button { s.composeNew(reply: m) } label: { Label("Responder", systemImage: "arrowshape.turn.up.left") }.tint(Color(red: 0.18, green: 0.42, blue: 0.40))
                     }
-                    .swipeActions(edge: .leading) {
-                        Button { Task { await s.setRead(m, m.unread) } } label: {
-                            Label(m.unread ? "Leído" : "No leído", systemImage: m.unread ? "envelope.open" : "envelope.badge")
-                        }.tint(Brand.wine)
-                        Button { Task { await s.toggleStar(m) } } label: { Label("Destacar", systemImage: "star") }.tint(.orange)
+                    .swipeActions(edge: .leading, allowsFullSwipe: false) {       // → me encanta · destacar · leído
+                        Button { ask = (m, "star") } label: { Label(m.star ? "Quitar" : "Destacar", systemImage: m.star ? "star.slash" : "star") }.tint(Color(red: 0.55, green: 0.42, blue: 0.26))
+                        Button { ask = (m, "read") } label: { Label(m.unread ? "Leído" : "No leído", systemImage: m.unread ? "envelope.open" : "envelope.badge") }.tint(Color(red: 0.14, green: 0.28, blue: 0.42))
                     }
                     .contextMenu {
                         Button(m.unread ? "Marcar como leído" : "Marcar como no leído") { Task { await s.setRead(m, m.unread) } }
