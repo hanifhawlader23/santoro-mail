@@ -395,6 +395,7 @@ export default {
         const ip = req.headers.get('cf-connecting-ip'); if (ip) ctx.waitUntil(env.DB.get('selfip').then(v => v !== ip && env.DB.put('selfip', ip)));
         try { return await api(req, env, url, origin); } catch (e) { return json({ error: e.message }, e.message === 'NOT_CONNECTED' ? 401 : (e.status || 500)); }
       }
+      if (path === '/version') return new Response(JSON.stringify({ b: '__BUILD__' }), { headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
       if (path === '/' || path === '/index.html') return new Response(APP_HTML, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
       return new Response('Not found', { status: 404 });
     } catch (e) { return new Response('Error: ' + e.message, { status: 500 }); }

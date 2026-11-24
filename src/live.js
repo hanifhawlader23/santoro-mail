@@ -150,6 +150,8 @@ async function poll(){
 }
 
 /* ---------- start ---------- */
+/* la app se actualiza sola cuando subo una versión nueva (sin perder un correo a medio escribir) */
+function checkVersion(){fetch('/version',{cache:'no-store'}).then(r=>r.json()).then(d=>{if(d.b&&window.__BUILD&&d.b!==window.__BUILD&&!C){LS.set('justUpdated',1);location.reload()}}).catch(()=>{})}
 function liveError(msg){loadingScreen(false);let el=document.getElementById('liveErr');if(!el){el=document.createElement('div');el.id='liveErr';document.body.appendChild(el)}
   el.style.cssText='position:fixed;inset:0;z-index:160;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;color:var(--fg)';
   el.innerHTML=`<svg viewBox="0 0 900 843" style="width:70px;height:66px;color:var(--at)"><use href="#rider"/></svg><h2 style="font-weight:500;margin:0">No se pudo cargar tu correo</h2><p style="color:var(--fg2);max-width:420px;margin:0;font-size:14px">${esc(msg)}</p>
@@ -180,8 +182,11 @@ function liveError(msg){loadingScreen(false);let el=document.getElementById('liv
     loaded=true;
     if(!prefs.templates)savePrefs();
     loadingScreen(false);renderAll();
+    if(LS.get('justUpdated',0)){LS.set('justUpdated',0);toast(t('upd')+' ✓',{wine:true})}
+    if(!LS.get('swHelp',0)&&matchMedia('(max-width:860px)').matches){LS.set('swHelp',1);setTimeout(()=>toast(t('sw_help'),{ms:7000}),1500)}
     setInterval(poll,60000);
-    window.__refresh=async()=>{await loadMail();await poll()};
+    window.__refresh=async()=>{checkVersion();await loadMail();await poll()};
+    setInterval(checkVersion,5*60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkVersion()});
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')poll()});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
   }catch(e){if(e.message!=='login')liveError(e.message||String(e));else loadingScreen(false)}
