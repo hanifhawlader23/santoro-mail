@@ -69,7 +69,21 @@ const lc=s=>String(s||'').toLowerCase();
 /* ---------- prefs ---------- */
 let saveT=null;
 function collectPrefs(){return {templates,sigs,favs,rules,aliases:ALIASES,pins:mails.filter(m=>m.pin).map(m=>m.id).concat((prefs.pins||[]).filter(id=>!mails.find(m=>m.id===id))),snz:Object.fromEntries(mails.filter(m=>m.snz).map(m=>[m.id,m.snz])),theme:S.theme,lang:LANG,av:AVV,cbook}}
-function savePrefs(){clearTimeout(saveT);saveT=setTimeout(()=>{prefs=collectPrefs();A('/prefs',{method:'PUT',body:prefs}).catch(fail)},700)}
+function savePrefs(){clearTimeout(saveT);saveT=setTimeout(()=>{sigRowsAll();prefs=collectPrefs();A('/prefs',{method:'PUT',body:prefs}).catch(fail)},700)}
+/* filas de la firma (correo, web, ciudad) dibujadas en El Messiri y guardadas como imagen: así se ven igual en cualquier correo */
+let rowsBusy=false,rowsT;
+async function sigRows(k){const s=Object.assign({},SIG_DEF[k],sigs[k]||{}),loc=[s.c,s.ph].filter(Boolean).join('  ·  '),h=[s.e,s.w,loc,'v1'].join('|');
+ if(sigs[k]&&sigs[k].rows&&sigs[k].rows.h===h)return false;
+ try{await document.fonts.load('500 23px "El Messiri"')}catch(e){}
+ if(!document.fonts.check('500 23px "El Messiri"'))return false;      // sin la fuente no dibujamos (se reintenta luego)
+ const icon=n=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=`/brand/w-${n}.png?v=${(window.BRANDV||{})['w-'+n+'.png']||''}`});
+ const draw=async(txt,ic,col)=>{const c=document.createElement('canvas');c.width=700;c.height=52;const x=c.getContext('2d');x.font='500 23px "El Messiri", Georgia, serif';x.textBaseline='middle';
+  try{x.letterSpacing='1.2px'}catch(e){}const im=await icon(ic),iw=im?30:0,gap=im?14:0,tw=x.measureText(txt).width,st=Math.max(4,(700-(iw+gap+tw))/2);
+  if(im)x.drawImage(im,st,11,30,30);x.fillStyle=col;x.fillText(txt,st+iw+gap,27);return c.toDataURL('image/png')};
+ const jobs=[];if(s.e)jobs.push(['mail',await draw(s.e,'mail','#F7F5E9')]);if(s.w)jobs.push(['web',await draw(s.w,'web','#F7F5E9')]);if(loc)jobs.push(['loc',await draw(loc,'pin','#D9B8BF')]);
+ for(const [r,d] of jobs)await A(`/sigimg/${k}/${r}`,{method:'PUT',body:{data:d}});
+ sigs[k]=Object.assign(sigs[k]||{},{rows:{h,v:Date.now()}});return true}
+function sigRowsAll(){clearTimeout(rowsT);rowsT=setTimeout(async()=>{if(rowsBusy)return;rowsBusy=true;try{let ch=false;for(const k of ['hanif','santoro'])ch=(await sigRows(k))||ch;if(ch){savePrefs();if(S.view==='tpl')renderTpl()}}catch(e){}rowsBusy=false},1500)}
 
 /* ---------- hooks from the UI ---------- */
 hook=function(kind,x){
@@ -181,6 +195,7 @@ function liveError(msg){loadingScreen(false);let el=document.getElementById('liv
     await loadMail();
     loaded=true;
     if(!prefs.templates)savePrefs();
+    sigRowsAll();
     loadingScreen(false);renderAll();
     if(LS.get('justUpdated',0)){LS.set('justUpdated',0);toast(t('upd')+' ✓',{wine:true})}
     if(!LS.get('swHelp',0)&&matchMedia('(max-width:860px)').matches){LS.set('swHelp',1);setTimeout(()=>toast(t('sw_help'),{ms:7000}),1500)}

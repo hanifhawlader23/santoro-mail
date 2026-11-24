@@ -7,7 +7,8 @@ const SIG_DEF = {
     ph: '', ig: '', yt: '', tt: '', wa: '', li: '', cta: '', cu: '',
     legal: '' }
 };
-const BRANDV = __BRANDV_JSON__;   // versión de cada imagen: los móviles no se quedan con la vieja
+const BRANDV = __BRANDV_JSON__;
+if (typeof window !== 'undefined') window.BRANDV = BRANDV;   // versión de cada imagen: los móviles no se quedan con la vieja
 const SOCIALS = [['ig', 'instagram', 'Instagram'], ['yt', 'youtube', 'YouTube'], ['tt', 'tiktok', 'TikTok'], ['wa', 'whatsapp', 'WhatsApp'], ['li', 'linkedin', 'LinkedIn']];
 function sgEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function sgUrl(f, v) {
@@ -41,27 +42,24 @@ function sigMarkup(s0, k, img, av) {
   const wrap = (inner) => `<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;${FF};color:${INK};max-width:480px">${inner}</table>`;
 
   if (st === 'anim') {
-    // Pequeña y centrada: logo animado, nombre, cargo, una línea fina, datos en 1-2 líneas, redes.
-    const dot = `<span style="color:${W}">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`;
-    const ri = n => `<img src="${img('r-' + n + '.png')}" width="15" height="15" alt="" style="display:inline-block;width:15px;height:15px;border:0;border-radius:4px;vertical-align:-3px">&nbsp;&nbsp;`;
-    const l1 = [s.e && ri('mail') + link('mailto:' + s.e, E(s.e)), s.w && ri('web') + link(sgUrl('w', s.w), E(s.w))].filter(Boolean).join('&nbsp;&nbsp;&nbsp;&nbsp;');
-    const l2 = [s.ph && ri('phone') + link('tel:' + String(s.ph).replace(/[^\d+]/g, ''), E(s.ph)), s.c && ri('pin') + `<span style="color:${MUT}">${E(s.c)}</span>`].filter(Boolean).join('&nbsp;&nbsp;&nbsp;&nbsp;');
-    const rsoc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 3px"><img src="${img('r-' + n + '.png')}" width="22" height="22" alt="${label}" style="display:block;width:22px;height:22px;border:0;border-radius:6px"></a>`).join('');
-    const ctaLink = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="${FF};font-size:9.5px;letter-spacing:2.5px;color:${W};text-decoration:none;border-bottom:1px solid ${W};padding-bottom:1px">${E(s.cta).toUpperCase()}&nbsp;&rarr;</a>` : '';
-    const title = isS ? 'SANTORO' : E(s.n).toUpperCase();
-    const sub = isS ? `${E(s.n).toUpperCase()} · ${E(s.r).toUpperCase()}` : E(s.r).toUpperCase();
-    const C = 'align="center" style="text-align:center;padding-left:16px;padding-right:16px;';
-    return `<table cellpadding="0" cellspacing="0" role="presentation" width="350" style="border-collapse:separate;width:350px;max-width:100%;background:#F7F5E9;border:3px double ${W};border-radius:4px;${FF};color:${INK}">
-<tr><td ${C}padding-top:16px"><img src="${img('logo-' + k + '.gif')}" width="72" height="72" alt="${isS ? 'Santoro' : E(s.n)}" style="display:inline-block;width:72px;height:72px;border:0;border-radius:16px"></td></tr>
-<tr><td ${C}padding-top:10px;font-size:13.5px;letter-spacing:4px;color:${INK}">${title}</td></tr>
-<tr><td ${C}padding-top:3px;font-size:8.5px;letter-spacing:2px;color:${W}">${sub}</td></tr>
-<tr><td align="center" style="padding:9px 0 0"><div style="width:36px;height:1px;line-height:1px;font-size:0;background:${W};margin:0 auto">&nbsp;</div></td></tr>
-${l1 ? `<tr><td ${C}padding-top:10px;font-size:11px;line-height:1.6;color:${INK}">${l1}</td></tr>` : ''}
-${l2 ? `<tr><td ${C}padding-top:4px;font-size:10.5px;line-height:1.6;color:${MUT}">${l2}</td></tr>` : ''}
-${rsoc ? `<tr><td ${C}padding-top:9px">${rsoc}</td></tr>` : ''}
-${ctaLink ? `<tr><td ${C}padding-top:9px">${ctaLink}</td></tr>` : ''}
-${s.legal ? `<tr><td ${C}padding-top:8px;font-size:8.5px;line-height:1.4;color:#a39d97">${E(s.legal)}</td></tr>` : ''}
-<tr><td style="height:12px;line-height:12px;font-size:0">&nbsp;</td></tr>
+    // Tarjeta vino: igual en modo claro y oscuro. Cabecera animada (logo + nombre + cargo, en El Messiri) que lleva a la web.
+    const CR = '#F7F5E9', RO = '#D9B8BF', web = s.w ? sgUrl('w', s.w) : '';
+    const rows = s.rows && s.rows.v ? s.rows : null;                    // filas en imagen El Messiri (las genera la app)
+    const rowImg = (r, href, alt) => `<tr><td align="center" style="padding:2px 0 0;text-align:center">${href ? `<a href="${E(href)}" style="text-decoration:none">` : ''}<img src="${img('sigimg-' + k + '-' + r + '.png')}&r=${rows.v}" width="350" height="26" alt="${E(alt)}" style="display:block;width:350px;max-width:100%;height:auto;border:0">${href ? '</a>' : ''}</td></tr>`;
+    const rowTxt = (href, txt, col) => `<tr><td align="center" style="padding:3px 16px 0;text-align:center;${FF};font-size:12px;letter-spacing:1px;color:${col}">${href ? `<a href="${E(href)}" style="color:${col};text-decoration:none">${txt}</a>` : txt}</td></tr>`;
+    const loc = [s.c, s.ph].filter(Boolean).join('  ·  ');
+    const info = rows
+      ? (s.e ? rowImg('mail', 'mailto:' + s.e, s.e) : '') + (s.w ? rowImg('web', web, s.w) : '') + (loc ? rowImg('loc', s.ph ? 'tel:' + String(s.ph).replace(/[^\d+]/g, '') : '', loc) : '')
+      : (s.e ? rowTxt('mailto:' + s.e, E(s.e), CR) : '') + (s.w ? rowTxt(web, E(s.w), CR) : '') + (loc ? rowTxt('', E(loc), RO) : '');
+    const wsoc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 4px"><img src="${img('w-' + n + '.png')}" width="26" height="26" alt="${label}" style="display:block;width:26px;height:26px;border:0"></a>`).join('');
+    const ctaLink = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="${FF};font-size:10px;letter-spacing:3px;color:${CR};text-decoration:none;border-bottom:1px solid ${RO};padding-bottom:2px">${E(s.cta).toUpperCase()}&nbsp;&rarr;</a>` : '';
+    return `<table cellpadding="0" cellspacing="0" role="presentation" width="350" bgcolor="#5B1A2C" style="border-collapse:separate;width:350px;max-width:100%;background:#5B1A2C;border-radius:14px;${FF};color:${CR}">
+<tr><td align="center" style="padding:0;text-align:center">${web ? `<a href="${E(web)}" style="text-decoration:none">` : ''}<img src="${img('head-' + k + '.gif')}" width="350" height="150" alt="${isS ? 'Santoro' : E(s.n)} · ${E(s.r)}" style="display:block;width:350px;max-width:100%;height:auto;border:0;border-radius:14px 14px 0 0">${web ? '</a>' : ''}</td></tr>
+${info}
+${wsoc ? `<tr><td align="center" style="padding:14px 0 0;text-align:center">${wsoc}</td></tr>` : ''}
+${ctaLink ? `<tr><td align="center" style="padding:14px 0 0;text-align:center">${ctaLink}</td></tr>` : ''}
+${s.legal ? `<tr><td align="center" style="padding:10px 18px 0;text-align:center;font-size:8.5px;line-height:1.4;color:${RO}">${E(s.legal)}</td></tr>` : ''}
+<tr><td style="height:16px;line-height:16px;font-size:0">&nbsp;</td></tr>
 </table>`;
   }
   const pic = av ? `<img src="${E(av)}" width="76" height="76" alt="" style="display:block;width:76px;height:76px;border-radius:14px;object-fit:cover;border:0">`

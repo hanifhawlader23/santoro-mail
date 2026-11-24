@@ -269,6 +269,12 @@ async function api(req, env, url, origin) {
     return json((d.value || []).map(m => mapMsg(m, url.searchParams.get('folder') || 'inbox')));
   }
   let m;
+  if ((m = p.match(/^\/sigimg\/(santoro|hanif)\/(mail|web|loc)$/))) {
+    if (method === 'DELETE') { await env.DB.delete('sigimg:' + m[1] + ':' + m[2]); return json({ ok: true }); }
+    const mm = String(body.data || '').match(/^data:image\/png;base64,(.+)$/); if (!mm) return json({ error: 'PNG no válido' }, 400);
+    const bin = Uint8Array.from(atob(mm[1]), c => c.charCodeAt(0)); if (bin.length > 400000) return json({ error: 'Imagen demasiado grande' }, 413);
+    await env.DB.put('sigimg:' + m[1] + ':' + m[2], bin); return json({ ok: true });
+  }
   if ((m = p.match(/^\/avatar\/(santoro|hanif)$/))) {
     if (method === 'DELETE') { await env.DB.delete('av:' + m[1]); return json({ ok: true }); }
     const mm = String(body.data || '').match(/^data:(image\/(?:gif|png|jpeg|webp));base64,(.+)$/);
@@ -365,6 +371,11 @@ export default {
       if (path.startsWith('/brand/rider-')) { const k = path.includes('cream') ? 'cream' : 'wine'; return new Response(Uint8Array.from(atob(PNG[k]), c => c.charCodeAt(0)), { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=604800' } }); }
       if (path.startsWith('/brand/') && BRAND_FILES[path.slice(7)]) { const n = path.slice(7); return new Response(Uint8Array.from(atob(BRAND_FILES[n]), c => c.charCodeAt(0)), { headers: { 'content-type': n.endsWith('.gif') ? 'image/gif' : 'image/png', 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } }); }
       if (path === '/logo') return senderLogo(url.searchParams.get('e') || '', ctx);
+      const sgm = path.match(/^\/brand\/sigimg-(santoro|hanif)-(mail|web|loc)\.png$/);
+      if (sgm) {
+        const r = await env.DB.get('sigimg:' + sgm[1] + ':' + sgm[2], 'arrayBuffer'); if (!r) return new Response('', { status: 404 });
+        return new Response(r, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=31536000, immutable' } });
+      }
       if (path.startsWith('/brand/avatar-')) {
         const k = path.slice(14); if (!/^(santoro|hanif)$/.test(k)) return new Response('', { status: 404 });
         const r = await env.DB.getWithMetadata('av:' + k, 'arrayBuffer'); if (!r || !r.value) return new Response('', { status: 404 });
