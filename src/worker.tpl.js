@@ -82,7 +82,7 @@ const rcpt = list => (Array.isArray(list) ? list : String(list || '').split(/[,;
 /*__SIG_JS__*/
 function sigServer(o, prefs, k) {
   const avv = (prefs.av || {})[k];
-  return sigMarkup(((prefs.sigs || {})[k]) || {}, k, n => `${o}/brand/${n}`, avv ? `${o}/brand/avatar-${k}?v=${avv}` : null);
+  return sigMarkup(((prefs.sigs || {})[k]) || {}, k, n => `${o}/brand/${n}?v=${BRANDV[n] || ''}`, avv ? `${o}/brand/avatar-${k}?v=${avv}` : null);
 }
 /* logos/fotos de remitentes, como Gmail: icono de la web de la empresa o Gravatar para correos personales */
 const FREE_MAIL = /^(gmail|googlemail|hotmail|outlook|live|msn|yahoo|ymail|icloud|me|mac|aol|proton|protonmail|gmx|zoho|yandex|mail)\./i;

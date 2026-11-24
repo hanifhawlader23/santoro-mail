@@ -7,6 +7,7 @@ const SIG_DEF = {
     ph: '', ig: '', yt: '', tt: '', wa: '', li: '', cta: '', cu: '',
     legal: 'Este mensaje y sus adjuntos son confidenciales. Si lo has recibido por error, avísame y elimínalo.' }
 };
+const BRANDV = __BRANDV_JSON__;   // versión de cada imagen: los móviles no se quedan con la vieja
 const SOCIALS = [['ig', 'instagram', 'Instagram'], ['yt', 'youtube', 'YouTube'], ['tt', 'tiktok', 'TikTok'], ['wa', 'whatsapp', 'WhatsApp'], ['li', 'linkedin', 'LinkedIn']];
 function sgEsc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function sgUrl(f, v) {
@@ -39,12 +40,25 @@ function sigMarkup(s0, k, img, av) {
     + (s.legal ? `<div style="${FF};font-size:10px;line-height:1.45;color:#9a948e;margin-top:10px;max-width:480px">${E(s.legal)}</div>` : '');
   const wrap = (inner) => `<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;${FF};color:${INK};max-width:480px">${inner}</table>`;
 
-  if (st === 'anim') return wrap(
-    `<tr><td><img src="${img('sig-' + k + '.gif')}" width="480" alt="${E(s.n)} · ${isS ? 'Santoro' : 'Hanif Hawlader'}" style="display:block;width:480px;max-width:100%;height:auto;border:0"></td></tr>`
-    + (contactGrid ? `<tr><td style="padding:12px 6px 0">${contactGrid}</td></tr>` : '')
-    + (socRow ? `<tr><td style="padding:12px 6px 0">${socRow}</td></tr>` : '')
-    + (foot ? `<tr><td style="padding:2px 6px 0;border-top:0">${foot}</td></tr>` : ''));
-
+  if (st === 'anim') {
+    // Toda la firma dentro de un único marco: banner animado + datos + redes + aviso, con mucho aire.
+    const line = (n, h) => `<tr><td style="padding:0 0 7px 0;${FF};font-size:12px;letter-spacing:.3px;color:${INK};white-space:nowrap">${ico(n, 13)}&nbsp;&nbsp;&nbsp;${h}</td></tr>`;
+    const osoc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 8px 0 0"><img src="${img('o-' + n + '.png')}" width="24" height="24" alt="${label}" style="display:block;width:24px;height:24px;border:0"></a>`).join('');
+    const ctaLink = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="${FF};font-size:10.5px;letter-spacing:3px;color:${W};text-decoration:none;border-bottom:1px solid ${W};padding-bottom:2px;white-space:nowrap">${E(s.cta).toUpperCase()}&nbsp;&rarr;</a>` : '';
+    const who = isS ? `<span style="font-size:14px;color:${INK}">${E(s.n)}</span><span style="font-size:12px;color:${MUT}">&nbsp;&nbsp;·&nbsp;&nbsp;${E(s.r)}</span>`
+                    : `<span style="font-size:12.5px;color:${MUT};letter-spacing:.3px">${E(s.r)}</span>`;
+    const row = (inner, pt) => `<tr><td width="24%" style="width:24%;padding:0"></td><td style="padding:${pt}px 22px 0 0">${inner}</td></tr>`;
+    return `<table cellpadding="0" cellspacing="0" role="presentation" width="480" style="border-collapse:separate;width:480px;max-width:100%;background:#F7F5E9;border:3px double ${W};border-radius:3px;${FF};color:${INK}">
+<tr><td style="padding:14px 18px 0 18px"><img src="${img('sig-' + k + '.gif')}" width="440" alt="${E(s.n)} · ${isS ? 'Santoro' : 'Hanif Hawlader'}" style="display:block;width:440px;max-width:100%;height:auto;border:0"></td></tr>
+<tr><td style="padding:0 18px"><table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:collapse;width:100%">
+${row(who, 4)}
+${row(`<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse">${items.map(([n, h]) => line(n, h)).join('')}</table>`, 16)}
+${osoc ? row(`<div style="white-space:nowrap">${osoc}</div>`, 10) : ''}
+${ctaLink ? row(ctaLink, osoc ? 14 : 10) : ''}
+</table></td></tr>
+${s.legal ? `<tr><td style="padding:18px 22px 16px 22px"><div style="border-top:1px solid #e2d8d0;padding-top:10px;${FF};font-size:9.5px;line-height:1.5;color:#a39d97">${E(s.legal)}</div></td></tr>` : '<tr><td style="height:16px"></td></tr>'}
+</table>`;
+  }
   const pic = av ? `<img src="${E(av)}" width="76" height="76" alt="" style="display:block;width:76px;height:76px;border-radius:14px;object-fit:cover;border:0">`
     : `<img src="${img(isS ? 'av-santoro.gif' : 'av-hanif.gif')}" width="76" height="76" alt="" style="display:block;width:76px;height:76px;border-radius:14px;border:0">`;
   const head = isS
