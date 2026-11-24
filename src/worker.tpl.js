@@ -154,7 +154,7 @@ async function claude(env, prompt, max = 900) {
   if (!env.ANTHROPIC_API_KEY) {
     // free fallback: Cloudflare Workers AI (10,000 neurons/day included, no key, no card)
     if (!env.AI) throw new Error('NO_AI_KEY');
-    const r = await env.AI.run(env.FREE_AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast', { messages: [{ role: 'system', content: 'Responde siempre en el idioma que se pida, sin preámbulos ni comentarios.' }, { role: 'user', content: prompt }], max_tokens: Math.min(max, 1500) });
+    const r = await env.AI.run(env.FREE_AI_MODEL || '@cf/meta/llama-3.3-70b-instruct-fp8-fast', { messages: [{ role: 'system', content: 'Responde siempre en el idioma que se pida, sin preámbulos ni comentarios. Usa SOLO la información que te dan; si algo no está en el texto, no lo inventes.' }, { role: 'user', content: prompt }], max_tokens: Math.min(max, 1500), temperature: 0.2 });
     const t = typeof r.response === 'string' ? r.response : (r.response ? JSON.stringify(r.response) : (r.result && r.result.response) || '');
     if (!t) throw new Error('IA gratuita: límite diario alcanzado o sin respuesta');
     return t.trim();
