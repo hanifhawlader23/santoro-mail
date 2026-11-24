@@ -51,7 +51,7 @@ function mapTrk(r){return {...r,id:'t:'+r.id,tid:r.id,live:true}}
 
 /* ---------- loading ---------- */
 async function loadMail(){
-  const [inb,arc,spm,trs,snt,drf,trk,sch]=await Promise.all([A('/messages?folder=inbox&top=120'),A('/messages?folder=archive&top=40').catch(()=>[]),A('/messages?folder=spam&top=30').catch(()=>[]),A('/messages?folder=trash&top=30').catch(()=>[]),A('/messages?folder=sent&top=60'),A('/messages?folder=drafts&top=30').catch(()=>[]),A('/tracking'),A('/sched')]);
+  const [inb,arc,spm,trs,snt,drf,trk,sch]=await Promise.all([A('/messages?folder=inbox&top=120'),A('/messages?folder=archive&top=40').catch(()=>[]),A('/messages?folder=spam&top=30').catch(()=>[]),A('/messages?folder=trash&top=30').catch(()=>[]),A('/messages?folder=sent&top=60').catch(()=>[]),A('/messages?folder=drafts&top=30').catch(()=>[]),A('/tracking').catch(()=>[]),A('/sched').catch(()=>[])]);
   if(detectAliases([...inb,...arc,...spm,...trs,...snt.map(x=>({to:[lc(x.from&&x.from.e)]}))]))savePrefs();
   mails=[...inb,...arc,...spm,...trs].map(mapMail);
   const recs=trk.map(mapTrk);
@@ -150,11 +150,17 @@ async function poll(){
 }
 
 /* ---------- start ---------- */
+function liveError(msg){loadingScreen(false);let el=document.getElementById('liveErr');if(!el){el=document.createElement('div');el.id='liveErr';document.body.appendChild(el)}
+  el.style.cssText='position:fixed;inset:0;z-index:160;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;color:var(--fg)';
+  el.innerHTML=`<svg viewBox="0 0 900 843" style="width:70px;height:66px;color:var(--at)"><use href="#rider"/></svg><h2 style="font-weight:500;margin:0">No se pudo cargar tu correo</h2><p style="color:var(--fg2);max-width:420px;margin:0;font-size:14px">${esc(msg)}</p>
+   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="btn pri" onclick="location.reload()">Reintentar</button><a class="btn" href="/auth/logout">Entrar de nuevo</a></div>`}
 (async()=>{
+  // nada de datos de ejemplo en la app real
+  mails=[];sent=[];drafts=[];scheduled=[];alog=[];favs=[];
   loadingScreen(true);
   try{
     const me=await A('/me');Object.assign(ME,me);
-    prefs=await A('/prefs');
+    prefs=await A('/prefs').catch(()=>({}));
     if(prefs.templates)templates=prefs.templates;if(prefs.sigs)sigs=prefs.sigs;if(prefs.rules)rules=prefs.rules;
     favs=prefs.favs||[];AVV=prefs.av||{};
     if(prefs.theme){S.theme=prefs.theme;applyTheme()}
@@ -178,6 +184,6 @@ async function poll(){
     window.__refresh=async()=>{await loadMail();await poll()};
     document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')poll()});
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)poll()});
-  }catch(e){loadingScreen(false);if(e.message!=='login'){toast(`${t('err')}: ${esc(e.message)}`,{ms:10000});renderAll()}}
+  }catch(e){if(e.message!=='login')liveError(e.message||String(e));else loadingScreen(false)}
 })();
 })();

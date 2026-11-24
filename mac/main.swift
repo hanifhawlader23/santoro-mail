@@ -7,7 +7,8 @@ import UserNotifications
 let APP_URL = URL(string: "https://hanif.jamalhanif2002.workers.dev/")!
 let IN_APP_HOSTS = ["hanif.jamalhanif2002.workers.dev", "mail.hanifhawlader.com",
                     "login.microsoftonline.com", "login.live.com", "login.microsoft.com",
-                    "aadcdn.msftauth.net", "aadcdn.msauth.net", "account.live.com"]
+                    "aadcdn.msftauth.net", "aadcdn.msauth.net", "account.live.com",
+                    "sso.godaddy.com", "sso.secureserver.net", "godaddy.com", "secureserver.net", "office.com"]
 
 final class AppDelegate: NSObject, NSApplicationDelegate, WKNavigationDelegate, WKUIDelegate,
                          WKScriptMessageHandler, UNUserNotificationCenterDelegate, NSWindowDelegate {
