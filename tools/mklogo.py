@@ -15,16 +15,19 @@ def q_save(frames, path, dur, colors=40, bg=None):
     q = [f.quantize(palette=pal, dither=Image.Dither.NONE) for f in frames]
     q[0].save(path, save_all=True, append_images=q[1:], duration=dur, loop=0, optimize=True, disposal=1)
 
+AMP = 3.2
 def sway_face(S, bg, line, n=44, glint_col=(255, 255, 255), scale=.86):
     fr = []
     for i in range(n):
         ph = 2 * math.pi * i / n
-        ang = 3.2 * math.sin(ph)                       # gentle head sway
+        ang = AMP * math.sin(ph)                       # gentle head sway
         gl = (i / n - .55) / .3
         f = face(int(S * scale), line, glint=gl if 0 <= gl <= 1 else None, glint_col=glint_col)
-        f = f.rotate(ang, resample=Image.BICUBIC, center=(f.width / 2, f.height * .96))
+        pad = int(f.height * .12)                      # room so the hair is never cut while it sways
+        big = Image.new('RGBA', (f.width + 2 * pad, f.height + 2 * pad), (0, 0, 0, 0)); big.alpha_composite(f, (pad, pad))
+        big = big.rotate(ang, resample=Image.BICUBIC, center=(big.width / 2, pad + f.height * .96))
         im = Image.new('RGBA', (S, S), bg + (255,))
-        im.alpha_composite(f, ((S - f.width) // 2, int(S * (1 - scale) / 2) + int(1.5 * math.sin(2 * ph))))
+        im.alpha_composite(big, ((S - big.width) // 2, int(S * (1 - scale) / 2) - pad + int(1.5 * math.sin(2 * ph))))
         fr.append(im.convert('RGB'))
     return fr
 
@@ -64,5 +67,7 @@ if __name__ == '__main__':
     fr = sway_face(200, DARK, CREAM, n=26); q_save(fr, 'av-hanif.gif', [120] * len(fr), 12)
     fr, d = coin(); q_save(fr, 'av-flip.gif', d, 48)
     # logos de la firma (2x: 180px -> se ve a 90px), fondo crema exacto
-    fr = sway_face(150, CREAM, INK, n=26, glint_col=(160, 132, 124), scale=.92); q_save(fr, 'logo-hanif.gif', [120] * len(fr), 12, CREAM)
-    fr = rock_rider(150, CREAM, n=26); q_save(fr, 'logo-santoro.gif', [120] * len(fr), 12, CREAM)
+    globals()['AMP'] = 2.2
+    fr = sway_face(150, CREAM, INK, n=26, glint_col=(160, 132, 124), scale=.76); q_save(fr, 'logo-hanif.gif', [120] * len(fr), 12, CREAM)
+    globals()['AMP'] = 3.2
+    fr = rock_rider(150, CREAM, n=26, size=.72); q_save(fr, 'logo-santoro.gif', [120] * len(fr), 12, CREAM)

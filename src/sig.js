@@ -41,24 +41,26 @@ function sigMarkup(s0, k, img, av) {
   const wrap = (inner) => `<table cellpadding="0" cellspacing="0" role="presentation" style="border-collapse:collapse;${FF};color:${INK};max-width:480px">${inner}</table>`;
 
   if (st === 'anim') {
-    // Compacta y elegante: logo animado centrado, nombre y cargo centrados, datos en dos columnas, redes + botón.
-    const rsoc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 6px 0 0"><img src="${img('r-' + n + '.png')}" width="26" height="26" alt="${label}" style="display:block;width:26px;height:26px;border:0;border-radius:7px"></a>`).join('');
-    const ctaLink = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="${FF};font-size:10px;letter-spacing:2.5px;color:${W};text-decoration:none;border-bottom:1px solid ${W};padding-bottom:2px;white-space:nowrap">${E(s.cta).toUpperCase()}&nbsp;&rarr;</a>` : '';
-    const cell = (n, h, al) => `<div style="padding:3px 0;${FF};font-size:11.5px;color:${INK};white-space:nowrap;text-align:${al}">${ico(n, 12)}&nbsp;&nbsp;${h}</div>`;
-    const left = items.filter((_, i) => i % 2 === 0), right = items.filter((_, i) => i % 2 === 1);
+    // Pequeña y centrada: logo animado, nombre, cargo, una línea fina, datos en 1-2 líneas, redes.
+    const dot = `<span style="color:${W}">&nbsp;&nbsp;·&nbsp;&nbsp;</span>`;
+    const l1 = [s.e && link('mailto:' + s.e, E(s.e)), s.w && link(sgUrl('w', s.w), E(s.w))].filter(Boolean).join(dot);
+    const l2 = [s.ph && link('tel:' + String(s.ph).replace(/[^\d+]/g, ''), E(s.ph)), s.c && E(s.c)].filter(Boolean).join(dot);
+    const rsoc = SOCIALS.filter(([f]) => s[f]).map(([f, n, label]) => `<a href="${E(sgUrl(f, s[f]))}" style="text-decoration:none;display:inline-block;margin:0 3px"><img src="${img('r-' + n + '.png')}" width="22" height="22" alt="${label}" style="display:block;width:22px;height:22px;border:0;border-radius:6px"></a>`).join('');
+    const ctaLink = s.cta && s.cu ? `<a href="${E(sgUrl('cu', s.cu))}" style="${FF};font-size:9.5px;letter-spacing:2.5px;color:${W};text-decoration:none;border-bottom:1px solid ${W};padding-bottom:1px">${E(s.cta).toUpperCase()}&nbsp;&rarr;</a>` : '';
     const title = isS ? 'SANTORO' : E(s.n).toUpperCase();
-    const sub = isS ? `${E(s.n).toUpperCase()} &nbsp;·&nbsp; ${E(s.r).toUpperCase()}` : E(s.r).toUpperCase();
-    return `<table cellpadding="0" cellspacing="0" role="presentation" width="420" style="border-collapse:separate;width:420px;max-width:100%;background:#F7F5E9;border:3px double ${W};border-radius:4px;${FF};color:${INK}">
-<tr><td align="center" style="padding:16px 22px 0;text-align:center"><img src="${img('logo-' + k + '.gif')}" width="74" height="74" alt="${isS ? 'Santoro' : E(s.n)}" style="display:inline-block;width:74px;height:74px;border:0"></td></tr>
-<tr><td align="center" style="padding:6px 22px 0;text-align:center;font-size:15px;letter-spacing:5px;color:${INK}">${title}</td></tr>
-<tr><td align="center" style="padding:4px 22px 0;text-align:center;font-size:9.5px;letter-spacing:2.5px;color:${W}">${sub}</td></tr>
-<tr><td style="padding:12px 22px 0"><div style="height:1px;line-height:1px;font-size:0;background:#e2d8d0">&nbsp;</div></td></tr>
-<tr><td style="padding:9px 22px 0"><table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:collapse;width:100%"><tr>
- <td width="50%" valign="top" style="vertical-align:top;padding-right:12px">${left.map(([n, h]) => cell(n, h, 'left')).join('')}</td>
- <td width="50%" valign="top" align="right" style="vertical-align:top;text-align:right">${right.map(([n, h]) => cell(n, h, 'right')).join('')}</td></tr></table></td></tr>
-${rsoc || ctaLink ? `<tr><td style="padding:10px 22px 0"><table cellpadding="0" cellspacing="0" role="presentation" width="100%" style="border-collapse:collapse;width:100%"><tr><td style="vertical-align:middle;white-space:nowrap">${rsoc}</td><td align="right" style="vertical-align:middle;text-align:right">${ctaLink}</td></tr></table></td></tr>` : ''}
-${s.legal ? `<tr><td align="center" style="padding:10px 22px 0;text-align:center;font-size:9px;line-height:1.4;color:#a39d97">${E(s.legal)}</td></tr>` : ''}
-<tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>
+    const sub = isS ? `${E(s.n).toUpperCase()} · ${E(s.r).toUpperCase()}` : E(s.r).toUpperCase();
+    const C = 'align="center" style="text-align:center;padding-left:16px;padding-right:16px;';
+    return `<table cellpadding="0" cellspacing="0" role="presentation" width="340" style="border-collapse:separate;width:340px;max-width:100%;background:#F7F5E9;border:3px double ${W};border-radius:4px;${FF};color:${INK}">
+<tr><td ${C}padding-top:12px"><img src="${img('logo-' + k + '.gif')}" width="56" height="56" alt="${isS ? 'Santoro' : E(s.n)}" style="display:inline-block;width:56px;height:56px;border:0"></td></tr>
+<tr><td ${C}padding-top:2px;font-size:13px;letter-spacing:4px;color:${INK}">${title}</td></tr>
+<tr><td ${C}padding-top:3px;font-size:8.5px;letter-spacing:2px;color:${W}">${sub}</td></tr>
+<tr><td align="center" style="padding:9px 0 0"><div style="width:36px;height:1px;line-height:1px;font-size:0;background:${W};margin:0 auto">&nbsp;</div></td></tr>
+${l1 ? `<tr><td ${C}padding-top:9px;font-size:11px;line-height:1.5;color:${INK}">${l1}</td></tr>` : ''}
+${l2 ? `<tr><td ${C}padding-top:1px;font-size:10.5px;line-height:1.5;color:${MUT}">${l2}</td></tr>` : ''}
+${rsoc ? `<tr><td ${C}padding-top:9px">${rsoc}</td></tr>` : ''}
+${ctaLink ? `<tr><td ${C}padding-top:9px">${ctaLink}</td></tr>` : ''}
+${s.legal ? `<tr><td ${C}padding-top:8px;font-size:8.5px;line-height:1.4;color:#a39d97">${E(s.legal)}</td></tr>` : ''}
+<tr><td style="height:12px;line-height:12px;font-size:0">&nbsp;</td></tr>
 </table>`;
   }
   const pic = av ? `<img src="${E(av)}" width="76" height="76" alt="" style="display:block;width:76px;height:76px;border-radius:14px;object-fit:cover;border:0">`

@@ -68,7 +68,7 @@ const lc=s=>String(s||'').toLowerCase();
 
 /* ---------- prefs ---------- */
 let saveT=null;
-function collectPrefs(){return {templates,sigs,favs,rules,aliases:ALIASES,pins:mails.filter(m=>m.pin).map(m=>m.id).concat((prefs.pins||[]).filter(id=>!mails.find(m=>m.id===id))),snz:Object.fromEntries(mails.filter(m=>m.snz).map(m=>[m.id,m.snz])),theme:S.theme,lang:LANG,av:AVV}}
+function collectPrefs(){return {templates,sigs,favs,rules,aliases:ALIASES,pins:mails.filter(m=>m.pin).map(m=>m.id).concat((prefs.pins||[]).filter(id=>!mails.find(m=>m.id===id))),snz:Object.fromEntries(mails.filter(m=>m.snz).map(m=>[m.id,m.snz])),theme:S.theme,lang:LANG,av:AVV,cbook}}
 function savePrefs(){clearTimeout(saveT);saveT=setTimeout(()=>{prefs=collectPrefs();A('/prefs',{method:'PUT',body:prefs}).catch(fail)},700)}
 
 /* ---------- hooks from the UI ---------- */
@@ -164,7 +164,7 @@ function liveError(msg){loadingScreen(false);let el=document.getElementById('liv
     const me=await A('/me');Object.assign(ME,me);
     prefs=await A('/prefs').catch(()=>({}));
     if(prefs.templates)templates=prefs.templates;if(prefs.sigs)sigs=prefs.sigs;if(prefs.rules)rules=prefs.rules;
-    favs=prefs.favs||[];AVV=prefs.av||{};
+    favs=prefs.favs||[];AVV=prefs.av||{};cbook=prefs.cbook||[];
     if(prefs.theme){S.theme=prefs.theme;applyTheme()}
     // aliases: SOLO los reales = Microsoft (lo que creaste en GoDaddy) + los que reciben correo + los que añadiste tú a mano
     DOM=ME.email.split('@')[1];
