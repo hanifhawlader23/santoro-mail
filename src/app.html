@@ -2,7 +2,7 @@
 <html lang="es" data-theme="light">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <title>Santoro Mail</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -197,6 +197,8 @@ html,body,.list,#items,.items{position:relative;overflow-x:hidden;overscroll-beh
 #to-sug .sg b{display:block;font-weight:500;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #to-sug .sg small{display:block;font-size:12px;color:var(--fg3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #to-sug .sg .hv{color:var(--at)}#to-sug .sg .hv svg.i{width:15px;height:15px}
+@media (hover:none) and (pointer:coarse){input,select,textarea,[contenteditable],.cf input,.cf select,.fld input,.fld select,.fld textarea,#c-body,.search input{font-size:16px!important}}
+html,body{touch-action:manipulation;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 .achips{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}
 @media(max-width:860px){.lh-row .btn .lbl{display:none}}
 [data-theme="dark"] .achip i,[data-theme="dark"] .item .newdot{background:color-mix(in srgb,var(--ac) 62%,#fff)}
@@ -1653,6 +1655,9 @@ document.addEventListener('click',e=>{
  }
 });
 function snz(m,fn){m.snz=fn().toISOString();hook('prefs');closeReader();toast(`${t('snoozed_until')} ${fdt(m.snz)}`);renderAll()}
+/* ---- sin zoom: ni pellizcar ni doble toque (es una app, no una web) ---- */
+['gesturestart','gesturechange','gestureend'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+document.addEventListener('touchmove',e=>{if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
 /* ---- pull to refresh ---- */
 let refreshing=false;
 async function doRefresh(){if(refreshing)return;refreshing=true;const p=ptrEl();p.classList.add('spin');p.style.opacity=1;p.style.transform='translateY(14px)';
