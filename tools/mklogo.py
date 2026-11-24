@@ -31,9 +31,12 @@ def sway_face(S, bg, line, n=44, glint_col=(255, 255, 255), scale=.86):
         fr.append(im.convert('RGB'))
     return fr
 
-def rock_rider(S, bg, n=40, size=.78):
+def rock_rider(S, bg, n=40, size=.78, col=None):
     fr = []
-    base = rider.resize((int(S * size), int(S * size * rider.height / rider.width)), Image.LANCZOS)
+    src = rider
+    if col:
+        a = rider.getchannel('A'); src = Image.new('RGBA', rider.size, col + (255,)); src.putalpha(a)
+    base = src.resize((int(S * size), int(S * size * src.height / src.width)), Image.LANCZOS)
     for i in range(n):
         ph = 2 * math.pi * i / n
         r = base.rotate(4 * math.sin(ph), resample=Image.BICUBIC, center=(base.width * .45, base.height * .95))
@@ -68,6 +71,6 @@ if __name__ == '__main__':
     fr, d = coin(); q_save(fr, 'av-flip.gif', d, 48)
     # logos de la firma (2x: 180px -> se ve a 90px), fondo crema exacto
     globals()['AMP'] = 2.2
-    fr = sway_face(150, CREAM, INK, n=26, glint_col=(160, 132, 124), scale=.76); q_save(fr, 'logo-hanif.gif', [120] * len(fr), 12, CREAM)
+    fr = sway_face(160, WINE, CREAM, n=26, glint_col=(255, 255, 255), scale=.74); q_save(fr, 'logo-hanif.gif', [120] * len(fr), 12)
     globals()['AMP'] = 3.2
-    fr = rock_rider(150, CREAM, n=26, size=.72); q_save(fr, 'logo-santoro.gif', [120] * len(fr), 12, CREAM)
+    fr = rock_rider(160, WINE, n=26, size=.70, col=CREAM); q_save(fr, 'logo-santoro.gif', [120] * len(fr), 12)
