@@ -121,6 +121,8 @@ async function sendTracked(env, origin, m) {
   let html = m.html || wrapEmail(textToHtml(m.text || ''), m.sig || '');
   const tr = addTracking(html, id, origin, m.track || { open: true, click: true });
   const msg = { subject: m.subject || '', body: { contentType: 'HTML', content: tr.html }, toRecipients: rcpt(m.to), ccRecipients: rcpt(m.cc) };
+  let atts = m.attachments; if (!atts && m.attKey) atts = await kget(env, m.attKey, []);
+  if (atts && atts.length) msg.attachments = atts.map(a => ({ '@odata.type': '#microsoft.graph.fileAttachment', name: a.name, contentType: a.type || 'application/octet-stream', contentBytes: a.data }));
   const me = allowed(env);
   if (m.from && lc(m.from) !== me) msg.from = { emailAddress: { address: m.from } };
   await g(env, '/me/sendMail', { method: 'POST', body: JSON.stringify({ message: msg, saveToSentItems: true }) });
@@ -314,7 +316,7 @@ async function api(req, env, url, origin) {
   if (p === '/tracking') { const idx = await kget(env, 'trkidx', []); const recs = (await Promise.all(idx.slice(0, +url.searchParams.get('n') || 80).map(id => kget(env, 'trk:' + id)))).filter(Boolean); return json(recs); }
   if (p === '/sched') {
     let s = await kget(env, 'sched', []);
-    if (method === 'POST') { s.push({ ...body, id: 'p' + rid(5) }); await kput(env, 'sched', s); }
+    if (method === 'POST') { const id = 'p' + rid(5), it = { ...body, id }; if (it.attachments && it.attachments.length) { it.attKey = 'schedatt:' + id; it.attN = it.attachments.length; await kput(env, it.attKey, it.attachments, { expirationTtl: 60 * 60 * 24 * 60 }); } delete it.attachments; s.push(it); await kput(env, 'sched', s); }
     return json(s);
   }
   if ((m = p.match(/^\/sched\/([^/]+)(\/now)?$/))) {

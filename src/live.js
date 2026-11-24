@@ -119,11 +119,11 @@ function sigEmail(k){return `<div style="margin-top:10px">${sigBuild(k,true)}</d
 doSend=function(){
   syncC();if(!C.to.trim()){toast(t('need_to'));return}
   const to=C.to.trim(),name=C.toName||((mails.find(m=>m.from.e===lc(to))||{from:{}}).from.n)||to.split('@')[0];
-  const payload={from:C.from,to,name,subject:C.sub||'(sin asunto)',text:fillVars(C.body,name),sig:sigEmail(idOf(C.from)),track:{open:C.trackO,click:C.trackC},follow:+C.follow||0,draftId:C.draftGid||null};
+  const payload={from:C.from,to,name,subject:C.sub||'(sin asunto)',text:fillVars(C.body,name),sig:sigEmail(idOf(C.from)),track:{open:C.trackO,click:C.trackC},follow:+C.follow||0,draftId:C.draftGid||null,attachments:(C.atts||[]).map(x=>({name:x.name,type:x.type,data:x.data}))};
   const draftId=C.draftId,at=C.at;$('#scrim').classList.remove('on');C=null;
   if(at){A('/sched',{method:'POST',body:{...payload,at:new Date(at).toISOString()}}).then(s=>{scheduled=s.map(p=>({id:p.id,from:p.from,to:{n:p.name||p.to,e:p.to},sub:p.subject,body:p.text,at:p.at}));if(draftId)drafts=drafts.filter(d=>d.id!==draftId);toast(t('sched_ok'),{wine:true});renderAll()}).catch(fail);return}
   let undone=false,left=S.undoSec;
-  const el=toast(`${t('sending')} <b class="cd">${left}</b>`,{action:t('undo'),ms:S.undoSec*1000+400,onAction:()=>{undone=true;openCompose({from:payload.from,to:payload.to,toName:name,sub:payload.subject,body:payload.text,draftId,draftGid:payload.draftId});toast(t('undone'))}});
+  const el=toast(`${t('sending')} <b class="cd">${left}</b>`,{action:t('undo'),ms:S.undoSec*1000+400,onAction:()=>{undone=true;openCompose({from:payload.from,to:payload.to,toName:name,sub:payload.subject,body:payload.text,draftId,draftGid:payload.draftId,atts:payload.attachments.map(x=>({...x,size:Math.round(x.data.length*.75)}))});toast(t('undone'))}});
   const iv=setInterval(()=>{left--;const b=el.querySelector('.cd');if(b)b.textContent=left;if(left<=0)clearInterval(iv)},1000);
   setTimeout(()=>{if(undone)return;A('/send',{method:'POST',body:payload}).then(r=>{sent.unshift(mapTrk(r));if(draftId)drafts=drafts.filter(d=>d.id!==draftId);toast(t('sent_ok'),{wine:true});renderAll()})
     .catch(e=>{toast(/from|alias|SendAs|permission/i.test(e.message)?t('alias_err'):`${t('err')}: ${esc(e.message)}`,{ms:9000});openCompose({from:payload.from,to:payload.to,toName:name,sub:payload.subject,body:payload.text,draftId,draftGid:payload.draftId})})},S.undoSec*1000+200);
