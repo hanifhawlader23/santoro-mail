@@ -68,12 +68,21 @@ struct Initials: View {
     var color: Color = Brand.wine
     var size: CGFloat = 38
     var ring: Bool = false
+    var email: String? = nil          // logo de la empresa / Gravatar, como Gmail
     var body: some View {
-        Text(initials(name)).font(Brand.f(size * 0.36, .medium)).tracking(0.5)
-            .foregroundStyle(Brand.at)
-            .frame(width: size, height: size)
-            .background(RoundedRectangle(cornerRadius: size * 0.26).fill(color.opacity(0.13)))
-            .overlay(RoundedRectangle(cornerRadius: size * 0.26).stroke(color, lineWidth: ring ? 2 : 0).padding(-3))
+        ZStack {
+            Text(initials(name)).font(Brand.f(size * 0.36, .medium)).tracking(0.5)
+                .foregroundStyle(Brand.at)
+            if let e = email, let u = URL(string: BASE + "/logo?e=" + (e.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? e)) {
+                AsyncImage(url: u) { ph in
+                    if let img = ph.image { img.resizable().scaledToFit().padding(size * 0.1).frame(width: size, height: size).background(Color.white) }
+                }
+            }
+        }
+        .frame(width: size, height: size)
+        .background(RoundedRectangle(cornerRadius: size * 0.26).fill(color.opacity(0.13)))
+        .clipShape(RoundedRectangle(cornerRadius: size * 0.26))
+        .overlay(RoundedRectangle(cornerRadius: size * 0.26).stroke(color, lineWidth: ring ? 2 : 0).padding(-3))
     }
     func initials(_ n: String) -> String {
         let clean = n.components(separatedBy: CharacterSet(charactersIn: "·-")).first ?? n
@@ -118,8 +127,9 @@ struct GIFView: View {
 /// Santoro profile animation shipped inside the app (works offline)
 struct SantoroAvatar: View {
     var size: CGFloat = 44
+    var who: String = "santoro"       // "santoro" o "hanif" (monograma animado)
     var body: some View {
-        GIFView(data: Bundle.main.url(forResource: "av-santoro", withExtension: "gif").flatMap { try? Data(contentsOf: $0) })
+        GIFView(data: Bundle.main.url(forResource: "av-" + who, withExtension: "gif").flatMap { try? Data(contentsOf: $0) })
             .frame(width: size, height: size)
             .clipShape(RoundedRectangle(cornerRadius: size * 0.24))
     }

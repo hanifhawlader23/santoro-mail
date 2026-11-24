@@ -19,8 +19,7 @@
 
 const APP_HTML = __HTML__;
 const PNG = { wine: __PNG_WINE__, cream: __PNG_CREAM__ };
-const SIGGIF = { santoro: __GIF_S_B64__, hanif: __GIF_H_B64__ };
-const AVGIF = { santoro: __AV_S_B64__ };
+const BRAND_FILES = __BRAND_FILES__;   // firmas GIF, avatares, iconos (src/brand/)
 const GIF = Uint8Array.from(atob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'), c => c.charCodeAt(0));
 const GRAPH = 'https://graph.microsoft.com/v1.0';
 const SCOPES = 'offline_access User.Read Mail.ReadWrite Mail.Send';
@@ -80,18 +79,36 @@ function addTracking(html, id, origin, opts) {
 }
 const rcpt = list => (Array.isArray(list) ? list : String(list || '').split(/[,;]\s*/)).map(s => s.trim()).filter(Boolean).map(a => ({ emailAddress: { address: a } }));
 
-const SIG_DEF = { santoro: { st: 'anim', n: 'Hanif Hawlader', r: 'Fundador', e: 'santoro@hanifhawlader.com', w: 'hanifhawlader.com', c: 'Santander · España', l: 'Elegancia, hecha a mano.' },
-  hanif: { st: 'anim', n: 'Hanif Hawlader', r: 'Producción y dirección creativa', e: 'contacto@hanifhawlader.com', w: 'hanifhawlader.com', c: 'Cantabria · España', l: '' } };
+/*__SIG_JS__*/
 function sigServer(o, prefs, k) {
-  const s = Object.assign({}, SIG_DEF[k], ((prefs.sigs || {})[k]) || {}), st = s.st || 'anim', W = '#5B1A2C', ff = "font-family:'El Messiri',Georgia,serif", mut = 'color:#6b6560';
-  const avv = (prefs.av || {})[k], av = avv ? `${o}/brand/avatar-${k}?v=${avv}` : k === 'santoro' ? `${o}/brand/av-santoro.gif` : null;
-  const logo = `<img src="${o}/brand/rider-wine.png" width="46" alt="Santoro" style="display:block;border:0">`;
-  const contact = `<div style="font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a></div><div style="font-size:12px;${mut}">${esc(s.c)}</div>`;
-  if (st === 'anim') return `<div style="${ff};color:#000"><img src="${o}/brand/sig-${k}.gif" width="440" alt="${esc(s.n)}" style="display:block;width:440px;max-width:100%;height:auto;border:0;border-radius:6px"><div style="padding:8px 2px 0;font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a> · ${esc(s.c)}</div></div>`;
-  if (st === 'card') return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse;background:#F7F5E9;border-radius:10px"><tr><td style="padding:14px 14px 14px 16px;vertical-align:middle">${av ? `<img src="${av}" width="64" height="64" alt="" style="display:block;width:64px;height:64px;border-radius:12px;border:0">` : logo}</td><td style="padding:14px 18px 14px 4px;vertical-align:middle;border-left:3px solid ${W}"><div style="padding-left:12px"><div style="font-size:15px">${esc(s.n)}</div><div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()}${k === 'santoro' ? ' · SANTORO' : ''}</div>${contact}${s.l ? `<div style="font-size:11px;color:${W};font-style:italic;margin-top:5px">${esc(s.l)}</div>` : ''}</div></td></tr></table>`;
-  if (st === 'min') return `<div style="${ff};color:#000;font-size:13px;line-height:1.5"><b style="font-weight:500">${esc(s.n)}</b> <span style="color:${W}">—</span> ${esc(s.r)}${k === 'santoro' ? ' · Santoro' : ''}<br><span style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)}</span></div>`;
-  if (k === 'santoro') return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse"><tr><td style="padding-right:16px;border-right:1px solid ${W};vertical-align:middle">${logo}</td><td style="padding-left:16px;vertical-align:middle"><div style="font-size:14px">${esc(s.n)}</div><div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()} · SANTORO</div>${contact}${s.l ? `<div style="font-size:11px;color:${W};font-style:italic;margin-top:6px">${esc(s.l)}</div>` : ''}</td></tr></table>`;
-  return `<div style="${ff};color:#000"><div style="font-size:15px;letter-spacing:2px">${esc(s.n).toUpperCase()}</div><div style="width:28px;height:1px;background:${W};margin:6px 0 7px"></div><div style="font-size:12px;color:#555">${esc(s.r)}</div><div style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)} · ${esc(s.c)}</div>${s.l ? `<div style="font-size:11px;color:${W};margin-top:5px">${esc(s.l)}</div>` : ''}<div style="font-size:9.5px;letter-spacing:3px;color:${W};margin-top:8px">FUNDADOR DE SANTORO</div></div>`;
+  const avv = (prefs.av || {})[k];
+  return sigMarkup(((prefs.sigs || {})[k]) || {}, k, n => `${o}/brand/${n}`, avv ? `${o}/brand/avatar-${k}?v=${avv}` : null);
+}
+/* logos/fotos de remitentes, como Gmail: icono de la web de la empresa o Gravatar para correos personales */
+const FREE_MAIL = /^(gmail|googlemail|hotmail|outlook|live|msn|yahoo|ymail|icloud|me|mac|aol|proton|protonmail|gmx|zoho|yandex|mail)\./i;
+async function senderLogo(email, ctx) {
+  email = lc(email).trim(); const dom = email.split('@')[1] || '';
+  if (!dom || !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(dom)) return new Response('', { status: 404 });
+  const cache = caches.default, key = new Request('https://logo.cache/' + encodeURIComponent(FREE_MAIL.test(dom) ? email : dom));
+  const hit = await cache.match(key); if (hit) return hit;
+  const tries = [];
+  if (FREE_MAIL.test(dom)) {
+    const h = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(email)))].map(b => b.toString(16).padStart(2, '0')).join('');
+    tries.push(`https://www.gravatar.com/avatar/${h}?s=128&d=404`);
+  } else {
+    const base = dom.split('.').slice(-2).join('.');
+    tries.push(`https://${base}/apple-touch-icon.png`, `https://www.${base}/apple-touch-icon.png`, `https://icons.duckduckgo.com/ip3/${base}.ico`);
+  }
+  let res = new Response('', { status: 404, headers: { 'cache-control': 'public, max-age=86400' } });
+  for (const u of tries) {
+    try {
+      const r = await fetch(u, { cf: { cacheTtl: 604800 }, redirect: 'follow' });
+      const ct = r.headers.get('content-type') || '';
+      if (r.ok && /image|icon|octet/.test(ct)) { const b = await r.arrayBuffer(); if (b.byteLength > 200) { res = new Response(b, { headers: { 'content-type': ct.includes('octet') ? 'image/x-icon' : ct, 'cache-control': 'public, max-age=604800' } }); break; } }
+    } catch (e) {}
+  }
+  ctx.waitUntil(cache.put(key, res.clone()));
+  return res;
 }
 async function sendTracked(env, origin, m) {
   // m: {from, to, cc, subject, text|html, sig | sigAuto, track:{open,click}, follow, name}
@@ -344,8 +361,8 @@ export default {
         return Response.redirect(to, 302);
       }
       if (path.startsWith('/brand/rider-')) { const k = path.includes('cream') ? 'cream' : 'wine'; return new Response(Uint8Array.from(atob(PNG[k]), c => c.charCodeAt(0)), { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=604800' } }); }
-      if (path === '/brand/sig-santoro.gif' || path === '/brand/sig-hanif.gif') { const k = path.includes('hanif') ? 'hanif' : 'santoro'; return new Response(Uint8Array.from(atob(SIGGIF[k]), c => c.charCodeAt(0)), { headers: { 'content-type': 'image/gif', 'cache-control': 'public, max-age=86400' } }); }
-      if (path === '/brand/av-santoro.gif') return new Response(Uint8Array.from(atob(AVGIF.santoro), c => c.charCodeAt(0)), { headers: { 'content-type': 'image/gif', 'cache-control': 'public, max-age=86400' } });
+      if (path.startsWith('/brand/') && BRAND_FILES[path.slice(7)]) { const n = path.slice(7); return new Response(Uint8Array.from(atob(BRAND_FILES[n]), c => c.charCodeAt(0)), { headers: { 'content-type': n.endsWith('.gif') ? 'image/gif' : 'image/png', 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } }); }
+      if (path === '/logo') return senderLogo(url.searchParams.get('e') || '', ctx);
       if (path.startsWith('/brand/avatar-')) {
         const k = path.slice(14); if (!/^(santoro|hanif)$/.test(k)) return new Response('', { status: 404 });
         const r = await env.DB.getWithMetadata('av:' + k, 'arrayBuffer'); if (!r || !r.value) return new Response('', { status: 404 });

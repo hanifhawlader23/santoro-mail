@@ -192,7 +192,7 @@ struct MailList: View {
         let g = h < 6 ? "Buenas noches" : h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches"
         return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 14) {
-                SantoroAvatar(size: 58)
+                SantoroAvatar(size: 58, who: "hanif")
                 VStack(alignment: .leading, spacing: 2) {
                     Cap(Date().formatted(.dateTime.weekday(.wide).day().month(.wide)))
                     Text("\(g), Hanif").font(Brand.f(22, .medium)).foregroundStyle(Brand.fg)
@@ -257,7 +257,7 @@ struct MailRow: View {
         let c = alias?.color ?? Brand.wine
         HStack(alignment: .top, spacing: 12) {
             Rectangle().fill(c).frame(width: m.unread ? 5 : 3).opacity(m.unread ? 1 : 0.45)
-            Initials(name: sent ? (m.to.first ?? "?") : m.from.n, color: c, size: 40, ring: m.unread).padding(.top, 12)
+            Initials(name: sent ? (m.to.first ?? "?") : m.from.n, color: c, size: 40, ring: m.unread, email: sent ? nil : m.from.e).padding(.top, 12)
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     if m.unread { Circle().fill(c).frame(width: 7, height: 7) }

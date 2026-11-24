@@ -140,6 +140,7 @@ main{position:relative;overflow:hidden;height:100%}
 .steps{margin:10px 0 0;padding:0;list-style:none;counter-reset:st}
 .steps li{counter-increment:st;display:flex;gap:10px;font-size:12.5px;color:var(--fg2);padding:4px 0;line-height:1.5}
 .steps li::before{content:counter(st);flex:none;width:20px;height:20px;border-radius:6px;background:var(--acc);color:var(--on);font-size:11px;display:flex;align-items:center;justify-content:center}
+.fm .fld.wide{grid-column:1/-1}
 .achips{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}
 @media(max-width:860px){.lh-row .btn .lbl{display:none}}
 [data-theme="dark"] .achip i,[data-theme="dark"] .item .newdot{background:color-mix(in srgb,var(--ac) 62%,#fff)}
@@ -171,7 +172,8 @@ main{position:relative;overflow:hidden;height:100%}
 .sigst{display:flex;gap:6px;flex-wrap:wrap;padding:10px 14px;border-bottom:1px solid var(--line)}
 .me-av{width:28px;height:28px;border-radius:7px;overflow:hidden;flex:none}
 @media(max-width:860px){.prof{grid-template-columns:1fr}}
-.av{width:36px;height:36px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;font-size:12.5px;letter-spacing:.04em;background:var(--wash2);color:var(--at);flex:none}
+.av .lg{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;border-radius:inherit;padding:4px}
+.av{position:relative;overflow:hidden;width:36px;height:36px;border-radius:var(--r-s);display:flex;align-items:center;justify-content:center;font-size:12.5px;letter-spacing:.04em;background:var(--wash2);color:var(--at);flex:none}
 .av.h{background:var(--hw);color:var(--fg)}
 .item .who{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .item.unread .who{font-weight:600}
@@ -919,7 +921,7 @@ function renderList(){
  const r=rows();
  const itemHTML=x=>`
   <div class="item ${x.unread?'unread':''} ${S.sel&&S.sel.k===x.k&&S.sel.id===x.id?'sel':''}" data-k="${x.k}" data-open="${x.id}" ${acStyle(x.to||x.from)}>
-   ${x.k!=='m'&&!x.draft&&!x.sched&&avSrc(x.idn)?avBox(x.idn):`<div class="av ${x.idn==='hanif'?'h':''}">${x.draft?ic('pen'):x.sched?ic('cal'):esc(ini(x.name.replace(t('to')+': ','')))}</div>`}
+   ${x.k!=='m'&&!x.draft&&!x.sched&&avSrc(x.idn)?avBox(x.idn):`<div class="av ${x.idn==='hanif'?'h':''}">${x.draft?ic('pen'):x.sched?ic('cal'):esc(ini(x.name.replace(t('to')+': ','')))}${LIVE&&x.k==='m'&&x.em?`<img class="lg" src="/logo?e=${encodeURIComponent(x.em)}" alt="" loading="lazy" onerror="this.remove()">`:''}</div>`}
    <div style="min-width:0"><div class="who">${x.unread?'<span class="newdot"></span>':''}${x.draft?`<span class="acc">${t('c_draft')}</span> · `:''}${esc(x.name)}</div><div class="sub">${esc(x.sub)}</div><div class="snip">${esc(mdStrip(x.snip).replace(/\n+/g,' '))}</div></div>
    <div class="meta"><span>${x.snz?ic('clock'):''}${rel(x.date)}</span>
     <span class="row">${x.att?ic('file'):''}${x.spam?'<span class="tag warn">!</span>':''}${(()=>{const A=ALIASES.find(a=>a.email===(x.to||x.from));return A?`<span class="tag ac">${esc(aMark(A))}</span>`:`<span class="tag ${x.idn==='hanif'?'h':''}">${x.idn==='hanif'?'HH':'S'}</span>`})()}</span>
@@ -1070,30 +1072,9 @@ function renderTrack(){
 
 /* ================= templates & signatures ================= */
 /* one builder for the in-app preview and the real e-mail (abs = absolute URLs, e-mail safe) */
-function sigBuild(k,abs){const s=sigs[k]||{},st=s.st||'anim',o=abs?location.origin:'',W='#5B1A2C';
- const logo=abs?`<img src="${o}/brand/rider-wine.png" width="46" alt="Santoro" style="display:block;border:0">`:`<svg viewBox="0 0 900 843" width="44" height="41" style="color:${W};display:block"><use href="#rider"/></svg>`;
- const av=AVV[k]?(abs?`${o}/brand/avatar-${k}?v=${AVV[k]}`:avSrc(k)):DEFAV[k]?(abs?`${o}/brand/av-${k}.gif`:DEFAV[k]):null;
- const ff=`font-family:'El Messiri',Georgia,serif`,mut='color:#6b6560';
- const contact=`<div style="font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a></div><div style="font-size:12px;${mut}">${esc(s.c)}</div>`;
- if(st==='anim'){const g=abs?`${o}/brand/sig-${k}.gif`:SIGGIF[k];
-  return `<div style="${ff};color:#000"><img src="${g}${abs?'':'#'+(window.__sigt||0)}" width="440" alt="${esc(s.n)} · ${k==='santoro'?'Santoro':'Hanif Hawlader'}" style="display:block;width:440px;max-width:100%;height:auto;border:0;border-radius:6px">
-   <div style="padding:8px 2px 0;font-size:12px;${mut}">${esc(s.e)} · <a href="https://${esc(s.w)}" style="color:${W};text-decoration:none">${esc(s.w)}</a> · ${esc(s.c)}</div></div>`}
- if(st==='card'){const pic=av?`<img src="${av}" width="64" height="64" alt="" style="display:block;width:64px;height:64px;border-radius:12px;object-fit:cover;border:0">`:logo;
-  return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse;background:#F7F5E9;border-radius:10px"><tr>
-   <td style="padding:14px 14px 14px 16px;vertical-align:middle">${pic}</td>
-   <td style="padding:14px 18px 14px 4px;vertical-align:middle;border-left:3px solid ${W}"><div style="padding-left:12px"><div style="font-size:15px">${esc(s.n)}</div>
-    <div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()}${k==='santoro'?' · SANTORO':''}</div>${contact}
-    ${s.l?`<div style="font-size:11px;color:${W};font-style:italic;margin-top:5px">${esc(s.l)}</div>`:''}</div></td></tr></table>`}
- if(st==='min')return `<div style="${ff};color:#000;font-size:13px;line-height:1.5"><b style="font-weight:500">${esc(s.n)}</b> <span style="color:${W}">—</span> ${esc(s.r)}${k==='santoro'?' · Santoro':''}<br><span style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)}</span></div>`;
- // classic
- if(k==='santoro')return `<table cellpadding="0" cellspacing="0" style="${ff};color:#000;border-collapse:collapse"><tr>
-  <td style="padding-right:16px;border-right:1px solid ${W};vertical-align:middle">${logo}</td>
-  <td style="padding-left:16px;vertical-align:middle"><div style="font-size:14px">${esc(s.n)}</div>
-   <div style="font-size:10px;letter-spacing:3px;color:${W};margin:2px 0 6px">${esc(s.r).toUpperCase()} · SANTORO</div>${contact}
-   ${s.l?`<div style="font-size:11px;color:${W};font-style:italic;margin-top:6px">${esc(s.l)}</div>`:''}</td></tr></table>`;
- return `<div style="${ff};color:#000"><div style="font-size:15px;letter-spacing:2px">${esc(s.n).toUpperCase()}</div><div style="width:28px;height:1px;background:${W};margin:6px 0 7px"></div>
-  <div style="font-size:12px;color:#555">${esc(s.r)}</div><div style="font-size:12px;${mut}">${esc(s.e)} · ${esc(s.w)} · ${esc(s.c)}</div>
-  ${s.l?`<div style="font-size:11px;color:${W};margin-top:5px">${esc(s.l)}</div>`:''}<div style="font-size:9.5px;letter-spacing:3px;color:${W};margin-top:8px">FUNDADOR DE SANTORO</div></div>`}
+/*__SIG_JS__*/
+function sigBuild(k,abs){const o=abs?location.origin:'';const img=n=>`${o}/brand/${n}`+(!abs&&n.startsWith('sig-')?`#${window.__sigt||0}`:'');
+ const av=AVV[k]?(abs?`${o}/brand/avatar-${k}?v=${AVV[k]}`:avSrc(k)):null;return sigMarkup(sigs[k]||{},k,img,av)}
 function sigHTML(k){return `<div class="pv" style="background:#fff;color:#000;padding:16px;border-radius:5px">${sigBuild(k,false)}</div>`}
 function renderTpl(){
  $('#tplPage').innerHTML=`
@@ -1105,7 +1086,7 @@ function renderTpl(){
    <div id="pv-${k}" style="padding:10px">${sigHTML(k)}</div>
    ${(sigs[k].st||'anim')==='anim'?`<p class="muted" style="font-size:11px;padding:0 14px 8px;margin:0">${t('sg_anim_note')}</p>`:''}
    ${(sigs[k].st)==='card'&&!avSrc(k)?`<p class="muted" style="font-size:11px;padding:0 14px 8px;margin:0">${t('sg_card_note')}</p>`:''}
-   <div class="fm">${[['n','name'],['r','role'],['e','email'],['w','web'],['c','city'],['l','line']].map(([f,l])=>`<div class="fld"><label>${t(l)}</label><input data-sig="${k}" data-f="${f}" value="${esc(sigs[k][f])}"></div>`).join('')}</div></div>`).join('')}</div></div>`;
+   <div class="fm">${[['n',t('name')],['r',t('role')],['e',t('email')],['w',t('web')],['c',t('city')],['l',t('line')],['ph','Teléfono','+34 600 000 000'],['ig','Instagram','@usuario'],['yt','YouTube','@canal'],['tt','TikTok','@usuario'],['wa','WhatsApp','+34 600 000 000'],['li','LinkedIn','usuario o enlace'],['cta','Botón: texto','Descubre Santoro'],['cu','Botón: enlace','hanifhawlader.com'],['legal','Aviso legal','']].map(([f,l,ph])=>`<div class="fld ${f==='legal'?'wide':''}"><label>${l}</label><input data-sig="${k}" data-f="${f}" value="${esc(sigs[k][f]??(SIG_DEF[k]||{})[f]??'')}" placeholder="${ph||''}"></div>`).join('')}</div></div>`).join('')}</div></div>`;
 }
 function openTplEditor(id){
  const x=id==='new'?{id:'t'+Date.now(),cat:'prov',id_:'santoro',name:'',sub:'',body:''}:templates.find(z=>z.id===id);
@@ -1274,7 +1255,7 @@ function setAvatar(k,data){if(LIVE){hook('avatar',{k,data});return}
  if(data)AVV[k]=data;else delete AVV[k];LS.set('avv',AVV);toast(data?t('av_ok'):t('av_rm'),{wine:true});renderAll()}
 /* ---- animated signature banners ---- */
 const SIGGIF={santoro:'__GIF_S__',hanif:'__GIF_H__'};
-const DEFAV={santoro:'__AV_S__'};   // built-in animated profile GIFs (Hanif's arrives with his monogram)
+const DEFAV={santoro:'__AV_S__',hanif:'__AV_H__'};   // built-in animated profile GIFs (Hanif's arrives with his monogram)
 /* light markup inside mail bodies: **bold**  ==wine highlight== */
 const md2html=t=>esc(String(t||'')).replace(/\*\*([^*\n][^*]*?)\*\*/g,'<b>$1</b>').replace(/==([^=\n][^=]*?)==/g,'<b class="hl">$1</b>').replace(/\n/g,'<br>');
 const mdStrip=t=>String(t||'').replace(/\*\*|==/g,'');

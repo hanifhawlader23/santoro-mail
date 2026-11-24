@@ -145,7 +145,21 @@ def fadeout(final, start, n=5):
     return [Image.blend(final, start, (i + 1) / n) for i in range(n)]
 
 
-def save(frames, path):
+def deco(im, mark=None):
+    """luxury card frame: wine border, fine inner rule, corner diamonds, optional small mark bottom-right"""
+    im = im.copy(); d = ImageDraw.Draw(im)
+    d.rectangle((8, 8, W - 9, H - 9), outline=WINE, width=2)
+    d.rectangle((15, 15, W - 16, H - 16), outline=(214, 196, 192), width=1)
+    for (x, y) in ((8, 8), (W - 9, 8), (8, H - 9), (W - 9, H - 9)):
+        d.polygon([(x, y - 7), (x + 7, y), (x, y + 7), (x - 7, y)], fill=WINE)
+    if mark:
+        f = font(500, 15); tw = width(mark, f, 5)
+        spaced(d, (W - 40 - tw, H - 46), mark, f, (150, 120, 125), 5)
+    return im
+
+
+def save(frames, path, mark=None):
+    frames = [deco(f, mark) for f in frames]
     """endless loop: full signature 2.6 s -> soft fade -> build-in -> shimmer -> full again.
     Frame 0 is the complete signature, so clients that don't animate (Outlook desktop) still show it all."""
     final = frames[-1]
@@ -189,8 +203,6 @@ def avatar_santoro(path, S=200, n=40):
 
 if __name__ == '__main__':
     import sys
-    save(frames_santoro('Hanif Hawlader', 'Fundador', 'Elegancia, hecha a mano.'), 'sig-santoro.gif')
-    save(frames_hanif('Hanif Hawlader', 'Producción y dirección creativa', ''), 'sig-hanif.gif')
+    save(frames_santoro('Hanif Hawlader', 'Fundador', 'Elegancia, hecha a mano.'), 'sig-santoro.gif', mark='EST. MMXXVI')
     avatar_santoro('av-santoro.gif')
-    frames_santoro('Hanif Hawlader', 'Fundador', 'Elegancia, hecha a mano.')[-1].save('prev-santoro.png')
-    frames_hanif('Hanif Hawlader', 'Producción y dirección creativa', '')[-1].save('prev-hanif.png')
+    deco(frames_santoro('Hanif Hawlader', 'Fundador', 'Elegancia, hecha a mano.')[-1], 'EST. MMXXVI').save('prev-santoro.png')
