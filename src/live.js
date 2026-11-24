@@ -72,15 +72,17 @@ function collectPrefs(){return {templates,sigs,favs,rules,aliases:ALIASES,pins:m
 function savePrefs(){clearTimeout(saveT);saveT=setTimeout(()=>{sigRowsAll();prefs=collectPrefs();A('/prefs',{method:'PUT',body:prefs}).catch(fail)},700)}
 /* filas de la firma (correo, web, ciudad) dibujadas en El Messiri y guardadas como imagen: así se ven igual en cualquier correo */
 let rowsBusy=false,rowsT;
-async function sigRows(k){const s=Object.assign({},SIG_DEF[k],sigs[k]||{}),loc=[s.c,s.ph].filter(Boolean).join('  ·  '),h=[s.e,s.w,loc,'v1'].join('|');
+async function sigRows(k){const s=Object.assign({},SIG_DEF[k],sigs[k]||{}),h=[s.e,s.w,'v2'].join('|');
  if(sigs[k]&&sigs[k].rows&&sigs[k].rows.h===h)return false;
- try{await document.fonts.load('500 23px "El Messiri"')}catch(e){}
- if(!document.fonts.check('500 23px "El Messiri"'))return false;      // sin la fuente no dibujamos (se reintenta luego)
+ try{await document.fonts.load('500 21px "El Messiri"')}catch(e){}
+ if(!document.fonts.check('500 21px "El Messiri"'))return false;      // sin la fuente no dibujamos (se reintenta luego)
  const icon=n=>new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=`/brand/w-${n}.png?v=${(window.BRANDV||{})['w-'+n+'.png']||''}`});
- const draw=async(txt,ic,col)=>{const c=document.createElement('canvas');c.width=700;c.height=52;const x=c.getContext('2d');x.font='500 23px "El Messiri", Georgia, serif';x.textBaseline='middle';
-  try{x.letterSpacing='1.2px'}catch(e){}const im=await icon(ic),iw=im?30:0,gap=im?14:0,tw=x.measureText(txt).width,st=Math.max(4,(700-(iw+gap+tw))/2);
-  if(im)x.drawImage(im,st,11,30,30);x.fillStyle=col;x.fillText(txt,st+iw+gap,27);return c.toDataURL('image/png')};
- const jobs=[];if(s.e)jobs.push(['mail',await draw(s.e,'mail','#F7F5E9')]);if(s.w)jobs.push(['web',await draw(s.w,'web','#F7F5E9')]);if(loc)jobs.push(['loc',await draw(loc,'pin','#D9B8BF')]);
+ // fondo vino OPACO (igual que la cabecera): así Gmail en modo oscuro no lo cambia
+ const draw=async(txt,ic,hh,ty)=>{const c=document.createElement('canvas');c.width=600;c.height=hh;const x=c.getContext('2d');x.fillStyle='#5B1A2C';x.fillRect(0,0,600,hh);
+  x.font='500 21px "El Messiri", Georgia, serif';x.textBaseline='middle';try{x.letterSpacing='1.2px'}catch(e){}
+  const im=await icon(ic),iw=im?26:0,gap=im?12:0,tw=x.measureText(txt).width,st=Math.max(4,(600-(iw+gap+tw))/2);
+  if(im)x.drawImage(im,st,ty-13,26,26);x.fillStyle='#F7F5E9';x.fillText(txt,st+iw+gap,ty+1);return c.toDataURL('image/png')};
+ const jobs=[];if(s.e)jobs.push(['mail',await draw(s.e,'mail',48,22)]);if(s.w)jobs.push(['web',await draw(s.w,'web',64,26)]);
  for(const [r,d] of jobs)await A(`/sigimg/${k}/${r}`,{method:'PUT',body:{data:d}});
  sigs[k]=Object.assign(sigs[k]||{},{rows:{h,v:Date.now()}});return true}
 function sigRowsAll(){clearTimeout(rowsT);rowsT=setTimeout(async()=>{if(rowsBusy)return;rowsBusy=true;try{let ch=false;for(const k of ['hanif','santoro'])ch=(await sigRows(k))||ch;if(ch){savePrefs();if(S.view==='tpl')renderTpl()}}catch(e){}rowsBusy=false},1500)}
@@ -177,7 +179,7 @@ function liveError(msg){loadingScreen(false);let el=document.getElementById('liv
   try{
     const me=await A('/me');Object.assign(ME,me);
     prefs=await A('/prefs').catch(()=>({}));
-    if(prefs.templates)templates=prefs.templates;if(prefs.sigs)sigs=prefs.sigs;if(prefs.rules)rules=prefs.rules;
+    if(prefs.templates)templates=prefs.templates;if(prefs.sigs){sigs=prefs.sigs;if(sigs.hanif&&/producci[oó]n y direcci[oó]n creativa/i.test(sigs.hanif.r||''))sigs.hanif.r='Fundador de Santoro';if(sigs.hanif&&/Cantabria/.test(sigs.hanif.c||''))sigs.hanif.c=''}if(prefs.rules)rules=prefs.rules;
     favs=prefs.favs||[];AVV=prefs.av||{};cbook=prefs.cbook||[];
     if(prefs.theme){S.theme=prefs.theme;applyTheme()}
     // aliases: SOLO los reales = Microsoft (lo que creaste en GoDaddy) + los que reciben correo + los que añadiste tú a mano
