@@ -22,8 +22,12 @@ struct ComposeView: View {
     @State private var check: String?
     @State private var schedule = false
     @State private var closeAsk = false
+    @State private var toText = ""
+    @State private var ccText = ""
+    @State private var bccText = ""
+    @State private var showCc = false
     @FocusState private var focus: Field?
-    enum Field { case to, subject, body, idea }
+    enum Field: Hashable { case to, cc, bcc, subject, body, idea }
 
     var fromAlias: Alias? { s.aliases.first { $0.email == draft.from } }
 
@@ -32,13 +36,11 @@ struct ComposeView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     fromChips
-                    line("Para") {
-                        TextField("nombre@empresa.com", text: $draft.to).font(Brand.f(16)).focused($focus, equals: .to)
-                            #if os(iOS)
-                            .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
-                            #endif
+                    recipients("Para", list: $draft.to, text: $toText, field: .to, extra: true)
+                    if showCc || !draft.cc.isEmpty || !draft.bcc.isEmpty {
+                        recipients("Cc", list: $draft.cc, text: $ccText, field: .cc)
+                        recipients("Cco", list: $draft.bcc, text: $bccText, field: .bcc)
                     }
-                    if focus == .to { suggestions }
                     line("Asunto") { TextField("", text: $draft.subject).font(Brand.f(16)).focused($focus, equals: .subject) }
 
                     tools.padding(.top, 12)
@@ -63,7 +65,8 @@ struct ComposeView: View {
                         }
                         .padding(12).background(RoundedRectangle(cornerRadius: 12).fill(Brand.card))
                     }
-                    options.padding(.top, 14)
+                    sigCard.padding(.top, 14)
+                    options.padding(.top, 12)
                     if let error { Text(error).font(Brand.f(13)).foregroundStyle(.red).padding(.top, 8) }
                 }
                 .padding(.horizontal, 18).padding(.top, 6).padding(.bottom, 30)
@@ -79,6 +82,12 @@ struct ComposeView: View {
                     Button { if draft.body.isEmpty && draft.to.isEmpty { dismiss() } else { closeAsk = true } } label: { Image(systemName: "xmark") }
                 }
                 ToolbarItem(placement: .confirmationAction) { sendButton }
+                #if os(iOS)
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button { commitAll(); focus = nil } label: { Text("Listo").font(Brand.f(15, .medium)) }
+                }
+                #endif
             }
             .confirmationDialog("¿Qué hacemos con este correo?", isPresented: $closeAsk, titleVisibility: .visible) {
                 Button("Guardar en borradores") { let d = draft; dismiss(); Task { await s.saveDraft(d) } }
@@ -93,6 +102,7 @@ struct ComposeView: View {
             .fileImporter(isPresented: $pickFile, allowedContentTypes: [.item], allowsMultipleSelection: true) { r in
                 if case .success(let urls) = r { for u in urls { addFile(u) } }
             }
+            .onChange(of: focus) { old, _ in if old == .to || old == .cc || old == .bcc { commitAll() } }
             .onChange(of: photo) { _, p in
                 guard let p else { return }
                 Task {
@@ -108,7 +118,7 @@ struct ComposeView: View {
         #if os(macOS)
         .frame(minWidth: 640, minHeight: 680)
         #endif
-        .onAppear { focus = draft.to.isEmpty ? .to : .body }
+        // el teclado solo sale cuando tocas un campo
     }
 
     // MARK: partes
@@ -139,16 +149,55 @@ struct ComposeView: View {
         .padding(.bottom, 6)
     }
 
-    var suggestions: some View {
-        let l = s.suggest(draft.to)
+    // MARK: destinatarios como en Gmail: cada correo es una burbuja, puedes poner varios
+    func recipients(_ label: String, list: Binding<String>, text: Binding<String>, field: Field, extra: Bool = false) -> some View {
+        let items = split(list.wrappedValue)
+        return VStack(spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Text(label).font(Brand.f(13)).foregroundStyle(Brand.fg3).frame(width: 40, alignment: .leading)
+                Flow(spacing: 6) {
+                    ForEach(items, id: \.self) { e in
+                        HStack(spacing: 5) {
+                            Text(name(e)).font(Brand.f(13.5, .medium)).lineLimit(1)
+                            Button { list.wrappedValue = items.filter { $0 != e }.joined(separator: ", ") } label: {
+                                Image(systemName: "xmark").font(.system(size: 9, weight: .bold))
+                            }.buttonStyle(.plain)
+                        }
+                        .foregroundStyle(Brand.at)
+                        .padding(.horizontal, 10).padding(.vertical, 5)
+                        .background(Capsule().fill(Brand.wine.opacity(0.09)))
+                        .overlay(Capsule().stroke(Brand.wine.opacity(0.22)))
+                    }
+                    TextField(items.isEmpty ? "nombre@empresa.com" : "", text: text)
+                        .font(Brand.f(16)).frame(minWidth: 120)
+                        .focused($focus, equals: field)
+                        .onSubmit { commit(list, text) }
+                        .onChange(of: text.wrappedValue) { _, v in if v.hasSuffix(",") || v.hasSuffix(" ") || v.hasSuffix(";") { commit(list, text) } }
+                        #if os(iOS)
+                        .keyboardType(.emailAddress).textInputAutocapitalization(.never).autocorrectionDisabled()
+                        .submitLabel(.next)
+                        #endif
+                }
+                if extra {
+                    Button { withAnimation { showCc.toggle() } } label: {
+                        Text("Cc/Cco").font(Brand.f(12, .medium)).foregroundStyle(showCc ? Brand.at : Brand.fg3)
+                    }.buttonStyle(.plain)
+                }
+            }
+            .padding(.vertical, 9)
+            if focus == field { suggestions(list, text) }
+            Divider()
+        }
+    }
+
+    func suggestions(_ list: Binding<String>, _ text: Binding<String>) -> some View {
+        let have = Set(split(list.wrappedValue))
+        let l = s.suggest(text.wrappedValue).filter { !have.contains($0.e) }
         return VStack(spacing: 0) {
             ForEach(l, id: \.e) { c in
                 Button {
-                    var parts = draft.to.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
-                    if let last = parts.last, !last.contains("@") || c.e.hasPrefix(last.lowercased()) { parts.removeLast() }
-                    parts.append(c.e)
-                    draft.to = parts.joined(separator: ", ")
-                    focus = .subject
+                    list.wrappedValue = (split(list.wrappedValue) + [c.e]).joined(separator: ", ")
+                    text.wrappedValue = ""
                 } label: {
                     HStack(spacing: 10) {
                         Initials(name: c.n.isEmpty ? c.e : c.n, size: 30, email: c.e)
@@ -166,7 +215,36 @@ struct ComposeView: View {
         .padding(.horizontal, 10)
         .background(RoundedRectangle(cornerRadius: 12).fill(Brand.card))
         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Brand.line))
-        .padding(.vertical, 6)
+        .padding(.bottom, 8)
+    }
+
+    func split(_ s: String) -> [String] {
+        s.split(whereSeparator: { $0 == "," || $0 == ";" }).map { $0.trimmingCharacters(in: .whitespaces).lowercased() }.filter { !$0.isEmpty }
+    }
+    func name(_ e: String) -> String {
+        if let c = s.contacts.first(where: { $0.e == e }), !c.n.isEmpty, !c.n.contains("@") { return c.n }
+        return e
+    }
+    func commit(_ list: Binding<String>, _ text: Binding<String>) {
+        let parts = split(text.wrappedValue.replacingOccurrences(of: " ", with: ","))
+        guard !parts.isEmpty else { text.wrappedValue = ""; return }
+        var l = split(list.wrappedValue)
+        for p in parts where !l.contains(p) { l.append(p) }
+        list.wrappedValue = l.joined(separator: ", ")
+        text.wrappedValue = ""
+    }
+    func commitAll() {
+        commit($draft.to, $toText); commit($draft.cc, $ccText); commit($draft.bcc, $bccText)
+    }
+
+    /// la firma que se añadirá (la misma imagen animada que recibe la otra persona)
+    var sigCard: some View {
+        let k = fromAlias?.ident == "hanif" ? "hanif" : "santoro"
+        return VStack(alignment: .leading, spacing: 8) {
+            Cap("Firma que se añade")
+            SigImage(k: k).id(k)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     var tools: some View {
@@ -261,7 +339,7 @@ struct ComposeView: View {
                 Text(draft.sendAt == nil ? "Enviar" : "Programar").font(Brand.f(14.5, .medium))
             }
             .foregroundStyle(Brand.cream).padding(.horizontal, 14).padding(.vertical, 7)
-            .background(Capsule().fill(draft.to.isEmpty ? Brand.wine.opacity(0.4) : Brand.wine))
+            .background(Capsule().fill(draft.to.isEmpty && toText.isEmpty ? Brand.wine.opacity(0.4) : Brand.wine))
         }
         .buttonStyle(.plain)
         .disabled(sending || draft.to.isEmpty)
@@ -291,7 +369,9 @@ struct ComposeView: View {
 
     // MARK: acciones
     func go(force: Bool = false) {
-        let to = draft.to.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }.filter { !$0.isEmpty }
+        commitAll()
+        let to = split(draft.to) + split(draft.cc) + split(draft.bcc)
+        if split(draft.to).isEmpty { error = "Añade al menos un destinatario en «Para»."; return }
         let bad = to.filter { $0.range(of: "^[^@\\s]+@[^@\\s]+\\.[a-zA-Z]{2,}$", options: .regularExpression) == nil }
         if !bad.isEmpty { error = "Revisa la dirección: \(bad.joined(separator: ", "))"; return }
         if !force {
@@ -611,7 +691,25 @@ struct TemplateEditor: View {
     }
 }
 
-/// Vista previa de la firma tal como sale en el correo (cabecera animada)
+/// Cabecera animada de la firma, tal como sale en el correo
+struct SigImage: View {
+    let k: String
+    var width: CGFloat = 250
+    @State private var data: Data?
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 12).fill(Brand.wine)
+            if data != nil { GIFView(data: data).clipShape(RoundedRectangle(cornerRadius: 12)) }
+            else { ProgressView().tint(Brand.cream) }
+        }
+        .frame(width: width, height: width * 0.4)
+        .task {
+            guard data == nil, let u = URL(string: BASE + "/brand/head-\(k).gif") else { return }
+            data = try? await URLSession.shared.data(from: u).0
+        }
+    }
+}
+
 struct SigPreview: View {
     let k: String
     let title: String
@@ -630,6 +728,34 @@ struct SigPreview: View {
         .task {
             guard data == nil, let u = URL(string: BASE + "/brand/head-\(k).gif") else { return }
             data = try? await URLSession.shared.data(from: u).0
+        }
+    }
+}
+
+/// Coloca las burbujas una tras otra y salta de línea cuando no caben
+struct Flow: Layout {
+    var spacing: CGFloat = 6
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let maxW = proposal.width ?? 300
+        var x: CGFloat = 0, y: CGFloat = 0, row: CGFloat = 0
+        for v in subviews {
+            let s = v.sizeThatFits(.unspecified)
+            let w = min(s.width, maxW)
+            if x > 0 && x + w > maxW { x = 0; y += row + spacing; row = 0 }
+            x += w + spacing; row = max(row, s.height)
+        }
+        return CGSize(width: maxW, height: y + row)
+    }
+    func placeSubviews(in b: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var x = b.minX, y = b.minY, row: CGFloat = 0
+        for (i, v) in subviews.enumerated() {
+            var s = v.sizeThatFits(.unspecified)
+            let last = i == subviews.count - 1
+            if x > b.minX && x + min(s.width, b.width) > b.maxX { x = b.minX; y += row + spacing; row = 0 }
+            if last { s.width = max(b.maxX - x, min(s.width, b.width)) }   // el campo de texto ocupa el resto
+            s.width = min(s.width, b.maxX - x)
+            v.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(width: s.width, height: s.height))
+            x += s.width + spacing; row = max(row, s.height)
         }
     }
 }

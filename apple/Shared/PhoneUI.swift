@@ -122,7 +122,15 @@ struct PhoneMain: View {
                     }
                 }
                 .toolbar {
-                    ToolbarItem(placement: .topBarLeading) { MenuButton(n: s.unread()) { open() } }
+                    ToolbarItemGroup(placement: .topBarLeading) {
+                        if !home {
+                            Button { goHome() } label: {
+                                Image(systemName: "chevron.left").font(.system(size: 15, weight: .semibold)).foregroundStyle(Brand.at)
+                                    .frame(width: 34, height: 34)
+                            }.buttonStyle(.plain).accessibilityLabel("Volver a la bandeja")
+                        }
+                        MenuButton(n: s.unread()) { open() }
+                    }
                 }
                 .navigationDestination(for: String.self) { id in
                     if let m = s.find(id) { Reader(mail: m) }
@@ -130,6 +138,16 @@ struct PhoneMain: View {
             }
             .overlay(alignment: .bottomTrailing) {
                 if s.section == .mail && path.isEmpty && !menu { ComposeFab() }
+            }
+            // deslizar desde el borde izquierdo: vuelve a «Todas» (o abre el menú si ya estás ahí), como en iPhone
+            .overlay(alignment: .leading) {
+                if path.isEmpty && !menu {
+                    Color.clear.frame(width: 22).frame(maxHeight: .infinity).contentShape(Rectangle())
+                        .gesture(DragGesture(minimumDistance: 15).onEnded { v in
+                            guard v.translation.width > 60 else { return }
+                            if home { open() } else { goHome() }
+                        })
+                }
             }
 
             if menu {
@@ -155,6 +173,8 @@ struct PhoneMain: View {
         .onChange(of: s.folder) { _, _ in path = NavigationPath() }
         .onChange(of: s.alias) { _, _ in path = NavigationPath() }
     }
+    var home: Bool { s.section == .mail && s.folder == "inbox" && s.alias == nil }
+    func goHome() { withAnimation(.spring(response: 0.35, dampingFraction: 0.88)) { s.section = .mail; s.folder = "inbox"; s.alias = nil } }
     func open() { withAnimation(.spring(response: 0.38, dampingFraction: 0.86)) { menu = true } }
     func close() { withAnimation(.spring(response: 0.32, dampingFraction: 0.9)) { menu = false } }
 }

@@ -28,6 +28,8 @@ struct Draft: Identifiable {
     var id = UUID()
     var from: String
     var to: String = ""
+    var cc: String = ""
+    var bcc: String = ""
     var subject: String = ""
     var body: String = ""
     var replyTo: Mail? = nil
@@ -238,6 +240,8 @@ final class Store: ObservableObject {
                 "from": d.from, "to": d.to.trimmingCharacters(in: CharacterSet(charactersIn: " ,")), "name": name,
                 "subject": d.subject.isEmpty ? "(sin asunto)" : d.subject, "text": text, "sigAuto": true,
                 "track": ["open": track, "click": track], "follow": 0]
+            if !d.cc.isEmpty { body["cc"] = d.cc }
+            if !d.bcc.isEmpty { body["bcc"] = d.bcc }
             if !d.atts.isEmpty { body["attachments"] = d.atts.map { ["name": $0.name, "type": $0.type, "data": $0.data] } }
             if let at = d.sendAt {
                 body["at"] = ISO.b.string(from: at)

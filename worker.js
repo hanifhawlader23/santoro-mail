@@ -202,7 +202,7 @@ async function sendTracked(env, origin, m) {
   }
   let html = m.html || wrapEmail(textToHtml(m.text || ''), m.sig || '');
   const tr = addTracking(html, id, origin, m.track || { open: true, click: true });
-  const msg = { subject: m.subject || '', body: { contentType: 'HTML', content: tr.html }, toRecipients: rcpt(m.to), ccRecipients: rcpt(m.cc) };
+  const msg = { subject: m.subject || '', body: { contentType: 'HTML', content: tr.html }, toRecipients: rcpt(m.to), ccRecipients: rcpt(m.cc), bccRecipients: rcpt(m.bcc) };
   let atts = m.attachments; if (!atts && m.attKey) atts = await kget(env, m.attKey, []);
   if (atts && atts.length) msg.attachments = atts.map(a => ({ '@odata.type': '#microsoft.graph.fileAttachment', name: a.name, contentType: a.type || 'application/octet-stream', contentBytes: a.data }));
   const me = allowed(env);
