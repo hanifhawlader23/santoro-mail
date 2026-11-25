@@ -106,6 +106,11 @@ final class Store: ObservableObject {
     func refresh(first: Bool = false, quiet: Bool = false) async {
         loading = true
         if !quiet { activity = "Sincronizando…" }
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-preview") {
+            try? await Task.sleep(nanoseconds: 2_500_000_000); loading = false; activity = nil; return
+        }
+        #endif
         defer { loading = false; booted = true; if activity == "Sincronizando…" { activity = nil } }
         do {
             let me = try await API.shared.get("/me", Me.self)

@@ -63,6 +63,43 @@ struct Splash: View {
     }
 }
 
+// MARK: tirar hacia abajo para actualizar: baja el logo de Santoro (como en la web)
+struct PullLogo: View {
+    var pull: CGFloat
+    var busy: Bool
+    var body: some View {
+        let p = min(max(pull, 0) / 90, 1)
+        let show = busy || p > 0.04
+        ZStack {
+            RoundedRectangle(cornerRadius: 13)
+                .fill(LinearGradient(colors: [Color(hex: "#7E2D44"), Brand.wine], startPoint: .top, endPoint: .bottom))
+            if busy { SwayLogo(size: 30) }
+            else {
+                Image("RiderCream").resizable().scaledToFit().frame(width: 30, height: 30)
+                    .rotationEffect(.degrees(Double(p) * 18 - 9), anchor: .bottom)
+            }
+        }
+        .frame(width: 44, height: 44)
+        .overlay(RoundedRectangle(cornerRadius: 13).stroke(Color.white.opacity(0.18), lineWidth: 1))
+        .shadow(color: Brand.wine.opacity(0.35), radius: 8, y: 4)
+        .scaleEffect(busy ? 1 : 0.55 + 0.45 * p)
+        .opacity(show ? 1 : 0)
+        .offset(y: busy ? 12 : max(0, pull) * 0.5 - 22)
+        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: busy)
+        .allowsHitTesting(false)
+    }
+}
+
+/// mide cuánto se ha tirado de la lista hacia abajo
+struct PullTracker: ViewModifier {
+    @Binding var pull: CGFloat
+    func body(content: Content) -> some View {
+        if #available(iOS 18.0, macOS 15.0, *) {
+            content.onScrollGeometryChange(for: CGFloat.self) { g in -(g.contentOffset.y + g.contentInsets.top) } action: { _, v in pull = v }
+        } else { content }
+    }
+}
+
 // MARK: botón del menú (cuadrado vino con relieve)
 struct MenuButton: View {
     var n: Int
@@ -100,6 +137,7 @@ struct PhoneMain: View {
     @State private var path = NavigationPath()
     @State private var sel: String?
     init() {
+        UIRefreshControl.appearance().tintColor = .clear       // la ruedita gris no: sale nuestro logo
         // títulos en El Messiri, como el resto de la marca
         let wine = UIColor(red: 91 / 255, green: 26 / 255, blue: 44 / 255, alpha: 1)
         let ink = UIColor { $0.userInterfaceStyle == .dark ? UIColor(red: 0.86, green: 0.62, blue: 0.68, alpha: 1) : wine }

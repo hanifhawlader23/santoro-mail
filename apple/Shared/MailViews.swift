@@ -132,6 +132,7 @@ struct MailList: View {
     @Binding var sel: String?
     @State private var q = ""
     @State private var showDigest = false
+    @State private var pull: CGFloat = 0
     @State private var ask: (Mail, String)? = nil     // se confirma antes de hacer nada
     @AppStorage("set.confirmSwipe") private var confirmSwipe = true
 
@@ -183,6 +184,10 @@ struct MailList: View {
         .background(Brand.bg)
         .searchable(text: $q, prompt: "Buscar correos, personas, pedidos…")
         .refreshable { await s.refresh() }
+        #if os(iOS)
+        .modifier(PullTracker(pull: $pull))
+        .overlay(alignment: .top) { PullLogo(pull: pull, busy: s.loading && s.activity == "Sincronizando…") }
+        #endif
         .confirmationDialog(ask?.1 == "del" ? "¿Eliminar este correo?" : "¿Seguro?", isPresented: Binding(get: { ask != nil }, set: { if !$0 { ask = nil } }), titleVisibility: .visible) {
             if let a = ask {
                 Button(a.1 == "del" ? "Eliminar" : a.1 == "star" ? (a.0.star ? "Quitar destacado" : "Destacar") : (a.0.unread ? "Marcar como leído" : "Marcar como no leído"), role: a.1 == "del" ? .destructive : nil) {
