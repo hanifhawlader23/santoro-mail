@@ -25,7 +25,7 @@ struct Draft: Identifiable {
     var replyTo: Mail? = nil
 }
 
-enum Section: Hashable { case mail, track, settings }
+enum AppSection: Hashable { case mail, track, settings }
 
 let FOLDERS: [(String, String, String)] = [
     ("inbox", "Bandeja de entrada", "tray"), ("sent", "Enviados", "paperplane"), ("drafts", "Borradores", "doc.text"),
@@ -38,7 +38,7 @@ final class Store: ObservableObject {
     @Published var aliases: [Alias] = []
     @Published var box: [String: [Mail]] = [:]
     @Published var tracks: [Track] = []
-    @Published var section: Section = .mail
+    @Published var section: AppSection = .mail
     @Published var folder = "inbox"
     @Published var alias: String? = nil
     @Published var loading = false
