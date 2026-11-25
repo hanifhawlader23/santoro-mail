@@ -8,9 +8,13 @@ final class TapTests: XCTestCase {
         app.launch()
         let row = app.staticTexts["Muestras de lana fría"]
         XCTAssertTrue(row.waitForExistence(timeout: 10))
-        let list = app.collectionViews.firstMatch.exists ? app.collectionViews.firstMatch : app.tables.firstMatch
-        let top = list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15))
-        top.press(forDuration: 0.1, thenDragTo: top.withOffset(CGVector(dx: 0, dy: 450)), withVelocity: .slow, thenHoldForDuration: 0.3)
+        let list = app.collectionViews.firstMatch
+        print("LISTS", app.collectionViews.count, app.tables.count, app.scrollViews.count)
+        list.swipeDown(velocity: .slow)
+        if !app.staticTexts["Sincronizando…"].waitForExistence(timeout: 2) {
+            let top = list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05))
+            top.press(forDuration: 0.3, thenDragTo: top.withOffset(CGVector(dx: 0, dy: 500)), withVelocity: 600, thenHoldForDuration: 0.5)
+        }
         XCTAssertTrue(app.staticTexts["Sincronizando…"].waitForExistence(timeout: 3), "tirar hacia abajo no actualiza")
         Thread.sleep(forTimeInterval: 0.3)
         let shot = XCUIScreen.main.screenshot()
