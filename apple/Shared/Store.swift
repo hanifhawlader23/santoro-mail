@@ -107,6 +107,9 @@ final class Store: ObservableObject {
         loading = true
         if !quiet { activity = "Sincronizando…" }
         #if DEBUG
+        NSLog("SMREFRESH quiet=%d", quiet ? 1 : 0)
+        #endif
+        #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-preview") {
             try? await Task.sleep(nanoseconds: 6_000_000_000); loading = false; activity = nil; return
         }

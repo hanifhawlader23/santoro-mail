@@ -95,7 +95,12 @@ struct PullTracker: ViewModifier {
     @Binding var pull: CGFloat
     func body(content: Content) -> some View {
         if #available(iOS 18.0, macOS 15.0, *) {
-            content.onScrollGeometryChange(for: CGFloat.self) { g in -(g.contentOffset.y + g.contentInsets.top) } action: { _, v in pull = v }
+            content.onScrollGeometryChange(for: CGFloat.self) { g in -(g.contentOffset.y + g.contentInsets.top) } action: { _, v in
+                pull = v
+                #if DEBUG
+                if v > 4 { NSLog("SMPULL %.0f", v) }
+                #endif
+            }
         } else { content }
     }
 }
