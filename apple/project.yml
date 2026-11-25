@@ -34,6 +34,19 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         CODE_SIGN_STYLE: Automatic
+    scheme:
+      testTargets: [SantoroMailUITests]
+  SantoroMailUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    dependencies:
+      - target: SantoroMail-iOS
+    settings:
+      base:
+        TEST_TARGET_NAME: SantoroMail-iOS
+        PRODUCT_BUNDLE_IDENTIFIER: com.hanifhawlader.santoromail.uitests
+        GENERATE_INFOPLIST_FILE: YES
   SantoroMail-macOS:
     type: application
     platform: macOS
