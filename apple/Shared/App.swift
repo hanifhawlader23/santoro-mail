@@ -30,10 +30,16 @@ struct SantoroMailApp: App {
 
 struct RootView: View {
     @EnvironmentObject var s: Store
+    @AppStorage("set.theme") private var theme = "system"
     var body: some View {
-        Group {
-            if s.loggedIn { MainView() } else { LoginView() }
+        ZStack {
+            if !s.loggedIn { LoginView().transition(.opacity) }
+            else if !s.booted { Splash().transition(.opacity) }
+            else { MainView().transition(.opacity) }
         }
+        .animation(.easeInOut(duration: 0.45), value: s.booted)
+        .animation(.easeInOut(duration: 0.3), value: s.loggedIn)
+        .preferredColorScheme(theme == "light" ? .light : theme == "dark" ? .dark : nil)
         .task { await s.start() }
         .alert("Santoro Mail", isPresented: Binding(get: { s.message != nil }, set: { if !$0 { s.message = nil } })) {
             Button("OK") { s.message = nil }

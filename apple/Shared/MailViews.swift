@@ -7,6 +7,18 @@ import AppKit
 #endif
 
 struct MainView: View {
+    #if os(iOS)
+    @Environment(\.horizontalSizeClass) private var hsize
+    var body: some View {
+        if hsize == .compact { PhoneMain() } else { WideMain() }
+    }
+    #else
+    var body: some View { WideMain() }
+    #endif
+}
+
+/// Mac e iPad: tres columnas
+struct WideMain: View {
     @EnvironmentObject var s: Store
     @State private var sel: String?
     @State private var column: NavigationSplitViewColumn = .content
@@ -33,6 +45,7 @@ struct MainView: View {
                 }.frame(maxWidth: .infinity, maxHeight: .infinity).background(Brand.bg)
             }
         }
+        .overlay(alignment: .top) { SyncPill() }
         .sheet(item: $s.compose) { d in ComposeView(draft: d).environmentObject(s) }
         .onChange(of: s.folder) { _, _ in sel = nil }
         .onChange(of: s.alias) { _, _ in sel = nil }
@@ -118,9 +131,9 @@ struct MailList: View {
     @EnvironmentObject var s: Store
     @Binding var sel: String?
     @State private var q = ""
-    @State private var summary: String?
-    @State private var summarizing = false
+    @State private var showDigest = false
     @State private var ask: (Mail, String)? = nil     // se confirma antes de hacer nada
+    @AppStorage("set.confirmSwipe") private var confirmSwipe = true
 
     var rows: [Mail] {
         let l = s.current
@@ -143,25 +156,23 @@ struct MailList: View {
                 }.frame(maxWidth: .infinity).padding(.top, 50).listRowSeparator(.hidden).listRowBackground(Color.clear)
             }
             ForEach(rows) { m in
-                MailRow(m: m, alias: s.aliasFor(m), sent: s.folder == "sent" || s.folder == "drafts", track: s.folder == "sent" ? s.trackFor(m) : nil)
-                    .tag(m.id)
+                link(m)
                     .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 12))
                     .listRowBackground(m.unread ? s.color(m).opacity(0.08) : Color.clear)
                     .swipeActions(edge: .trailing, allowsFullSwipe: false) {      // ← responder · reenviar · borrar
-                        Button { ask = (m, "del") } label: { Label("Eliminar", systemImage: "trash") }.tint(Color(red: 0.56, green: 0.17, blue: 0.17))
+                        Button { act(m, "del") } label: { Label("Eliminar", systemImage: "trash") }.tint(Color(red: 0.56, green: 0.17, blue: 0.17))
                         Button { s.composeNew(subject: "Fwd: " + m.sub, body: "\n\n---------- Reenviado ----------\nDe: \(m.from.n) <\(m.from.e)>\nAsunto: \(m.sub)\n\n" + m.snip) } label: { Label("Reenviar", systemImage: "arrowshape.turn.up.right") }.tint(Color(red: 0.34, green: 0.38, blue: 0.18))
                         Button { s.composeNew(reply: m) } label: { Label("Responder", systemImage: "arrowshape.turn.up.left") }.tint(Color(red: 0.18, green: 0.42, blue: 0.40))
                     }
                     .swipeActions(edge: .leading, allowsFullSwipe: false) {       // → me encanta · destacar · leído
-                        Button { ask = (m, "star") } label: { Label(m.star ? "Quitar" : "Destacar", systemImage: m.star ? "star.slash" : "star") }.tint(Color(red: 0.55, green: 0.42, blue: 0.26))
-                        Button { ask = (m, "read") } label: { Label(m.unread ? "Leído" : "No leído", systemImage: m.unread ? "envelope.open" : "envelope.badge") }.tint(Color(red: 0.14, green: 0.28, blue: 0.42))
+                        Button { act(m, "star") } label: { Label(m.star ? "Quitar" : "Destacar", systemImage: m.star ? "star.slash" : "star") }.tint(Color(red: 0.55, green: 0.42, blue: 0.26))
+                        Button { act(m, "read") } label: { Label(m.unread ? "Leído" : "No leído", systemImage: m.unread ? "envelope.open" : "envelope.badge") }.tint(Color(red: 0.14, green: 0.28, blue: 0.42))
                     }
                     .contextMenu {
                         Button(m.unread ? "Marcar como leído" : "Marcar como no leído") { Task { await s.setRead(m, m.unread) } }
                         Button(m.star ? "Quitar destacado" : "Destacar") { Task { await s.toggleStar(m) } }
                         Button("Responder") { s.composeNew(to: m.from.e, subject: "Re: " + m.sub, reply: m) }
                         Divider()
-                        Button("Archivar") { Task { await s.move(m, to: "archive") } }
                         Button("Spam") { Task { await s.move(m, to: "spam") } }
                         Button("Eliminar", role: .destructive) { Task { await s.move(m, to: "trash") } }
                     }
@@ -175,9 +186,7 @@ struct MailList: View {
         .confirmationDialog(ask?.1 == "del" ? "¿Eliminar este correo?" : "¿Seguro?", isPresented: Binding(get: { ask != nil }, set: { if !$0 { ask = nil } }), titleVisibility: .visible) {
             if let a = ask {
                 Button(a.1 == "del" ? "Eliminar" : a.1 == "star" ? (a.0.star ? "Quitar destacado" : "Destacar") : (a.0.unread ? "Marcar como leído" : "Marcar como no leído"), role: a.1 == "del" ? .destructive : nil) {
-                    let m = a.0, k = a.1
-                    Task { if k == "del" { await s.move(m, to: "trash") } else if k == "star" { await s.toggleStar(m) } else { await s.setRead(m, m.unread) } }
-                    ask = nil
+                    run(a.0, a.1); ask = nil
                 }
             }
             Button("Cancelar", role: .cancel) { ask = nil }
@@ -191,48 +200,91 @@ struct MailList: View {
                 }
                 #if os(macOS)
                 Button { Task { await s.refresh() } } label: { Image(systemName: "arrow.clockwise") }.help("Actualizar")
-                #endif
                 Button { s.composeNew() } label: { Image(systemName: "square.and.pencil") }.help("Nuevo correo")
+                #endif
             }
         }
     }
 
+    @ViewBuilder func link(_ m: Mail) -> some View {
+        let r = MailRow(m: m, alias: s.aliasFor(m), sent: s.folder == "sent" || s.folder == "drafts", track: s.folder == "sent" ? s.trackFor(m) : nil)
+        #if os(iOS)
+        ZStack { NavigationLink(value: m.id) { EmptyView() }.opacity(0); r }
+        #else
+        r.tag(m.id)
+        #endif
+    }
+    func act(_ m: Mail, _ k: String) { if confirmSwipe { ask = (m, k) } else { run(m, k) } }
+    func run(_ m: Mail, _ k: String) {
+        Task { if k == "del" { await s.move(m, to: "trash") } else if k == "star" { await s.toggleStar(m) } else { await s.setRead(m, m.unread) } }
+    }
+
+    /// Resumen: fecha, hora, lo que queda del mes y los números del día — compacto
     var greeting: some View {
-        let h = Calendar.current.component(.hour, from: Date())
-        let g = h < 6 ? "Buenas noches" : h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches"
-        return VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 14) {
-                SantoroAvatar(size: 58, who: "hanif")
-                VStack(alignment: .leading, spacing: 2) {
-                    Cap(Date().formatted(.dateTime.weekday(.wide).day().month(.wide)))
-                    Text("\(g), Hanif").font(Brand.f(22, .medium)).foregroundStyle(Brand.fg)
-                    Text("\(s.unread()) sin leer · \(s.waiting) esperando respuesta").font(Brand.f(13)).foregroundStyle(Brand.fg2)
-                }
-                Spacer(minLength: 0)
-            }
-            if s.aiOn {
-                Button {
-                    summarizing = true
-                    Task { summary = (try? await AIPrompts.summary((s.box["inbox"] ?? []).filter { $0.unread })) ?? "No se pudo resumir ahora."; summarizing = false }
-                } label: {
-                    HStack(spacing: 6) {
-                        if summarizing { ProgressView().controlSize(.mini) } else { Image(systemName: "sparkles") }
-                        Text("Resumen IA del día").font(Brand.f(13, .medium))
+        TimelineView(.periodic(from: .now, by: 30)) { tl in
+            let d = tl.date
+            let es = Locale(identifier: "es_ES")
+            let cal = Calendar.current
+            let h = cal.component(.hour, from: d)
+            let g = h < 6 ? "Buenas noches" : h < 14 ? "Buenos días" : h < 21 ? "Buenas tardes" : "Buenas noches"
+            let left = (cal.range(of: .day, in: .month, for: d)?.count ?? 30) - cal.component(.day, from: d)
+            let month = d.formatted(Date.FormatStyle(locale: es).month(.wide))
+            VStack(alignment: .leading, spacing: 11) {
+                HStack(alignment: .center, spacing: 11) {
+                    SantoroAvatar(size: 42, who: "hanif")
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("\(g), Hanif").font(Brand.f(17.5, .medium)).foregroundStyle(Brand.fg).lineLimit(1)
+                        Text(d.formatted(Date.FormatStyle(locale: es).weekday(.wide).day().month(.wide)).capitalized)
+                            .font(Brand.f(12)).foregroundStyle(Brand.fg3)
                     }
-                    .foregroundStyle(Brand.at).padding(.horizontal, 12).padding(.vertical, 7)
-                    .overlay(Capsule().stroke(Brand.line, lineWidth: 1))
+                    Spacer(minLength: 4)
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Text(d.formatted(Date.FormatStyle(locale: es).hour(.twoDigits(amPM: .omitted)).minute())).font(Brand.f(21, .medium)).foregroundStyle(Brand.at).monospacedDigit()
+                        Text(left == 0 ? "último día de \(month)" : "quedan \(left) días de \(month)").font(Brand.f(10.5)).foregroundStyle(Brand.fg3)
+                    }
+                }
+                HStack(spacing: 6) {
+                    stat("envelope.badge", s.unread(), "sin leer")
+                    stat("clock", s.waiting, "esperando")
+                    stat("star", s.starred, "destacados")
+                }
+                Button { withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) { showDigest.toggle() } } label: {
+                    HStack(spacing: 6) {
+                        Image(systemName: "text.badge.star")
+                        Text(showDigest ? "Ocultar resumen" : "Resumen del día").font(Brand.f(13, .medium))
+                        Spacer()
+                        Image(systemName: "chevron.down").rotationEffect(.degrees(showDigest ? 180 : 0)).font(.caption.weight(.semibold))
+                    }.foregroundStyle(Brand.at).contentShape(Rectangle())
                 }.buttonStyle(.plain)
-            }
-            if let summary {
-                Text(summary).font(Brand.f(13.5)).foregroundStyle(Brand.fg2).padding(12)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(RoundedRectangle(cornerRadius: 12).fill(Brand.wine.opacity(0.06)))
+                if showDigest {
+                    VStack(alignment: .leading, spacing: 7) {
+                        ForEach(s.digest) { l in
+                            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                                Image(systemName: l.icon).font(.system(size: 12)).foregroundStyle(Brand.at).frame(width: 16)
+                                Text(markup(l.text, size: 13)).font(Brand.f(13)).foregroundStyle(Brand.fg2).fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                    }
+                    .padding(11).frame(maxWidth: .infinity, alignment: .leading)
+                    .background(RoundedRectangle(cornerRadius: 11).fill(Brand.wine.opacity(0.05)))
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
             }
         }
-        .padding(14)
+        .padding(13)
         .background(RoundedRectangle(cornerRadius: 16).fill(Brand.card))
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Brand.line, lineWidth: 1))
-        .padding(.vertical, 6)
+        .padding(.vertical, 4)
+    }
+    func stat(_ icon: String, _ n: Int, _ l: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon).font(.system(size: 11, weight: .semibold)).foregroundStyle(n > 0 ? Brand.at : Brand.fg3)
+            Text("\(n)").font(Brand.f(14, .semibold)).foregroundStyle(n > 0 ? Brand.fg : Brand.fg3)
+            Text(l).font(Brand.f(11)).foregroundStyle(Brand.fg3).lineLimit(1).minimumScaleFactor(0.8)
+        }
+        .padding(.horizontal, 9).padding(.vertical, 6).frame(maxWidth: .infinity)
+        .background(RoundedRectangle(cornerRadius: 10).fill(Brand.bg))
+        .overlay(RoundedRectangle(cornerRadius: 10).stroke(Brand.line, lineWidth: 1))
     }
 
     var chips: some View {
@@ -320,6 +372,7 @@ struct Reader: View {
                         Text(mail.when.formatted(date: .abbreviated, time: .shortened)).font(Brand.f(11.5)).foregroundStyle(Brand.fg3)
                     }
                 }
+                ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     pill("Responder", "arrowshape.turn.up.left") { s.composeNew(to: mail.from.e, subject: re(mail.sub), reply: mail) }
                     if s.aiOn {
@@ -333,9 +386,10 @@ struct Reader: View {
                             }
                         }
                     }
-                    pill("Archivar", "archivebox") { Task { await s.move(mail, to: "archive") } }
+                    pill("Reenviar", "arrowshape.turn.up.right") { s.composeNew(subject: "Fwd: " + mail.sub, body: "\n\n---------- Reenviado ----------\nDe: \(mail.from.n) <\(mail.from.e)>\nAsunto: \(mail.sub)\n\n" + mail.snip) }
                     pill("", "trash") { Task { await s.move(mail, to: "trash") } }
                     pill("", mail.star ? "star.fill" : "star") { Task { await s.toggleStar(mail) } }
+                }
                 }
                 if let atts = detail?.atts, !atts.isEmpty {
                     ScrollView(.horizontal, showsIndicators: false) {
