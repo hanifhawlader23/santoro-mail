@@ -51,6 +51,7 @@ let FOLDERS: [(String, String, String)] = [
 
 @MainActor
 final class Store: ObservableObject {
+    static let shared = Store()
     @Published var loggedIn = API.shared.token != nil
     @Published var me: Me?
     @Published var aliases: [Alias] = []
@@ -67,8 +68,9 @@ final class Store: ObservableObject {
     @Published var activity: String? = nil        // logo animado arriba: Sincronizando… / Enviando… / Enviado
     @Published var booted = false                 // primera carga hecha (antes se ve la pantalla de inicio)
     var prefs: [String: Any] = [:]
-    private var knownInbox: Set<String> = []
-    private var knownOpens: [String: Int] = [:]
+    // lo ya visto se guarda en el teléfono: así, al despertar en segundo plano, solo avisa de lo nuevo de verdad
+    private var knownInbox: Set<String> = Set(UserDefaults.standard.stringArray(forKey: "knownInbox") ?? [])
+    private var knownOpens: [String: Int] = (UserDefaults.standard.dictionary(forKey: "knownOpens") as? [String: Int]) ?? [:]
     private var poller: Task<Void, Never>?
 
     // MARK: session
@@ -325,7 +327,7 @@ final class Store: ObservableObject {
     // MARK: notifications + badge
     private func notifyNew(inbox: [Mail], tracks t: [Track], first: Bool) {
         let ids = Set(inbox.map(\.id))
-        if !first {
+        if !knownInbox.isEmpty {
             if Pref.bool("set.notifNew") { for m in inbox where m.unread && !knownInbox.contains(m.id) { post(m.from.n, m.sub) } }
             if Pref.bool("set.notifOpen") {
                 for r in t {
@@ -335,7 +337,9 @@ final class Store: ObservableObject {
             }
         }
         knownInbox = ids
+        UserDefaults.standard.set(Array(ids), forKey: "knownInbox")
         for r in t { knownOpens[r.id] = r.realOpens.count }
+        UserDefaults.standard.set(knownOpens, forKey: "knownOpens")
     }
     private func post(_ title: String, _ body: String) {
         let c = UNMutableNotificationContent(); c.title = title; c.body = body; c.sound = .default

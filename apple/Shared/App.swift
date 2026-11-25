@@ -1,13 +1,36 @@
 import SwiftUI
+#if os(iOS)
+import BackgroundTasks
+#endif
 
 @main
 struct SantoroMailApp: App {
-    @StateObject private var store = Store()
-    init() { Brand.registerFonts() }
+    @StateObject private var store = Store.shared
+    @Environment(\.scenePhase) private var phase
+    init() {
+        Brand.registerFonts()
+        #if os(iOS)
+        // iPhone despierta la app de vez en cuando (aunque esté cerrada) para buscar correo nuevo y avisar
+        BGTaskScheduler.shared.register(forTaskWithIdentifier: BG.id, using: nil) { task in
+            BG.schedule()
+            let work = Task { @MainActor in
+                await Store.shared.refresh(first: false, quiet: true)
+                task.setTaskCompleted(success: true)
+            }
+            task.expirationHandler = { work.cancel() }
+        }
+        #endif
+    }
     var body: some Scene {
         WindowGroup {
             RootView()
                 .environmentObject(store)
+                .onChange(of: phase) { _, p in
+                    if p == .active { if store.loggedIn && store.booted { Task { await store.refresh() } } }
+                    #if os(iOS)
+                    if p == .background { BG.schedule() }
+                    #endif
+                }
                 .tint(Brand.at)
                 #if os(macOS)
                 .frame(minWidth: 900, minHeight: 600)
@@ -77,5 +100,16 @@ struct LoginView: View {
         }
     }
 }
+
+#if os(iOS)
+enum BG {
+    static let id = "com.hanifhawlader.santoromail.refresh"
+    static func schedule() {
+        let r = BGAppRefreshTaskRequest(identifier: id)
+        r.earliestBeginDate = Date(timeIntervalSinceNow: 5 * 60)
+        try? BGTaskScheduler.shared.submit(r)
+    }
+}
+#endif
 
 extension Brand { static let cream = Color(red: 0.969, green: 0.961, blue: 0.914) }
