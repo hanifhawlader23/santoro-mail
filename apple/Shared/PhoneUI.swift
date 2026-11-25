@@ -231,8 +231,6 @@ struct SideMenu: View {
                 }
                 .padding(.horizontal, 10).padding(.top, 8).padding(.bottom, 20)
             }
-            Text(s.me?.email ?? "contacto@hanifhawlader.com").font(Brand.f(11)).foregroundStyle(Brand.fg3)
-                .padding(.horizontal, 18).padding(.bottom, 12)
         }
         .frame(width: w)
         .frame(maxHeight: .infinity, alignment: .top)
@@ -261,7 +259,7 @@ struct SideMenu: View {
                         .background(Capsule().fill(on ? Brand.wine : Brand.wine.opacity(0.10)))
                 }
             }
-            .padding(.horizontal, 10).padding(.vertical, 9)
+            .padding(.horizontal, 10).padding(.vertical, 7.5)
             .background(RoundedRectangle(cornerRadius: 11).fill(on ? Brand.wine.opacity(0.10) : Color.clear))
             .contentShape(Rectangle())
         }
