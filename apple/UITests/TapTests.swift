@@ -8,9 +8,11 @@ final class TapTests: XCTestCase {
         app.launch()
         let row = app.staticTexts["Muestras de lana fría"]
         XCTAssertTrue(row.waitForExistence(timeout: 10))
-        let start = row.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-        start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: 380)), withVelocity: .slow, thenHoldForDuration: 0.1)
-        Thread.sleep(forTimeInterval: 0.6)
+        let list = app.collectionViews.firstMatch.exists ? app.collectionViews.firstMatch : app.tables.firstMatch
+        let top = list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.15))
+        top.press(forDuration: 0.1, thenDragTo: top.withOffset(CGVector(dx: 0, dy: 450)), withVelocity: .slow, thenHoldForDuration: 0.3)
+        XCTAssertTrue(app.staticTexts["Sincronizando…"].waitForExistence(timeout: 3), "tirar hacia abajo no actualiza")
+        Thread.sleep(forTimeInterval: 0.3)
         let shot = XCUIScreen.main.screenshot()
         try? shot.pngRepresentation.write(to: URL(fileURLWithPath: NSHomeDirectory().components(separatedBy: "/Library/Developer").first! + "/SantoroMail-app/shots/pull.png"))
         let a = XCTAttachment(screenshot: shot); a.lifetime = .keepAlways; add(a)
