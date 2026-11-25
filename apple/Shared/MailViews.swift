@@ -231,17 +231,17 @@ struct MailList: View {
             let month = d.formatted(Date.FormatStyle(locale: es).month(.wide))
             VStack(alignment: .leading, spacing: 11) {
                 HStack(alignment: .center, spacing: 11) {
-                    SantoroAvatar(size: 42, who: "hanif")
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text("\(g), Hanif").font(Brand.f(17.5, .medium)).foregroundStyle(Brand.fg).lineLimit(1)
-                        Text(d.formatted(Date.FormatStyle(locale: es).weekday(.wide).day().month(.wide)).capitalized)
-                            .font(Brand.f(12)).foregroundStyle(Brand.fg3)
+                    SantoroAvatar(size: 44, who: "hanif")
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("\(g), Hanif").font(Brand.f(18, .medium)).foregroundStyle(Brand.fg).lineLimit(1).minimumScaleFactor(0.8)
+                        Text(day(d, es)).font(Brand.f(12.5)).foregroundStyle(Brand.fg3).lineLimit(1)
+                        Text(left == 0 ? "Último día de \(month)" : "Quedan \(left) días de \(month)").font(Brand.f(11)).foregroundStyle(Brand.at.opacity(0.85))
                     }
                     Spacer(minLength: 4)
-                    VStack(alignment: .trailing, spacing: 0) {
-                        Text(d.formatted(Date.FormatStyle(locale: es).hour(.twoDigits(amPM: .omitted)).minute())).font(Brand.f(21, .medium)).foregroundStyle(Brand.at).monospacedDigit()
-                        Text(left == 0 ? "último día de \(month)" : "quedan \(left) días de \(month)").font(Brand.f(10.5)).foregroundStyle(Brand.fg3)
-                    }
+                    Text(d.formatted(Date.FormatStyle(locale: es).hour(.twoDigits(amPM: .omitted)).minute()))
+                        .font(Brand.f(17, .medium)).foregroundStyle(Brand.cream).monospacedDigit()
+                        .padding(.horizontal, 10).padding(.vertical, 5)
+                        .background(RoundedRectangle(cornerRadius: 10).fill(Brand.wine))
                 }
                 HStack(spacing: 6) {
                     stat("envelope.badge", s.unread(), "sin leer")
@@ -275,6 +275,10 @@ struct MailList: View {
         .background(RoundedRectangle(cornerRadius: 16).fill(Brand.card))
         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Brand.line, lineWidth: 1))
         .padding(.vertical, 4)
+    }
+    func day(_ d: Date, _ es: Locale) -> String {
+        let t = d.formatted(Date.FormatStyle(locale: es).weekday(.wide).day().month(.wide))
+        return t.prefix(1).uppercased() + t.dropFirst()
     }
     func stat(_ icon: String, _ n: Int, _ l: String) -> some View {
         HStack(spacing: 6) {

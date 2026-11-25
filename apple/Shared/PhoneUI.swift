@@ -81,10 +81,9 @@ struct MenuButton: View {
                 .overlay(RoundedRectangle(cornerRadius: 11).stroke(LinearGradient(colors: [Color.white.opacity(0.35), Color.white.opacity(0.02)], startPoint: .top, endPoint: .bottom), lineWidth: 1))
                 .shadow(color: Brand.wine.opacity(0.4), radius: 4, y: 2)
                 if n > 0 {
-                    Text(n > 99 ? "99+" : "\(n)").font(Brand.f(9.5, .semibold)).foregroundStyle(Brand.wine)
-                        .padding(.horizontal, 4).frame(minWidth: 17, minHeight: 17)
-                        .background(Capsule().fill(Brand.cream)).overlay(Capsule().stroke(Brand.wine, lineWidth: 1))
-                        .offset(x: 7, y: -6)
+                    Circle().fill(Brand.cream).frame(width: 7, height: 7)
+                        .overlay(Circle().stroke(Brand.wine, lineWidth: 1.2))
+                        .padding(5)
                 }
             }
         }
@@ -99,6 +98,18 @@ struct PhoneMain: View {
     @EnvironmentObject var s: Store
     @State private var menu = false
     @State private var path = NavigationPath()
+    init() {
+        // títulos en El Messiri, como el resto de la marca
+        let wine = UIColor(red: 91 / 255, green: 26 / 255, blue: 44 / 255, alpha: 1)
+        let ink = UIColor { $0.userInterfaceStyle == .dark ? UIColor(red: 0.86, green: 0.62, blue: 0.68, alpha: 1) : wine }
+        let a = UINavigationBarAppearance(); a.configureWithTransparentBackground()
+        if let big = UIFont(name: "ElMessiri-Medium", size: 30), let small = UIFont(name: "ElMessiri-Medium", size: 17) {
+            a.largeTitleTextAttributes = [.font: big, .foregroundColor: ink]
+            a.titleTextAttributes = [.font: small, .foregroundColor: ink]
+        }
+        UINavigationBar.appearance().standardAppearance = a
+        UINavigationBar.appearance().scrollEdgeAppearance = a
+    }
 
     var body: some View {
         ZStack(alignment: .leading) {
@@ -133,6 +144,14 @@ struct PhoneMain: View {
         .overlay(alignment: .top) { SyncPill() }
         .sheet(item: $s.compose) { d in ComposeView(draft: d).environmentObject(s) }
         .onChange(of: s.section) { _, _ in path = NavigationPath() }
+        #if DEBUG
+        .onAppear {
+            let a = ProcessInfo.processInfo.arguments
+            if a.contains("-menu") { menu = true }
+            if a.contains("-compose") { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { s.composeNew(to: "mar") } }
+            if a.contains("-settings") { s.section = .settings }
+        }
+        #endif
         .onChange(of: s.folder) { _, _ in path = NavigationPath() }
         .onChange(of: s.alias) { _, _ in path = NavigationPath() }
     }
@@ -157,7 +176,7 @@ struct ComposeFab: View {
             .shadow(color: Brand.wine.opacity(0.45), radius: 12, y: 6)
         }
         .buttonStyle(.plain)
-        .padding(.trailing, 18).padding(.bottom, 22)
+        .padding(.trailing, 18).padding(.bottom, 84)
         .transition(.scale.combined(with: .opacity))
     }
 }
