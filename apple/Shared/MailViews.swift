@@ -133,6 +133,7 @@ struct MailList: View {
     @State private var q = ""
     @State private var showDigest = false
     @State private var pull: CGFloat = 0
+    @State private var pulled = false
     @State private var ask: (Mail, String)? = nil     // se confirma antes de hacer nada
     @AppStorage("set.confirmSwipe") private var confirmSwipe = true
 
@@ -187,6 +188,15 @@ struct MailList: View {
         #if os(iOS)
         .modifier(PullTracker(pull: $pull))
         .overlay(alignment: .top) { PullLogo(pull: pull, busy: s.loading && s.activity == "Sincronizando…") }
+        .onChange(of: pull) { _, v in
+            // al tirar lo suficiente, actualiza (con un toque de vibración)
+            if v > 90 && !pulled && !s.loading {
+                pulled = true
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                Task { await s.refresh() }
+            }
+            if v < 8 { pulled = false }
+        }
         #endif
         .confirmationDialog(ask?.1 == "del" ? "¿Eliminar este correo?" : "¿Seguro?", isPresented: Binding(get: { ask != nil }, set: { if !$0 { ask = nil } }), titleVisibility: .visible) {
             if let a = ask {

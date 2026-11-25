@@ -104,6 +104,7 @@ final class Store: ObservableObject {
 
     // MARK: loading
     func refresh(first: Bool = false, quiet: Bool = false) async {
+        if loading && !first { return }          // ya se está actualizando
         loading = true
         if !quiet { activity = "Sincronizando…" }
         #if DEBUG
