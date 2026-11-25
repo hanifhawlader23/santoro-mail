@@ -98,6 +98,7 @@ struct PhoneMain: View {
     @EnvironmentObject var s: Store
     @State private var menu = false
     @State private var path = NavigationPath()
+    @State private var sel: String?
     init() {
         // títulos en El Messiri, como el resto de la marca
         let wine = UIColor(red: 91 / 255, green: 26 / 255, blue: 44 / 255, alpha: 1)
@@ -116,7 +117,7 @@ struct PhoneMain: View {
             NavigationStack(path: $path) {
                 Group {
                     switch s.section {
-                    case .mail: MailList(sel: .constant(nil))
+                    case .mail: MailList(sel: $sel)
                     case .track: TrackList()
                     case .settings: SettingsView()
                     }
@@ -162,12 +163,18 @@ struct PhoneMain: View {
         .overlay(alignment: .top) { SyncPill() }
         .sheet(item: $s.compose) { d in ComposeView(draft: d).environmentObject(s) }
         .onChange(of: s.section) { _, _ in path = NavigationPath() }
+        .onChange(of: sel) { _, id in
+            guard let id else { return }
+            path.append(id)                       // abre el correo tocado
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { sel = nil }
+        }
         #if DEBUG
         .onAppear {
             let a = ProcessInfo.processInfo.arguments
             if a.contains("-menu") { menu = true }
             if a.contains("-compose") { DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { s.composeNew(to: "mar") } }
             if a.contains("-settings") { s.section = .settings }
+            if a.contains("-open") { DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { sel = "1" } }
         }
         #endif
         .onChange(of: s.folder) { _, _ in path = NavigationPath() }

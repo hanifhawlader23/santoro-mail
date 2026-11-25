@@ -206,13 +206,11 @@ struct MailList: View {
         }
     }
 
-    @ViewBuilder func link(_ m: Mail) -> some View {
-        let r = MailRow(m: m, alias: s.aliasFor(m), sent: s.folder == "sent" || s.folder == "drafts", track: s.folder == "sent" ? s.trackFor(m) : nil)
-        #if os(iOS)
-        ZStack { NavigationLink(value: m.id) { EmptyView() }.opacity(0); r }
-        #else
-        r.tag(m.id)
-        #endif
+    func link(_ m: Mail) -> some View {
+        // al tocar, la lista marca la selección y PhoneMain/WideMain abren el correo
+        MailRow(m: m, alias: s.aliasFor(m), sent: s.folder == "sent" || s.folder == "drafts", track: s.folder == "sent" ? s.trackFor(m) : nil)
+            .contentShape(Rectangle())
+            .tag(m.id)
     }
     func act(_ m: Mail, _ k: String) { if confirmSwipe { ask = (m, k) } else { run(m, k) } }
     func run(_ m: Mail, _ k: String) {
