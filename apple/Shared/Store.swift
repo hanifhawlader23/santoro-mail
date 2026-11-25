@@ -108,7 +108,7 @@ final class Store: ObservableObject {
         if !quiet { activity = "Sincronizando…" }
         #if DEBUG
         if ProcessInfo.processInfo.arguments.contains("-preview") {
-            try? await Task.sleep(nanoseconds: 2_500_000_000); loading = false; activity = nil; return
+            try? await Task.sleep(nanoseconds: 6_000_000_000); loading = false; activity = nil; return
         }
         #endif
         defer { loading = false; booted = true; if activity == "Sincronizando…" { activity = nil } }
