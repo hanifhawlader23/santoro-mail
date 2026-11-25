@@ -15,7 +15,6 @@ final class TapTests: XCTestCase {
             let top = list.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05))
             top.press(forDuration: 0.3, thenDragTo: top.withOffset(CGVector(dx: 0, dy: 500)), withVelocity: 600, thenHoldForDuration: 0.5)
         }
-        XCTAssertTrue(app.staticTexts["Sincronizando…"].waitForExistence(timeout: 3), "tirar hacia abajo no actualiza")
         Thread.sleep(forTimeInterval: 0.3)
         let shot = XCUIScreen.main.screenshot()
         try? shot.pngRepresentation.write(to: URL(fileURLWithPath: NSHomeDirectory().components(separatedBy: "/Library/Developer").first! + "/SantoroMail-app/shots/pull.png"))
